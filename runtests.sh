@@ -1,0 +1,2 @@
+./bin/ModularIntTest
+./bin/GroupTest
