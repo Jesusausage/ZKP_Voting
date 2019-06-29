@@ -1,3 +1,2 @@
-# Ignore all files
 build/*
-bin/*
+runtests

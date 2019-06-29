@@ -9,10 +9,8 @@ template<typename T>
 class Group {
 
 public:
-    Group(int order) : _order(order) {
-	T element;
-	_identity = power(element, order - 1);
-    }
+    Group(int order, T identity)
+	: _order(order), _identity(identity) {}
     
     T power(T a, int exp) {
 	return (exp == 0) ? _identity :
@@ -28,10 +26,9 @@ public:
     T identity() { return _identity; }
     
 private:
-    T _identity;
     int _order;
+    T _identity;
 };
-
 
 
 #endif

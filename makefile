@@ -1,26 +1,24 @@
 SRC = src/Group.cpp src/ModularInt.cpp src/Schnorr.cpp
+TEST = test/Main.cpp test/GroupTest.cpp test/ModularIntTest.cpp
 OBJ = $(SRC:src/%.cpp=build/%.o)
+TESTOBJ = $(TEST:test/%.cpp=build/test/%.o)
 DEP = $(OBJ:%.o=%.d)
+TESTDEP = $(TESTOBJ:%.o=%.d)
 FLAGS = -Wall -g -c -MMD
 INC = -I include -I lib
 
-all: bin/ModularIntTest bin/GroupTest
-
-bin/ModularIntTest: $(OBJ) build/ModularIntTest.o
+runtests: $(OBJ) $(TESTOBJ)
 	g++ $^ -o $@
 
-bin/GroupTest: $(OBJ) build/GroupTest.o
-	g++ $^ -o $@
+build/test/%.o: test/%.cpp
+	g++ $(FLAGS) $(INC) $< -o $@
 
 build/%.o: src/%.cpp
 	g++ $(FLAGS) $(INC) $< -o $@
 
-build/%.o: test/%.cpp
-	g++ $(FLAGS) $(INC) $< -o $@
-
--include $(DEP)
+-include $(DEP) $(TESTDEP)
 
 clean:
-	rm -rf build/* bin/*
+	rm -rf $(OBJ) $(TESTOBJ) $(DEP) $(TESTDEP)
 
 .PHONY: clean

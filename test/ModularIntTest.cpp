@@ -1,22 +1,20 @@
-#include "ModularInt.hpp"
-#include <assert.h>
-#include <iostream>
+#include "ModularIntTest.hpp"
 
 
 void TestModularIntConstructor() {    
-    ModularInt<7> x = 9;
-    ModularInt<7> y = 2;    
+    ModularInt x(9, 7);
+    ModularInt y(2, 7);    
     assert(x == y);
         
-    ModularInt<7> a = x;
-    ModularInt<7> b = -5;    
+    ModularInt a(x);
+    ModularInt b(-5, 7);
     assert(a == b);
 }
 
 
 void TestMultiply() {       
-    ModularInt<7> x = 9;
-    ModularInt<7> y = 4;
+    ModularInt x(9, 7);
+    ModularInt y(4, 7);
     auto z = x * y;
 
     assert(z == 1);
@@ -24,22 +22,11 @@ void TestMultiply() {
 
 
 void TestAssignment() {       
-    ModularInt<7> x = 9;
+    ModularInt x(9, 7);
 
     auto y = x;
-    auto z = 2;
+    ModularInt z(2, 7);
 
     assert(y == x);
     assert(z == x);
-}
-
-
-int main() {
-    TestModularIntConstructor();
-    TestMultiply();
-    TestAssignment();
-
-    std::cout << "ModularInt test success.\n";
-
-    return 0;
 }

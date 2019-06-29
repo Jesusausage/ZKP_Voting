@@ -1,20 +1,20 @@
-#include "Group.hpp"
-#include <assert.h>
-#include <iostream>
+#include "GroupTest.hpp"
 
 
 void TestGroupConstructor() {
-    Group<ModularInt<7>> G(7);
-    auto e = G.identity();
+    ModularInt e(1, 7);
+    Group<ModularInt> G(7, e);
+    auto x = G.identity();
 
-    assert(e == 1);
-    assert(e == ModularInt<7>(1));
+    assert(x == 1);
+    assert(x == ModularInt(1, 7));
 }
 
 
 void TestPower() {
-    Group<ModularInt<7>> G(7);
-    ModularInt<7> x = 2;
+    ModularInt e(1, 7);
+    Group<ModularInt> G(7, e);
+    ModularInt x(2, 7);
     auto y = G.power(x, 3);
 
     assert(y == 1);
@@ -22,20 +22,10 @@ void TestPower() {
 
 
 void TestInverse() {
-    Group<ModularInt<7>> G(7);
-    ModularInt<7> x = 2;
-    auto y = G.inverse(x);
+    ModularInt e(1, 7);
+    Group<ModularInt> G(7, e);
+    ModularInt x(2, 7);
+    ModularInt y = G.inverse(x);
 
     assert(y == 4);
-}
-
-
-int main() {
-    TestGroupConstructor();
-    TestPower();
-    TestInverse();
-
-    std::cout << "Group test success.\n";
-
-    return 0;
 }
