@@ -1,5 +1,5 @@
 SRC = src/Group.cpp src/ModularInt.cpp src/Schnorr.cpp
-TEST = test/Main.cpp test/GroupTest.cpp test/ModularIntTest.cpp
+TEST = test/Main.cpp test/GroupTest.cpp test/ModularIntTest.cpp test/SchnorrTest.cpp
 OBJ = $(SRC:src/%.cpp=build/%.o)
 TESTOBJ = $(TEST:test/%.cpp=build/test/%.o)
 DEP = $(OBJ:%.o=%.d)

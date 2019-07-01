@@ -1,9 +1,9 @@
 #include "Schnorr.hpp"
 
 
-long long int GetPrime() {
+int GetPrime() {
     srand(time(NULL));
-    long long int p = (rand() % 9000000 + 1000000) * 10 + 1;
+    int p = (rand() % 900 + 100) * 10 + 1;
     while (!TestPrime(p)) {
 	p += 2;
     }
@@ -12,12 +12,24 @@ long long int GetPrime() {
 }
 
 
-bool TestPrime(long long int p) {
+bool TestPrime(int p) {
     double ceil = sqrt(p);
+    
     int divisor = 3;
     while (divisor <= ceil) {
 	if (p % divisor == 0) return false;
 	divisor += 2;
     }
     return true;
+}
+
+
+int GenerateChallenge(int order) {
+    srand(time(NULL));
+    return (rand() % (order - 1)) + 1;
+}
+
+
+int GenerateResponse(int r, int challenge, int witness) {
+    return r + witness * challenge;
 }

@@ -9,25 +9,54 @@ template<typename T>
 class Group {
 
 public:
-    Group(int order, T identity)
-	: _order(order), _identity(identity) {}
+    Group(T generator, int modulus) {
+	_generator = generator;
+	_order = modulus - 1;
+	_identity = positivePower(generator, _order);
+    }
+
+    T newElement(int exp = 1) {
+	return power(_generator, exp);
+    }
     
     T power(T a, int exp) {
-	return (exp == 0) ? _identity :
-	    (exp == 1) ? a :
-	    (exp % 2 == 0) ? power(a * a, exp/2) :
-	    a * power(a * a, (exp - 1)/2);
+	if (exp > 0) {
+	    return positivePower(a, exp);
+	} else {
+	    return power(a, _order + exp);
+	}
     }
 
     T inverse(T a) {
-	return power(a, _order - 2);
+	return power(a, _order - 1);
     }
 
-    T identity() { return _identity; }
+    T identity() {
+	return _identity;
+    }
+
+    T generator() {
+	return _generator;
+    }
+
+    int order() {
+	return _order;
+    }
     
 private:
+    T _generator;
     int _order;
     T _identity;
+
+    T positivePower(T a, int exp) {
+	if (exp == 1) {
+	    return a;
+	} else if (exp % 2 == 0) {
+	    return power(a * a, exp/2);
+	} else {
+	    return a * power(a * a, (exp - 1)/2);
+	}
+    }
 };
 
 

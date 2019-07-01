@@ -1,5 +1,6 @@
 #include "GroupTest.hpp"
 #include "ModularIntTest.hpp"
+#include "SchnorrTest.hpp"
 
 
 int main() {
@@ -12,6 +13,12 @@ int main() {
     TestPower();
     TestInverse();
     std::cout << "Group test success.\n";
+
+    TestGetPrime();
+    TestGetGroup();
+    TestGenerateCommitment();
+    TestVerification();
+    std::cout << "Schnorr test success.\n";
     
     return 0;
 }
