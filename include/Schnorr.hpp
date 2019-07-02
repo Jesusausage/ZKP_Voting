@@ -1,5 +1,5 @@
-#ifndef SCHNORR_H
-#define SCHNORR_H
+#ifndef SCHNORR_HPP
+#define SCHNORR_HPP
 
 
 #include "SigmaUtils.hpp"

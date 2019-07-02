@@ -1,5 +1,5 @@
-#ifndef MODULARINT_H
-#define MODULARINT_H
+#ifndef MODULARINT_HPP
+#define MODULARINT_HPP
 
 
 #include <iostream>

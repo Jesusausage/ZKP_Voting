@@ -1,5 +1,5 @@
-#ifndef GROUP_H
-#define GROUP_H
+#ifndef GROUP_HPP
+#define GROUP_HPP
 
 
 #include "ModularInt.hpp"

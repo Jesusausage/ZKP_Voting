@@ -1,5 +1,5 @@
-#ifndef ELGAMALTEST_H
-#define ELGAMALTEST_H
+#ifndef ELGAMALTEST_HPP
+#define ELGAMALTEST_HPP
 
 
 #include "Elgamal.hpp"

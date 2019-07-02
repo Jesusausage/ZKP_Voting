@@ -1,5 +1,5 @@
-#ifndef MODULARINTTEST_H
-#define MODULARINTTEST_H
+#ifndef MODULARINTTEST_HPP
+#define MODULARINTTEST_HPP
 
 
 #include "ModularInt.hpp"

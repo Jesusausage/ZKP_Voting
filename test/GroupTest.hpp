@@ -1,5 +1,5 @@
-#ifndef GROUPTEST_H
-#define GROUPTEST_H
+#ifndef GROUPTEST_HPP
+#define GROUPTEST_HPP
 
 
 #include "Group.hpp"
