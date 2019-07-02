@@ -1,6 +1,7 @@
 #include "GroupTest.hpp"
 #include "ModularIntTest.hpp"
 #include "SchnorrTest.hpp"
+#include "ElgamalTest.hpp"
 
 
 int main() {
@@ -20,6 +21,11 @@ int main() {
     TestVerification();
     TestSimulation();
     std::cout << "Schnorr test success.\n";
+
+    TestGenerateElgamalCommitment();
+    TestElgamalVerification();
+    TestElgamalSimulation();
+    std::cout << "Elgamal test success.\n";
     
     return 0;
 }
