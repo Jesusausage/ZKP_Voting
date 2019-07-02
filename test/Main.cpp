@@ -30,5 +30,6 @@ int main() {
     TestElgamalSimulation();
     std::cout << "Elgamal test success.\n";
     
+	while (!std::cin.get())
     return 0;
 }

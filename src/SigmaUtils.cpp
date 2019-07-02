@@ -2,7 +2,7 @@
 
 
 int GetPrime() {
-    srand(time(NULL));
+    srand(static_cast<long int>(time(nullptr)));
     int p = (rand() % 900 + 100) * 10 + 1;
     while (!TestPrime(p) || !TestPrime((p - 1) / 2)) {
 	p += 2;
@@ -30,7 +30,7 @@ bool TestPrime(int p) {
 
 
 int GenerateChallenge(int order) {
-    srand(time(NULL));
+	srand(static_cast<long int>(time(nullptr)));
     return (rand() % (order - 1)) + 1;
 }
 

@@ -8,7 +8,7 @@
 template<typename T>
 T GenerateCommitment(Group<T> G, int& r) {
     int range = G.order() - 2;
-    srand(time(NULL));
+	srand(static_cast<long int>(time(nullptr)));
     r = (rand() % range) + 2;
     
     return G.newElement(r);    

@@ -9,7 +9,7 @@
 template<typename T>
 std::pair<T, T> GenerateCommitment(Group<T> G, int& u, T g ,T h) {
     int range = G.order() - 2;
-    srand(time(NULL));
+	srand(static_cast<long int>(time(nullptr)));
     u = (rand() % range) + 2;
 
     T r1 = G.power(g, u);

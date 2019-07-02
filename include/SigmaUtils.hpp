@@ -16,7 +16,7 @@ template<typename T>
 Group<T> GetGroup() {
     int p = GetPrime();
 
-    srand(time(NULL));
+	srand(static_cast<long int>(time(nullptr)));
     int g_val = (rand() % (p - 2)) + 2;
     ModularInt g(g_val, p);
     
