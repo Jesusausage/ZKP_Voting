@@ -1,5 +1,5 @@
-#ifndef SCHNORRTEST_H
-#define SCHNORRTEST_H
+#ifndef SCHNORRTEST_HPP
+#define SCHNORRTEST_HPP
 
 
 #include "Schnorr.hpp"
@@ -7,11 +7,9 @@
 #include <iostream>
 
 
-void TestGetPrime();
-void TestGetGroup();
-void TestGenerateCommitment();
 void TestVerification();
 void TestSimulation();
+void TestGenerateCommitment();
 
 
 #endif

@@ -1,5 +1,6 @@
 #include "GroupTest.hpp"
 #include "ModularIntTest.hpp"
+#include "SigmaUtilsTest.hpp"
 #include "SchnorrTest.hpp"
 #include "ElgamalTest.hpp"
 
@@ -17,6 +18,8 @@ int main() {
 
     TestGetPrime();
     TestGetGroup();
+    std::cout << "SigmaUtils test success.\n";
+    
     TestGenerateCommitment();
     TestVerification();
     TestSimulation();
