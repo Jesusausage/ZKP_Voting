@@ -43,4 +43,15 @@ bool VerifyResponse(Group<T> G, T public_key,
     return (result == commitment);
 }
 
+template<typename T>
+T GenerateSimulation(Group<T> G, T public_key,
+			int challenge, int response) {
+    T response_element = G.newElement(response);
+    T challenge_element = G.power(public_key, -challenge);
+    T commitment = response_element * challenge_element;
+
+    return commitment;    
+}
+
+
 #endif

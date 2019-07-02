@@ -18,6 +18,7 @@ int main() {
     TestGetGroup();
     TestGenerateCommitment();
     TestVerification();
+    TestSimulation();
     std::cout << "Schnorr test success.\n";
     
     return 0;

@@ -59,3 +59,21 @@ void TestVerification() {
 
     assert(accept == true);
 }
+
+
+void TestSimulation() {
+Group<ModularInt> G = GetGroup<ModularInt>();    
+    auto public_key = G.newElement(69);
+
+    // Peggy
+    int r = 0;
+    auto commitment = GenerateCommitment<ModularInt>(G, r);
+
+    // Victor
+    int challenge = GenerateChallenge(G.order());
+    int response = GenerateResponse(r, challenge, 69);
+
+    ModularInt u = GenerateSimulation(G, public_key, challenge, response);
+
+    assert(u == commitment);
+}

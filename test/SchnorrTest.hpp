@@ -11,6 +11,7 @@ void TestGetPrime();
 void TestGetGroup();
 void TestGenerateCommitment();
 void TestVerification();
+void TestSimulation();
 
 
 #endif
