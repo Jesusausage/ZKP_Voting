@@ -31,8 +31,6 @@ bool VerifyResponse(Group<T> G, std::pair<T, T> public_key, T g, T h,
     return (r1 == commitment.first) && (r2 == commitment.second);
 }
 
-#endif
-
 
 template<typename T>
 std::pair<T, T> GenerateSimulation(Group<T> G, std::pair<T, T> public_key,
@@ -43,3 +41,6 @@ std::pair<T, T> GenerateSimulation(Group<T> G, std::pair<T, T> public_key,
     std::pair<T, T> commitment(r1, r2);
     return commitment;
 }
+
+
+#endif
