@@ -8,6 +8,12 @@ void TestGetPrime() {
     for (int i = 2; i < ceil; i++) {
         assert(p % i != 0);
     }
+ 
+    int q = (p - 1) / 2;
+    ceil = sqrt(q);
+    for (int i = 2; i < ceil; i++) {
+        assert(q % i != 0);
+    }
 }
 
 
