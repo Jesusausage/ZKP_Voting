@@ -3,6 +3,7 @@
 #include "SigmaUtilsTest.hpp"
 #include "SchnorrTest.hpp"
 #include "ElgamalTest.hpp"
+#include "SchnorrProtocolTest.hpp"
 
 
 int main() {
@@ -29,6 +30,10 @@ int main() {
     TestElgamalVerification();
     TestElgamalSimulation();
     std::cout << "Elgamal test success.\n";
+
+    TestNormalSchnorrRun();
+    TestSimulatedSchnorrRun();
+    std::cout << "SchnorrProtocol test success.\n";
     
 	while (!std::cin.get())
     return 0;
