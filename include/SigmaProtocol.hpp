@@ -7,16 +7,18 @@
 
 class SigmaProtocol {
 public:
-    SigmaProtocol(Group<ModularInt> group) : G(group)
-    {}
     virtual void generateCommitment() = 0;
-    virtual void generateChallenge(int e = 0) = 0;
+    virtual void generateChallenge(int* e = nullptr) = 0;
     virtual bool generateResponse() = 0;
     virtual bool verify() = 0;
     virtual bool generateSimulation() = 0;
+    
+    virtual int challengeSize() = 0;
+
+    int challenge() { return _e; }
 
 protected:
-    Group<ModularInt> G;
+    int _e = 0;
 };
 
 

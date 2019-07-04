@@ -4,6 +4,7 @@
 #include "SchnorrTest.hpp"
 #include "ElgamalTest.hpp"
 #include "SchnorrProtocolTest.hpp"
+#include "OrProtocolTest.hpp"
 
 
 int main() {
@@ -35,6 +36,10 @@ int main() {
     TestSimulatedSchnorrRun();
     std::cout << "SchnorrProtocol test success.\n";
     
+    TestNormalOrRun();
+    TestSimulatedOrRun();
+    std::cout << "OrProtocol test success.\n";
+
 	while (!std::cin.get())
     return 0;
 }

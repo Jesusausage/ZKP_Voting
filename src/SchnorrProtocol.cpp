@@ -6,7 +6,7 @@ SchnorrProtocol::SchnorrProtocol(Group<ModularInt> group,
                                  ModularInt public_key, 
                                  int witness)
                                  : 
-                                 SigmaProtocol(group), 
+                                 G(group), 
                                  _g(generator), 
                                  _pub_key(public_key), 
                                  _w(witness) 
@@ -19,7 +19,7 @@ SchnorrProtocol::SchnorrProtocol(Group<ModularInt> group,
                                  ModularInt generator, 
                                  ModularInt public_key)
                                  :
-                                 SigmaProtocol(group),
+                                 G(group),
                                  _g(generator),
                                  _pub_key(public_key)
 {
@@ -36,10 +36,10 @@ void SchnorrProtocol::generateCommitment()
 }
 
 
-void SchnorrProtocol::generateChallenge(int e /*= 0*/)
+void SchnorrProtocol::generateChallenge(int* e /*= nullptr*/)
 {
     if (e) {
-        _e = e;
+        _e = *e;
     }
     else {
         _e = (rand() % (G.order() - 1)) + 1;

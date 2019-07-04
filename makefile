@@ -1,5 +1,5 @@
-SRC = src/Group.cpp src/ModularInt.cpp src/Schnorr.cpp src/SigmaUtils.cpp src/Elgamal.cpp src/SchnorrProtocol.cpp
-TEST = test/Main.cpp test/GroupTest.cpp test/ModularIntTest.cpp test/SchnorrTest.cpp test/SigmaUtilsTest.cpp test/ElgamalTest.cpp test/SchnorrProtocolTest.cpp
+SRC = src/Group.cpp src/ModularInt.cpp src/Schnorr.cpp src/SigmaUtils.cpp src/Elgamal.cpp src/SchnorrProtocol.cpp src/OrProtocol.cpp
+TEST = test/Main.cpp test/GroupTest.cpp test/ModularIntTest.cpp test/SchnorrTest.cpp test/SigmaUtilsTest.cpp test/ElgamalTest.cpp test/SchnorrProtocolTest.cpp test/OrProtocolTest.cpp
 OBJ = $(SRC:src/%.cpp=build/%.o)
 TESTOBJ = $(TEST:test/%.cpp=build/test/%.o)
 DEP = $(OBJ:%.o=%.d)
