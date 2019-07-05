@@ -7,7 +7,6 @@
 
 template<typename T>
 class Group {
-
 public:
     Group(T generator, int modulus) {
 	_generator = generator;
@@ -16,7 +15,7 @@ public:
     }
 
     T newElement(int exp = 1) {
-	return power(_generator, exp);
+		return power(_generator, exp);
     }
     
     T power(T a, int exp) {

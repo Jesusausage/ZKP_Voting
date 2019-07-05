@@ -6,6 +6,9 @@
 #include "SchnorrProtocolTest.hpp"
 #include "OrProtocolTest.hpp"
 
+#include <boost/asio.hpp>
+#include <ecp.h>
+
 
 int main() {
     TestModularIntConstructor();
