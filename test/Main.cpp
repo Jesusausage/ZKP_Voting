@@ -5,6 +5,7 @@
 #include "ElgamalTest.hpp"
 #include "SchnorrProtocolTest.hpp"
 #include "OrProtocolTest.hpp"
+#include "ECGroupTest.hpp"
 
 #include <boost/asio.hpp>
 #include <ecp.h>
@@ -42,6 +43,9 @@ int main() {
     TestNormalOrRun();
     TestSimulatedOrRun();
     std::cout << "OrProtocol test success.\n";
+
+    TestECGroupAddition();
+    std::cout << "ECGroup test success.\n";
 
 	while (!std::cin.get())
     return 0;

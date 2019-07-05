@@ -18,9 +18,11 @@ public:
         CryptoPP::Integer a = CryptoPP::Integer::Zero();
         CryptoPP::Integer b(7);
 
-        curve = CryptoPP::ECP(p, a, b);
+        _curve = CryptoPP::ECP(p, a, b);
 
-        base = newElement("0479BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8");
+        CryptoPP::Integer base_x("55066263022277343669578718895168534326250603453777594175500187360389116729240");
+        CryptoPP::Integer base_y("32670510020758816978083085130507043184471273380659243275938904335757337482424");
+        _base = CryptoPP::ECPPoint(base_x, base_y);
     }
 
     CryptoPP::ECPPoint newElement(std::string hex_string)
@@ -33,16 +35,32 @@ public:
         decoder.Get((CryptoPP::byte*)&decoded[0], decoded.size());
 
         CryptoPP::ECPPoint point;
-        curve.DecodePoint(point, (CryptoPP::byte*)decoded.data(), decoded.size());       
+        _curve.DecodePoint(point, (CryptoPP::byte*)decoded.data(), decoded.size());       
     }
 
-    CryptoPP::ECPPoint newElement(CryptoPP::Integer exp = 1) {
-        return curve.ScalarMultiply(base, exp);
+    CryptoPP::ECPPoint newElement(CryptoPP::Integer x, CryptoPP::Integer y)
+    {
+        return CryptoPP::ECPPoint(x, y);
+    }
+
+    CryptoPP::ECPPoint newElement(const CryptoPP::Integer& exp = 1) 
+    {
+        return _curve.ScalarMultiply(_base, exp);
+    }
+
+    CryptoPP::ECPPoint add(const CryptoPP::ECPPoint& x, const CryptoPP::ECPPoint& y)
+    {
+        return _curve.Add(x, y);
+    }
+
+    CryptoPP::ECPPoint base()
+    {
+        return _base;
     }
 
 private:
-    CryptoPP::ECP curve;
-    CryptoPP::ECPPoint base;
+    CryptoPP::ECP _curve;
+    CryptoPP::ECPPoint _base;
 };
 
 
