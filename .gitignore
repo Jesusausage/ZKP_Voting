@@ -3,3 +3,4 @@ runtests
 lib/*
 ZKP*
 Debug/*
+*.json
