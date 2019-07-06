@@ -45,6 +45,7 @@ int main() {
     std::cout << "OrProtocol test success.\n";
 
     TestECGroupAddition();
+    TestDecodePoint();
     std::cout << "ECGroup test success.\n";
 
 	while (!std::cin.get())
