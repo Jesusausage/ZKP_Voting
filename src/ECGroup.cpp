@@ -51,60 +51,60 @@ std::string CompressPoint(const CryptoPP::ECPPoint& point,
 }
 
 
-// CryptoPP::ECPPoint DecompressPoint(const std::string& compressed,
-//                                    const CryptoPP::ECP& curve)
-// {
-//     CryptoPP::Integer y(compressed[0]);
-//     CryptoPP::Integer x(compressed.substr(1).c_str());
+CryptoPP::ECPPoint DecompressPoint(const std::string& compressed,
+                                   const CryptoPP::ECP& curve)
+{
+    CryptoPP::Integer y(compressed[0]);
+    CryptoPP::Integer x(compressed.substr(1).c_str());
 
-//     CryptoPP::ModularArithmetic field = curve.GetField();
-//     auto alpha1 = field.Multiply(x, field.Square(x));
-//     auto alpha2 = field.Multiply(x, CURVE_A);
-//     auto alpha = field.Add(alpha1, field.Add(alpha2, CURVE_B));
-// }
+    CryptoPP::ModularArithmetic field = curve.GetField();
+    auto alpha1 = field.Multiply(x, field.Square(x));
+    auto alpha2 = field.Multiply(x, CURVE_A);
+    auto alpha = field.Add(alpha1, field.Add(alpha2, CURVE_B));
+}
 
 
-// long pow_mod(long x, long n, long p) {
-//   if (n == 0) return 1;
-//   if (n & 1)
-//     return (pow_mod(x, n-1, p) * x) % p;
-//   x = pow_mod(x, n/2, p);
-//   return (x * x) % p;
-// }
+/* Takes as input an odd prime p and n < p and returns r
+ * such that r * r = n [mod p]. */
+CryptoPP::Integer tonelli_shanks(CryptoPP::Integer n, CryptoPP::Integer p) 
+{
+    CryptoPP::Integer s = 0;
+    CryptoPP::Integer q = p - 1;
+    while ((q & 1) == 0)
+        q /= 2;
+        s++;
+    if (s == 1) {
+        CryptoPP::Integer r = a_exp_b_mod_c(n, (p + 1)/4, p);
+        if ((r * r) % p == n) 
+            return r;
+        return 0;
+    }
 
-// /* Takes as input an odd prime p and n < p and returns r
-//  * such that r * r = n [mod p]. */
-// long tonelli_shanks(long n, long p) {
-//   long s = 0;
-//   long q = p - 1;
-//   while ((q & 1) == 0) { q /= 2; ++s; }
-//   if (s == 1) {
-//     long r = pow_mod(n, (p+1)/4, p);
-//     if ((r * r) % p == n) return r;
-//     return 0;
-//   }
-//   // Find the first quadratic non-residue z by brute-force search
-//   long z = 1;
-//   while (pow_mod(++z, (p-1)/2, p) != p - 1);
-//   long c = pow_mod(z, q, p);
-//   long r = pow_mod(n, (q+1)/2, p);
-//   long t = pow_mod(n, q, p);
-//   long m = s;
-//   while (t != 1) {
-//     long tt = t;
-//     long i = 0;
-//     while (tt != 1) {
-//       tt = (tt * tt) % p;
-//       ++i;
-//       if (i == m) return 0;
-//     }
-//     long b = pow_mod(c, pow_mod(2, m-i-1, p-1), p);
-//     long b2 = (b * b) % p;
-//     r = (r * b) % p;
-//     t = (t * b2) % p;
-//     c = b2;
-//     m = i;
-//   }
-//   if ((r * r) % p == n) return r;
-//   return 0;
-// }
+    // Find the first quadratic non-residue z by brute-force search
+    CryptoPP::Integer z = 1;
+    while (a_exp_b_mod_c(++z, (p - 1)/2, p) != p - 1);
+    CryptoPP::Integer c = a_exp_b_mod_c(z, q, p);
+    CryptoPP::Integer r = a_exp_b_mod_c(n, (q + 1)/2, p);
+    CryptoPP::Integer t = a_exp_b_mod_c(n, q, p);
+    CryptoPP::Integer m = s;
+    while (t != 1) {
+        CryptoPP::Integer tt = t;
+        CryptoPP::Integer i = 0;
+        while (tt != 1) {
+            tt = (tt * tt) % p;
+            i++;
+            if (i == m) 
+                return 0;
+        }
+        CryptoPP::Integer b = a_exp_b_mod_c(c, a_exp_b_mod_c(2, m-i-1, p-1), p);
+        CryptoPP::Integer b2 = (b * b) % p;
+        r = (r * b) % p;
+        t = (t * b2) % p;
+        c = b2;
+        m = i;  
+    }
+    if ((r * r) % p == n) 
+        return r;
+
+    return 0;
+}
