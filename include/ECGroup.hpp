@@ -5,6 +5,8 @@
 #include <integer.h>
 #include <ecp.h>
 #include <hex.h>
+#include <randpool.h>
+#include <osrng.h>
 
 
 struct CompPoint {
@@ -24,7 +26,11 @@ CompPoint CompressPoint(const CryptoPP::ECPPoint& point,
 CryptoPP::ECPPoint DecompressPoint(const CompPoint& compressed,
                                    const CryptoPP::ECP& curve);
 
-CryptoPP::Integer TonelliShanks(CryptoPP::Integer n, CryptoPP::Integer p);                         
+CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a, 
+                                const CryptoPP::Integer& p);    
+
+CryptoPP::ECPPoint RandomPoint(const CryptoPP::ECP& curve, 
+                               const CryptoPP::ECPPoint& base);                    
 
 
 #endif

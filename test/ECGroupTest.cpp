@@ -41,3 +41,16 @@ void TestPointCompression()
 
     assert(p == base);
 }
+
+
+void TestRandomPoint()
+{
+    CryptoPP::ECP curve;
+    CryptoPP::ECPPoint base;
+    GenerateECGroup(curve, base);
+
+    auto p = RandomPoint(curve, base);
+    auto q = RandomPoint(curve, base);
+    assert(p.x != q.x);
+    assert(p.y != q.y);
+}

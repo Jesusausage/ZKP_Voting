@@ -39,7 +39,6 @@ CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string,
 }
 
 
-
 CompPoint CompressPoint(const CryptoPP::ECPPoint& point, 
                           const CryptoPP::ECP& curve)
 {
@@ -69,7 +68,8 @@ CryptoPP::ECPPoint DecompressPoint(const CompPoint& compressed,
 }
 
 
-CryptoPP::Integer TonelliShanks(CryptoPP::Integer a, CryptoPP::Integer p) 
+CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a, 
+                                const CryptoPP::Integer& p) 
 {
     CryptoPP::Integer s = 0;
     CryptoPP::Integer q = p - 1;
@@ -107,4 +107,20 @@ CryptoPP::Integer TonelliShanks(CryptoPP::Integer a, CryptoPP::Integer p)
         return r;
 
     return 0;
+}
+
+
+CryptoPP::ECPPoint RandomPoint(const CryptoPP::ECP& curve, 
+                               const CryptoPP::ECPPoint& base)
+{
+    CryptoPP::byte block[32];
+    CryptoPP::OS_GenerateRandomBlock(false, block, 32);
+    CryptoPP::RandomPool rng;
+    rng.IncorporateEntropy(block, 32);    
+
+    auto k = CryptoPP::Integer(rng, 
+                               CryptoPP::Integer::Two(), 
+                               curve.FieldSize() - 1);
+
+    return curve.Multiply(k, base);
 }

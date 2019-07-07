@@ -10,6 +10,7 @@
 void TestECGroupAddition();
 void TestDecodePoint();
 void TestPointCompression();
+void TestRandomPoint();
 
 
 #endif

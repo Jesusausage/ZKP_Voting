@@ -47,6 +47,7 @@ int main() {
     TestECGroupAddition();
     TestDecodePoint();
     TestPointCompression();
+    TestRandomPoint();
     std::cout << "ECGroup test success." << std::endl;
 
 	while (!std::cin.get())
