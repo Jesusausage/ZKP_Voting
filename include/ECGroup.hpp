@@ -8,8 +8,10 @@
 #include <randpool.h>
 #include <osrng.h>
 
+#include <iostream>
 
-struct CompPoint {
+
+struct CompressedPoint {
     CryptoPP::Integer x;
     bool y;
 };
@@ -20,17 +22,16 @@ void GenerateECGroup(CryptoPP::ECP& curve, CryptoPP::ECPPoint& base);
 CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string, 
                                    const CryptoPP::ECP& curve);
 
-CompPoint CompressPoint(const CryptoPP::ECPPoint& point, 
+CompressedPoint CompressPoint(const CryptoPP::ECPPoint& point, 
                           const CryptoPP::ECP& curve);
 
-CryptoPP::ECPPoint DecompressPoint(const CompPoint& compressed,
+CryptoPP::ECPPoint DecompressPoint(const CompressedPoint& compressed,
                                    const CryptoPP::ECP& curve);
 
 CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a, 
                                 const CryptoPP::Integer& p);    
 
-CryptoPP::ECPPoint RandomPoint(const CryptoPP::ECP& curve, 
-                               const CryptoPP::ECPPoint& base);                    
+CryptoPP::Integer RandomCoeff(const CryptoPP::ECP& curve);                    
 
 
 #endif

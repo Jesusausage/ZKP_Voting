@@ -30,27 +30,41 @@ void TestDecodePoint()
 }
 
 
-void TestPointCompression()
-{
-    CryptoPP::ECP curve;
-    CryptoPP::ECPPoint base;
-    GenerateECGroup(curve, base);
-
-    auto p_comp = CompressPoint(base, curve);
-    auto p = DecompressPoint(p_comp, curve);
-
-    assert(p == base);
-}
-
-
 void TestRandomPoint()
 {
     CryptoPP::ECP curve;
     CryptoPP::ECPPoint base;
     GenerateECGroup(curve, base);
 
-    auto p = RandomPoint(curve, base);
-    auto q = RandomPoint(curve, base);
-    assert(p.x != q.x);
-    assert(p.y != q.y);
+    auto p = RandomCoeff(curve);
+    auto q = RandomCoeff(curve);
+    assert(p != q);
+
+    auto P = curve.Multiply(p, base);
+    auto Q = curve.Multiply(q, base);
+    assert(P.x != Q.x);
+    assert(P.y != Q.y);
+}
+
+
+void TestPointCompression()
+{
+    CryptoPP::ECP curve;
+    CryptoPP::ECPPoint base;
+    GenerateECGroup(curve, base);
+
+    CryptoPP::Integer p;
+    CryptoPP::ECPPoint P;
+    CompressedPoint P_comp;
+    CryptoPP::ECPPoint P_decomp;
+
+    for (int i = 0; i < 80; i++) {
+        p = RandomCoeff(curve);
+        P = curve.Multiply(p, base);
+
+        P_comp = CompressPoint(P, curve);
+        P_decomp = DecompressPoint(P_comp, curve);
+
+        assert(P == P_decomp);
+    }
 }

@@ -27,9 +27,9 @@ CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string,
     decoder.MessageEnd();
 
     std::string decoded;
-    CryptoPP::word64 size = decoder.MaxRetrievable();
+    auto size = decoder.MaxRetrievable();
     if (size && size <= SIZE_MAX) {
-        decoded.resize(size);		
+        decoded.resize((size_t)size);	
         decoder.Get((CryptoPP::byte*)&decoded[0], decoded.size());
     }
 
@@ -39,10 +39,10 @@ CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string,
 }
 
 
-CompPoint CompressPoint(const CryptoPP::ECPPoint& point, 
+CompressedPoint CompressPoint(const CryptoPP::ECPPoint& point, 
                           const CryptoPP::ECP& curve)
 {
-    CompPoint compressed;
+    CompressedPoint compressed;
 
     compressed.y = (point.y.IsOdd()) ? 1 : 0;
     compressed.x = point.x;
@@ -51,7 +51,7 @@ CompPoint CompressPoint(const CryptoPP::ECPPoint& point,
 }
 
 
-CryptoPP::ECPPoint DecompressPoint(const CompPoint& compressed,
+CryptoPP::ECPPoint DecompressPoint(const CompressedPoint& compressed,
                                    const CryptoPP::ECP& curve)
 {
     CryptoPP::Integer x = compressed.x;
@@ -61,9 +61,11 @@ CryptoPP::ECPPoint DecompressPoint(const CompPoint& compressed,
     auto alpha2 = field.Multiply(x, CURVE_A);
     auto alpha = field.Add(alpha1, field.Add(alpha2, CURVE_B));
 
-    auto beta = TonelliShanks(alpha, field.GetModulus());
-    if (beta.IsOdd() != compressed.y)
-        beta.Negate();
+    auto p = field.GetModulus();
+    auto beta = TonelliShanks(alpha, p);
+
+    if (beta.IsOdd() != compressed.y)        
+        return CryptoPP::ECPPoint(x, p - beta);
     return CryptoPP::ECPPoint(x, beta);
 }
 
@@ -77,6 +79,8 @@ CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a,
         s += 1;
         q /= 2;
     }
+    if (s == 1)
+        return a_exp_b_mod_c(a, (p + 1)/4, p);
 
     CryptoPP::Integer z = 1;
     while (a_exp_b_mod_c(z, (p - 1)/2, p) != p - 1)
@@ -90,10 +94,10 @@ CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a,
         CryptoPP::Integer i = 1;
         while (a_exp_b_mod_c(t, 2*i, p) != 1) {
             i++;
-            if (i == m)
-                return 0;            
+            if (i == m) {
+                return 0;
+            }            
         }
-
         CryptoPP::Integer b = a_exp_b_mod_c(c, 
                                             a_exp_b_mod_c(2, m - i - 1, p - 1), 
                                             p);
@@ -102,25 +106,19 @@ CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a,
         t = a_times_b_mod_c(t, c, p);
         r = a_times_b_mod_c(r, b, p);
     }
-
-    if (a_times_b_mod_c(r, r, p) == a) 
-        return r;
-
-    return 0;
+    
+    return r;
 }
 
 
-CryptoPP::ECPPoint RandomPoint(const CryptoPP::ECP& curve, 
-                               const CryptoPP::ECPPoint& base)
+CryptoPP::Integer RandomCoeff(const CryptoPP::ECP& curve)
 {
     CryptoPP::byte block[32];
     CryptoPP::OS_GenerateRandomBlock(false, block, 32);
     CryptoPP::RandomPool rng;
     rng.IncorporateEntropy(block, 32);    
 
-    auto k = CryptoPP::Integer(rng, 
-                               CryptoPP::Integer::Two(), 
-                               curve.FieldSize() - 1);
-
-    return curve.Multiply(k, base);
+    return CryptoPP::Integer(rng, 
+                             CryptoPP::Integer::Two(), 
+                             curve.FieldSize() - 1);
 }
