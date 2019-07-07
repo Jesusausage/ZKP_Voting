@@ -7,7 +7,7 @@
 #include "OrProtocolTest.hpp"
 #include "ECGroupTest.hpp"
 
-#include <boost/asio.hpp>
+//#include <boost/asio.hpp>
 #include <ecp.h>
 
 
@@ -15,38 +15,39 @@ int main() {
     TestModularIntConstructor();
     TestMultiply();
     TestAssignment();
-    std::cout << "ModularInt test success.\n";
+    std::cout << "ModularInt test success." << std::endl;
     
     TestGroupConstructor();
     TestPower();
     TestInverse();
-    std::cout << "Group test success.\n";
+    std::cout << "Group test success." << std::endl;
 
     TestGetPrime();
     TestGetGroup();
-    std::cout << "SigmaUtils test success.\n";
+    std::cout << "SigmaUtils test success." << std::endl;
     
     TestGenerateCommitment();
     TestVerification();
     TestSimulation();
-    std::cout << "Schnorr test success.\n";
+    std::cout << "Schnorr test success." << std::endl;
 
     TestGenerateElgamalCommitment();
     TestElgamalVerification();
     TestElgamalSimulation();
-    std::cout << "Elgamal test success.\n";
+    std::cout << "Elgamal test success." << std::endl;
 
     TestNormalSchnorrRun();
     TestSimulatedSchnorrRun();
-    std::cout << "SchnorrProtocol test success.\n";
+    std::cout << "SchnorrProtocol test success." << std::endl;
     
     TestNormalOrRun();
     TestSimulatedOrRun();
-    std::cout << "OrProtocol test success.\n";
+    std::cout << "OrProtocol test success." << std::endl;
 
     TestECGroupAddition();
     TestDecodePoint();
-    std::cout << "ECGroup test success.\n";
+    TestPointCompression();
+    std::cout << "ECGroup test success." << std::endl;
 
 	while (!std::cin.get())
     return 0;

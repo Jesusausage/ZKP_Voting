@@ -9,6 +9,7 @@
 
 void TestECGroupAddition();
 void TestDecodePoint();
+void TestPointCompression();
 
 
 #endif

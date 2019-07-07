@@ -28,3 +28,16 @@ void TestDecodePoint()
     auto g = DecodeHexString(hex_string, curve);
     assert(g == base);
 }
+
+
+void TestPointCompression()
+{
+    CryptoPP::ECP curve;
+    CryptoPP::ECPPoint base;
+    GenerateECGroup(curve, base);
+
+    auto p_comp = CompressPoint(base, curve);
+    auto p = DecompressPoint(p_comp, curve);
+
+    assert(p == base);
+}
