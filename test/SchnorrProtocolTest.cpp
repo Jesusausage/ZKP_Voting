@@ -7,6 +7,15 @@ void TestNormalSchnorrRun()
     CryptoPP::ECPPoint base;
     CryptoPP::Integer order;
     GenerateECGroup(curve, base, order);
+
+    CryptoPP::Integer a = RandomCoeff(curve);
+    CryptoPP::Integer b = RandomCoeff(curve);
+    CryptoPP::Integer c = (a * b) % order;
+    auto A = curve.Multiply(a, base);
+    auto B = curve.Multiply(b, A);
+    auto C = curve.Multiply(c, base);
+    assert(B == C);
+
     CryptoPP::Integer witness = RandomCoeff(curve);
     CryptoPP::ECPPoint public_key = curve.Multiply(witness, base);
 

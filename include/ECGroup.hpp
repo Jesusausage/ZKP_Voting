@@ -40,5 +40,12 @@ CryptoPP::Integer RandomCoeff(const CryptoPP::ECP& curve);
 CryptoPP::Integer RandomInteger(const CryptoPP::Integer& min, 
                                 const CryptoPP::Integer& max);
 
+// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
+// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
+// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
+// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
+// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
+// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
+
 
 #endif

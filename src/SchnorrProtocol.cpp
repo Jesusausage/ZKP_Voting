@@ -50,7 +50,8 @@ bool SchnorrProtocol::generateResponse()
     if (_e.IsZero())
         return false;
 
-    _s = (((_w * _e) % _order) + _u) % _order;
+    auto we = a_times_b_mod_c(_w, _e, _order);
+    _s = (_u + we) % _order;
     return true;
 }
 
@@ -61,7 +62,7 @@ bool SchnorrProtocol::verify()
     auto beta = _curve.Multiply(_e, _curve.Inverse(_pub_key));
 
     auto result = _curve.Add(alpha, beta);
-    return (alpha == result);
+    return (_commitment == result);
 }
 
 
