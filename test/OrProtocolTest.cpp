@@ -3,21 +3,17 @@
 
 void TestNormalOrRun()
 {    
-    CryptoPP::ECP curve0;
-    CryptoPP::ECPPoint base0;
-    CryptoPP::Integer order0;
-    GenerateECGroup(curve0, base0, order0);
-    CryptoPP::Integer witness0 = RandomCoeff(curve0);
-    CryptoPP::ECPPoint public_key0 = curve0.Multiply(witness0, base0);
-    SchnorrProtocol prot0(curve0, base0, order0, public_key0, witness0);
+    auto elliptic_curve0 = GenerateECGroup();
+    auto witness0 = RandomInteger(2, elliptic_curve0.order);
+    auto public_key0 = elliptic_curve0.curve.Multiply(witness0, 
+                                                      elliptic_curve0.base);
+    SchnorrProtocol prot0(elliptic_curve0, public_key0, witness0);
 
-    CryptoPP::ECP curve1;
-    CryptoPP::ECPPoint base1;
-    CryptoPP::Integer order1;
-    GenerateECGroup(curve1, base1, order1);
-    CryptoPP::Integer witness1 = RandomCoeff(curve1);
-    CryptoPP::ECPPoint public_key1 = curve1.Multiply(witness1, base1);
-    SchnorrProtocol prot1(curve1, base1, order1, public_key1, witness1);
+    auto elliptic_curve1 = GenerateECGroup();
+    auto witness1 = RandomInteger(2, elliptic_curve1.order);
+    auto public_key1 = elliptic_curve1.curve.Multiply(witness1, 
+                                                      elliptic_curve1.base);
+    SchnorrProtocol prot1(elliptic_curve1, public_key1, witness1);
 
     OrProtocol prot(&prot0, &prot1, true);
     prot.generateCommitment();
@@ -33,21 +29,17 @@ void TestNormalOrRun()
 
 void TestSimulatedOrRun()
 {
-    CryptoPP::ECP curve0;
-    CryptoPP::ECPPoint base0;
-    CryptoPP::Integer order0;
-    GenerateECGroup(curve0, base0, order0);
-    CryptoPP::Integer witness0 = RandomCoeff(curve0);
-    CryptoPP::ECPPoint public_key0 = curve0.Multiply(witness0, base0);
-    SchnorrProtocol prot0(curve0, base0, order0, public_key0);
+    auto elliptic_curve0 = GenerateECGroup();
+    auto witness0 = RandomInteger(2, elliptic_curve0.order);
+    auto public_key0 = elliptic_curve0.curve.Multiply(witness0, 
+                                                      elliptic_curve0.base);
+    SchnorrProtocol prot0(elliptic_curve0, public_key0);
 
-    CryptoPP::ECP curve1;
-    CryptoPP::ECPPoint base1;
-    CryptoPP::Integer order1;
-    GenerateECGroup(curve1, base1, order1);
-    CryptoPP::Integer witness1 = RandomCoeff(curve1);
-    CryptoPP::ECPPoint public_key1 = curve1.Multiply(witness1, base1);
-    SchnorrProtocol prot1(curve1, base1, order1, public_key1);
+    auto elliptic_curve1 = GenerateECGroup();
+    auto witness1 = RandomInteger(2, elliptic_curve1.order);
+    auto public_key1 = elliptic_curve1.curve.Multiply(witness1, 
+                                                      elliptic_curve1.base);
+    SchnorrProtocol prot1(elliptic_curve1, public_key1);
 
     OrProtocol prot(&prot0, &prot1, true);
     prot.generateChallenge();

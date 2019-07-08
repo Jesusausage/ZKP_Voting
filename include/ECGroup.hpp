@@ -17,35 +17,30 @@ struct CompressedPoint {
 };
 
 
-void GenerateECGroup(CryptoPP::ECP& curve, CryptoPP::ECPPoint& base);
+struct EllipticCurve {
+    CryptoPP::ECP curve;
+    CryptoPP::ECPPoint base;
+    CryptoPP::Integer order;
+};
 
-void GenerateECGroup(CryptoPP::ECP& curve, 
-                     CryptoPP::ECPPoint& base, 
-                     CryptoPP::Integer& order);
+
+EllipticCurve GenerateECGroup();
 
 CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string, 
-                                   const CryptoPP::ECP& curve);
+                                   const EllipticCurve& ec);
 
-CompressedPoint CompressPoint(const CryptoPP::ECPPoint& point, 
-                          const CryptoPP::ECP& curve);
+CompressedPoint CompressPoint(const CryptoPP::ECPPoint& point);
 
 CryptoPP::ECPPoint DecompressPoint(const CompressedPoint& compressed,
-                                   const CryptoPP::ECP& curve);
+                                   const EllipticCurve& ec);
 
 CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a, 
                                 const CryptoPP::Integer& p);    
 
-CryptoPP::Integer RandomCoeff(const CryptoPP::ECP& curve);
-
 CryptoPP::Integer RandomInteger(const CryptoPP::Integer& min, 
-                                const CryptoPP::Integer& max);
-
-// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
-// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
-// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
-// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
-// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
-// CHANGE RANDOM GENERATION TO USE _order NOT _curve.FieldSize()
+                                const CryptoPP::Integer& max, 
+                                CryptoPP::byte* seed = nullptr, 
+                                size_t size = 0);
 
 
 #endif
