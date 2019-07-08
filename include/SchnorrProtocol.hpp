@@ -22,6 +22,7 @@ public:
     bool generateSimulation() override;
 
     CryptoPP::Integer challengeSize() override { return *_order; }
+    std::string getHashData() override;
 
 private:
     const CryptoPP::ECP* _curve;

@@ -18,6 +18,7 @@ public:
     bool generateSimulation() override;
 
     CryptoPP::Integer challengeSize() override { return _e_size; }
+    std::string getHashData() override;
 
 private:
     SigmaProtocol* _sigma0;

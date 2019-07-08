@@ -9,6 +9,7 @@
 
 void TestNormalSchnorrRun();
 void TestSimulatedSchnorrRun();
+void TestSchnorrNIZKP();
 
 
 #endif

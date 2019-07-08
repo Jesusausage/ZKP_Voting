@@ -35,7 +35,7 @@ void OrProtocol::generateCommitment()
 void OrProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
 {
     if (e) {
-        _e = *e;
+        _e = *e + _e_size;
     }
     else {
         _e = RandomInteger(_e_size, 2 * _e_size);
@@ -87,4 +87,13 @@ bool OrProtocol::generateSimulation()
     _sigma0->generateSimulation();
     _sigma1->generateSimulation();
     return true;
+}
+
+
+std::string OrProtocol::getHashData() 
+{
+    std::string ret;
+    ret += _sigma0->getHashData();
+    ret += _sigma1->getHashData();
+    return ret;
 }

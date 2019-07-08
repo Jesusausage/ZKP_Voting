@@ -10,6 +10,7 @@
 
 void TestNormalOrRun();
 void TestSimulatedOrRun();
+void TestOrNIZKP();
 
 
 #endif

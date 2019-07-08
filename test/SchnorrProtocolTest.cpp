@@ -34,3 +34,16 @@ void TestSimulatedSchnorrRun()
     ret = prot.verify();
     assert(ret == true);
 }
+
+
+void TestSchnorrNIZKP()
+{
+    auto elliptic_curve = GenerateECGroup();
+    auto witness = RandomInteger(2, elliptic_curve.order);
+    auto public_key = elliptic_curve.curve.Multiply(witness, 
+                                                    elliptic_curve.base);
+    SchnorrProtocol prot(elliptic_curve, public_key, witness);
+
+    bool ret = prot.produceNIZKP();
+    assert(ret == true); 
+}

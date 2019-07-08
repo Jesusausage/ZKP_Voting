@@ -55,7 +55,7 @@ bool SchnorrProtocol::generateResponse()
 bool SchnorrProtocol::verify()
 {
     auto alpha = _curve->Multiply(_s, *_base);
-    auto beta = _curve->Multiply(_e, _curve->Inverse(_pub_key));
+    auto beta = _curve->Multiply(_e, _curve->Inverse(_pub_key));        
 
     auto result = _curve->Add(alpha, beta);
     return (_commitment == result);
@@ -73,4 +73,15 @@ bool SchnorrProtocol::generateSimulation()
     auto beta = _curve->Multiply(_e, _curve->Inverse(_pub_key));
     _commitment = _curve->Add(alpha, beta);
     return true;
+}
+
+
+std::string SchnorrProtocol::getHashData() 
+{
+    std::string ret;
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment.x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment.y);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key.x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key.y);
+    return ret;
 }
