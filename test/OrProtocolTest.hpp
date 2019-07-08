@@ -4,7 +4,6 @@
 
 #include "SchnorrProtocol.hpp"
 #include "OrProtocol.hpp"
-#include "SigmaUtils.hpp"
 #include <assert.h>
 #include <iostream>
 
