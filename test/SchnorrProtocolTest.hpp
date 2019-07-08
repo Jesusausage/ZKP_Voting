@@ -3,7 +3,6 @@
 
 
 #include "SchnorrProtocol.hpp"
-#include "SigmaUtils.hpp"
 #include <assert.h>
 #include <iostream>
 

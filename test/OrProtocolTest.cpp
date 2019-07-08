@@ -2,17 +2,22 @@
 
 
 void TestNormalOrRun()
-{
-    Group<ModularInt> G0 = GetGroup<ModularInt>();
-    ModularInt generator0 = G0.newElement(27);
-    int witness0 = 42;
-    ModularInt public_key0 = G0.power(generator0, witness0);
-    SchnorrProtocol prot0(G0, generator0, public_key0, witness0);
+{    
+    CryptoPP::ECP curve0;
+    CryptoPP::ECPPoint base0;
+    CryptoPP::Integer order0;
+    GenerateECGroup(curve0, base0, order0);
+    CryptoPP::Integer witness0 = RandomCoeff(curve0);
+    CryptoPP::ECPPoint public_key0 = curve0.Multiply(witness0, base0);
+    SchnorrProtocol prot0(curve0, base0, order0, public_key0, witness0);
 
-    Group<ModularInt> G1 = GetGroup<ModularInt>();
-    ModularInt generator1 = G1.newElement(28);
-    ModularInt public_key1 = G1.power(generator1, 43);
-    SchnorrProtocol prot1(G1, generator1, public_key1);
+    CryptoPP::ECP curve1;
+    CryptoPP::ECPPoint base1;
+    CryptoPP::Integer order1;
+    GenerateECGroup(curve1, base1, order1);
+    CryptoPP::Integer witness1 = RandomCoeff(curve1);
+    CryptoPP::ECPPoint public_key1 = curve1.Multiply(witness1, base1);
+    SchnorrProtocol prot1(curve1, base1, order1, public_key1, witness1);
 
     OrProtocol prot(&prot0, &prot1, true);
     prot.generateCommitment();
@@ -28,15 +33,21 @@ void TestNormalOrRun()
 
 void TestSimulatedOrRun()
 {
-    Group<ModularInt> G0 = GetGroup<ModularInt>();
-    ModularInt generator0 = G0.newElement(27);
-    ModularInt public_key0 = G0.power(generator0, 42);
-    SchnorrProtocol prot0(G0, generator0, public_key0);
+    CryptoPP::ECP curve0;
+    CryptoPP::ECPPoint base0;
+    CryptoPP::Integer order0;
+    GenerateECGroup(curve0, base0, order0);
+    CryptoPP::Integer witness0 = RandomCoeff(curve0);
+    CryptoPP::ECPPoint public_key0 = curve0.Multiply(witness0, base0);
+    SchnorrProtocol prot0(curve0, base0, order0, public_key0);
 
-    Group<ModularInt> G1 = GetGroup<ModularInt>();
-    ModularInt generator1 = G1.newElement(28);
-    ModularInt public_key1 = G1.power(generator1, 43);
-    SchnorrProtocol prot1(G1, generator1, public_key1);
+    CryptoPP::ECP curve1;
+    CryptoPP::ECPPoint base1;
+    CryptoPP::Integer order1;
+    GenerateECGroup(curve1, base1, order1);
+    CryptoPP::Integer witness1 = RandomCoeff(curve1);
+    CryptoPP::ECPPoint public_key1 = curve1.Multiply(witness1, base1);
+    SchnorrProtocol prot1(curve1, base1, order1, public_key1);
 
     OrProtocol prot(&prot0, &prot1, true);
     prot.generateChallenge();

@@ -19,6 +19,10 @@ struct CompressedPoint {
 
 void GenerateECGroup(CryptoPP::ECP& curve, CryptoPP::ECPPoint& base);
 
+void GenerateECGroup(CryptoPP::ECP& curve, 
+                     CryptoPP::ECPPoint& base, 
+                     CryptoPP::Integer& order);
+
 CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string, 
                                    const CryptoPP::ECP& curve);
 
@@ -31,7 +35,10 @@ CryptoPP::ECPPoint DecompressPoint(const CompressedPoint& compressed,
 CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a, 
                                 const CryptoPP::Integer& p);    
 
-CryptoPP::Integer RandomCoeff(const CryptoPP::ECP& curve);                    
+CryptoPP::Integer RandomCoeff(const CryptoPP::ECP& curve);
+
+CryptoPP::Integer RandomInteger(const CryptoPP::Integer& min, 
+                                const CryptoPP::Integer& max);
 
 
 #endif

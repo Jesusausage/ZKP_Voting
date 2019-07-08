@@ -9,10 +9,9 @@ OrProtocol::OrProtocol(SigmaProtocol* sigma0,
                        _sigma1(sigma1),
                        _know0(know0)
 {
-    int s0 = _sigma0->challengeSize();
-    int s1 = _sigma1->challengeSize();
+    CryptoPP::Integer s0 = _sigma0->challengeSize();
+    CryptoPP::Integer s1 = _sigma1->challengeSize();
     _e_size = (s0 > s1) ? s0 : s1;
-	srand(static_cast<long int>(time(nullptr)));
 }
 
 
@@ -33,13 +32,13 @@ void OrProtocol::generateCommitment()
 }
 
 
-void OrProtocol::generateChallenge(int* e /*= nullptr*/)
+void OrProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
 {
     if (e) {
         _e = *e;
     }
     else {
-        _e = (rand() % _e_size) + _e_size;
+        _e = RandomInteger(_e_size, 2 * _e_size);
     }
 }
 
@@ -50,12 +49,12 @@ bool OrProtocol::generateResponse()
         return false;
 
     if (_know0) {
-        int e0 = _e - _sigma1->challenge();
+        CryptoPP::Integer e0 = _e - _sigma1->challenge();
         _sigma0->generateChallenge(&e0);
         _sigma0->generateResponse();
     }
     else {
-        int e1 = _e - _sigma0->challenge();
+        CryptoPP::Integer e1 = _e - _sigma0->challenge();
         _sigma1->generateChallenge(&e1);
         _sigma1->generateResponse();
     }
@@ -82,7 +81,7 @@ bool OrProtocol::generateSimulation()
         return false;
 
     _sigma0->generateChallenge();
-    int e1 = _e - _sigma0->challenge();
+    CryptoPP::Integer e1 = _e - _sigma0->challenge();
     _sigma1->generateChallenge(&e1);
 
     _sigma0->generateSimulation();

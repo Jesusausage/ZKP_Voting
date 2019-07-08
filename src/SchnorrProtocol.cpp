@@ -1,66 +1,67 @@
 #include "SchnorrProtocol.hpp"
 
 
-SchnorrProtocol::SchnorrProtocol(Group<ModularInt> group, 
-                                 ModularInt generator, 
-                                 ModularInt public_key, 
-                                 int witness)
-                                 : 
-                                 G(group), 
-                                 _g(generator), 
+SchnorrProtocol::SchnorrProtocol(CryptoPP::ECP curve, 
+                                 CryptoPP::ECPPoint base, 
+                                 CryptoPP::Integer order, 
+                                 CryptoPP::ECPPoint public_key, 
+                                 CryptoPP::Integer witness)
+                                 :
+                                 _curve(curve), 
+                                 _base(base), 
+                                 _order(order), 
                                  _pub_key(public_key), 
                                  _w(witness) 
-{
-	srand(static_cast<long int>(time(nullptr)));
-}
+{}
 
 
-SchnorrProtocol::SchnorrProtocol(Group<ModularInt> group, 
-                                 ModularInt generator, 
-                                 ModularInt public_key)
+SchnorrProtocol::SchnorrProtocol(CryptoPP::ECP curve, 
+                                 CryptoPP::ECPPoint base, 
+                                 CryptoPP::Integer order, 
+                                 CryptoPP::ECPPoint public_key)
                                  :
-                                 G(group),
-                                 _g(generator),
+                                 _curve(curve), 
+                                 _base(base), 
+                                 _order(order), 
                                  _pub_key(public_key)
-{
-	srand(static_cast<long int>(time(nullptr)));
-}
+{}
 
 
 void SchnorrProtocol::generateCommitment()
 {
-    int range = (G.order() / 2) - 2;
-    _u = (rand() % range) + 2;
-    
-    _commitment = G.power(_g, _u);
+    _u = RandomCoeff(_curve);    
+    _commitment = _curve.Multiply(_u, _base);
 }
 
 
-void SchnorrProtocol::generateChallenge(int* e /*= nullptr*/)
+void SchnorrProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
 {
     if (e) {
         _e = *e;
     }
     else {
-        _e = (rand() % (G.order() - 1)) + 1;
+        _e = RandomCoeff(_curve);
     }
 }
 
 
 bool SchnorrProtocol::generateResponse()
 {
-    if (!_e)
+    if (_e.IsZero())
         return false;
 
-    _s = (_u + (_w * _e)) % G.order();
+    _s = (((_w * _e) % _order) + _u) % _order;
     return true;
 }
 
 
 bool SchnorrProtocol::verify()
 {
-    ModularInt result = G.power(_g, _s) * G.power(_pub_key, -_e);
-    return (result == _commitment);
+    auto alpha = _curve.Multiply(_s, _base);
+    auto beta = _curve.Multiply(_e, _curve.Inverse(_pub_key));
+
+    auto result = _curve.Add(alpha, beta);
+    return (alpha == result);
 }
 
 
@@ -69,7 +70,10 @@ bool SchnorrProtocol::generateSimulation()
     if (!_e)
         return false;
 
-    _s = rand() % G.order();
-    _commitment = G.power(_g, _s) * G.power(_pub_key, -_e);
+    _s = RandomCoeff(_curve);
+
+    auto alpha = _curve.Multiply(_s, _base);
+    auto beta = _curve.Multiply(_e, _curve.Inverse(_pub_key));
+    _commitment = _curve.Add(alpha, beta);
     return true;
 }

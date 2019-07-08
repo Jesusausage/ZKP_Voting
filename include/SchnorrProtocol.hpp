@@ -10,29 +10,32 @@
 
 class SchnorrProtocol : public SigmaProtocol {
 public:
-    SchnorrProtocol(Group<ModularInt> group, 
-                    ModularInt generator, 
-                    ModularInt public_key, 
-                    int witness);
-    SchnorrProtocol(Group<ModularInt> group, 
-                    ModularInt generator, 
-                    ModularInt public_key);
+    SchnorrProtocol(CryptoPP::ECP curve, 
+                    CryptoPP::ECPPoint base,
+                    CryptoPP::Integer order,  
+                    CryptoPP::ECPPoint public_key, 
+                    CryptoPP::Integer witness);
+    SchnorrProtocol(CryptoPP::ECP curve, 
+                    CryptoPP::ECPPoint base, 
+                    CryptoPP::Integer order, 
+                    CryptoPP::ECPPoint public_key);
     void generateCommitment() override;
-    void generateChallenge(int* e = nullptr) override;
+    void generateChallenge(CryptoPP::Integer* e = nullptr) override;
     bool generateResponse() override;
     bool verify() override;
     bool generateSimulation() override;
 
-    int challengeSize() override { return G.order(); }
+    CryptoPP::Integer challengeSize() override { return _order; }
 
 private:
-    Group<ModularInt> G;
-    ModularInt _g;
-    ModularInt _pub_key;
-    int _w;
-    int _u;
-    ModularInt _commitment;
-    int _s;
+    CryptoPP::ECP _curve;
+    CryptoPP::ECPPoint _base;
+    CryptoPP::Integer _order;
+    CryptoPP::ECPPoint _pub_key;
+    CryptoPP::Integer _w;
+    CryptoPP::Integer _u;
+    CryptoPP::ECPPoint _commitment;
+    CryptoPP::Integer _s;
 };
 
 

@@ -3,12 +3,14 @@
 
 void TestNormalSchnorrRun() 
 {   
-    Group<ModularInt> G = GetGroup<ModularInt>();
-    ModularInt generator = G.newElement(27);
-    int witness = 42;
-    ModularInt public_key = G.power(generator, witness);
+    CryptoPP::ECP curve;
+    CryptoPP::ECPPoint base;
+    CryptoPP::Integer order;
+    GenerateECGroup(curve, base, order);
+    CryptoPP::Integer witness = RandomCoeff(curve);
+    CryptoPP::ECPPoint public_key = curve.Multiply(witness, base);
 
-    SchnorrProtocol prot(G, generator, public_key, witness);
+    SchnorrProtocol prot(curve, base, order, public_key, witness);
     prot.generateCommitment();
     prot.generateChallenge();
 
@@ -21,12 +23,15 @@ void TestNormalSchnorrRun()
 
 
 void TestSimulatedSchnorrRun()
-{
-    Group<ModularInt> G = GetGroup<ModularInt>();
-    ModularInt generator = G.newElement(27);
-    ModularInt public_key = G.power(generator, 42);
+{    
+    CryptoPP::ECP curve;
+    CryptoPP::ECPPoint base;
+    CryptoPP::Integer order;
+    GenerateECGroup(curve, base, order);
+    CryptoPP::Integer witness = RandomCoeff(curve);
+    CryptoPP::ECPPoint public_key = curve.Multiply(witness, base);
 
-    SchnorrProtocol prot(G, generator, public_key);
+    SchnorrProtocol prot(curve, base, order, public_key);
     prot.generateChallenge();
 
     bool ret = prot.generateSimulation();
