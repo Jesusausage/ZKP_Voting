@@ -1,24 +1,24 @@
 #include "SchnorrProtocol.hpp"
 
 
-SchnorrProtocol::SchnorrProtocol(const ECGroup& elliptic_curve,
+SchnorrProtocol::SchnorrProtocol(const ECGroup& ecg,
                                  const CryptoPP::ECPPoint& public_key, 
                                  const CryptoPP::Integer& witness)
                                  :
-                                 _curve(&elliptic_curve.curve), 
-                                 _base(&elliptic_curve.base),
-                                 _order(&elliptic_curve.order),
+                                 _curve(&ecg.curve), 
+                                 _base(&ecg.base),
+                                 _order(&ecg.order),
                                  _pub_key(public_key), 
                                  _w(witness) 
 {}
 
 
-SchnorrProtocol::SchnorrProtocol(const ECGroup& elliptic_curve,
+SchnorrProtocol::SchnorrProtocol(const ECGroup& ecg,
                                  const CryptoPP::ECPPoint& public_key)
                                  :
-                                 _curve(&elliptic_curve.curve), 
-                                 _base(&elliptic_curve.base),
-                                 _order(&elliptic_curve.order),
+                                 _curve(&ecg.curve), 
+                                 _base(&ecg.base),
+                                 _order(&ecg.order),
                                  _pub_key(public_key)
 {}
 
@@ -84,4 +84,33 @@ std::string SchnorrProtocol::getHashData()
     ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key.x);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key.y);
     return ret;
+}
+
+
+std::vector<CryptoPP::ECPPoint> SchnorrProtocol::commitment()
+{
+    std::vector<CryptoPP::ECPPoint> commitment;
+    commitment.push_back(_commitment);
+    return commitment;
+}
+
+
+CryptoPP::Integer SchnorrProtocol::response()
+{
+    return _s;
+}
+
+
+bool SchnorrProtocol::verifyNIZKP(const NIZKP& nizkp)
+{
+    _commitment = nizkp.commitment[0];
+    _e = nizkp.challenge;
+    _s = nizkp.response;
+    bool verified = this->verify();
+
+    std::string hash_data = getHashData();
+    auto challenge = genHashChallenge(hash_data);
+    bool valid_e = (challenge == _e);
+
+    return (verified && valid_e);
 }

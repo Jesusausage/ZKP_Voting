@@ -1,15 +1,20 @@
 #include "SigmaProtocol.hpp"
 
 
-bool SigmaProtocol::produceNIZKP()
+NIZKP SigmaProtocol::produceNIZKP()
 {
     generateCommitment();
 
     std::string hash_data = getHashData();
     auto challenge = genHashChallenge(hash_data);
     generateChallenge(&challenge);
-    
-    return (generateResponse() && verify());
+    assert(generateResponse() && verify());
+
+    NIZKP nizkp;
+    nizkp.commitment = this->commitment();
+    nizkp.challenge = this->challenge();
+    nizkp.response = this->response();
+    return nizkp;
 }
 
 

@@ -20,6 +20,11 @@ public:
     CryptoPP::Integer challengeSize() override { return _e_size; }
     std::string getHashData() override;
 
+    std::vector<CryptoPP::ECPPoint> commitment() override;
+    CryptoPP::Integer response() override;
+
+    bool verifyNIZKP(const NIZKP& nizkp) override;
+
 private:
     SigmaProtocol* _sigma0;
     SigmaProtocol* _sigma1;

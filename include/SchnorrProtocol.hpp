@@ -10,10 +10,10 @@
 
 class SchnorrProtocol : public SigmaProtocol {
 public:
-    SchnorrProtocol(const ECGroup& elliptic_curve,
+    SchnorrProtocol(const ECGroup& ecg,
                     const CryptoPP::ECPPoint& public_key, 
                     const CryptoPP::Integer& witness);
-    SchnorrProtocol(const ECGroup& elliptic_curve,
+    SchnorrProtocol(const ECGroup& ecg,
                     const CryptoPP::ECPPoint& public_key);
     void generateCommitment() override;
     void generateChallenge(CryptoPP::Integer* e = nullptr) override;
@@ -23,6 +23,11 @@ public:
 
     CryptoPP::Integer challengeSize() override { return *_order; }
     std::string getHashData() override;
+
+    std::vector<CryptoPP::ECPPoint> commitment() override;
+    CryptoPP::Integer response() override;
+
+    bool verifyNIZKP(const NIZKP& nizkp) override;
 
 private:
     const CryptoPP::ECP* _curve;

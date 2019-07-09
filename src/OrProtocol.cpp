@@ -97,3 +97,27 @@ std::string OrProtocol::getHashData()
     ret += _sigma1->getHashData();
     return ret;
 }
+
+
+std::vector<CryptoPP::ECPPoint> OrProtocol::commitment()
+{
+    std::vector<CryptoPP::ECPPoint> commitment;
+
+
+
+
+
+
+    return commitment;
+}
+
+
+CryptoPP::Integer OrProtocol::response()
+{
+    return ;
+}
+
+
+bool OrProtocol::verifyNIZKP(const NIZKP& nizkp)
+{
+}

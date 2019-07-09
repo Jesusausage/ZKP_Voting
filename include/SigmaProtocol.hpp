@@ -6,10 +6,13 @@
 #include <cryptlib.h>
 #include <sha3.h>
 #include <assert.h>
+#include <vector>
 
 
 struct NIZKP {
-
+    std::vector<CryptoPP::ECPPoint> commitment;
+    CryptoPP::Integer challenge;
+    CryptoPP::Integer response;
 };
 
 
@@ -24,13 +27,16 @@ public:
     virtual CryptoPP::Integer challengeSize() = 0;
     virtual std::string getHashData() = 0;
 
+    virtual std::vector<CryptoPP::ECPPoint> commitment() = 0; //f
     CryptoPP::Integer challenge() { return _e; }
-    bool produceNIZKP();
+    virtual CryptoPP::Integer response() = 0; //f
+
+    NIZKP produceNIZKP();
+    virtual bool verifyNIZKP(const NIZKP& nizkp); //f
 
 protected:
     CryptoPP::Integer _e = 0;
 
-private:
     CryptoPP::Integer genHashChallenge(const std::string& hash_data);
 };
 
