@@ -8,6 +8,11 @@
 #include <assert.h>
 
 
+struct NIZKP {
+
+};
+
+
 class SigmaProtocol {
 public:
     virtual void generateCommitment() = 0;

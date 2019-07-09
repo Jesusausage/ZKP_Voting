@@ -1,7 +1,7 @@
 #include "SchnorrProtocol.hpp"
 
 
-SchnorrProtocol::SchnorrProtocol(const EllipticCurve& elliptic_curve,
+SchnorrProtocol::SchnorrProtocol(const ECGroup& elliptic_curve,
                                  const CryptoPP::ECPPoint& public_key, 
                                  const CryptoPP::Integer& witness)
                                  :
@@ -13,7 +13,7 @@ SchnorrProtocol::SchnorrProtocol(const EllipticCurve& elliptic_curve,
 {}
 
 
-SchnorrProtocol::SchnorrProtocol(const EllipticCurve& elliptic_curve,
+SchnorrProtocol::SchnorrProtocol(const ECGroup& elliptic_curve,
                                  const CryptoPP::ECPPoint& public_key)
                                  :
                                  _curve(&elliptic_curve.curve), 

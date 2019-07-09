@@ -16,23 +16,22 @@ struct CompressedPoint {
     bool y;
 };
 
-
-struct EllipticCurve {
+struct ECGroup {
     CryptoPP::ECP curve;
     CryptoPP::ECPPoint base;
     CryptoPP::Integer order;
 };
 
 
-EllipticCurve GenerateECGroup();
+ECGroup GenerateECGroup();
 
 CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string, 
-                                   const EllipticCurve& ec);
+                                   const ECGroup& ec);
 
 CompressedPoint CompressPoint(const CryptoPP::ECPPoint& point);
 
 CryptoPP::ECPPoint DecompressPoint(const CompressedPoint& compressed,
-                                   const EllipticCurve& ec);
+                                   const ECGroup& ec);
 
 CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a, 
                                 const CryptoPP::Integer& p);    

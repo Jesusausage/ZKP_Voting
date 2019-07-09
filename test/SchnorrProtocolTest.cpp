@@ -3,11 +3,11 @@
 
 void TestNormalSchnorrRun() 
 {   
-    auto elliptic_curve = GenerateECGroup();
-    auto witness = RandomInteger(2, elliptic_curve.order);
-    auto public_key = elliptic_curve.curve.Multiply(witness, 
-                                                    elliptic_curve.base);
-    SchnorrProtocol prot(elliptic_curve, public_key, witness);
+    auto ecg = GenerateECGroup();
+    auto witness = RandomInteger(2, ecg.order);
+    auto public_key = ecg.curve.Multiply(witness, 
+                                                    ecg.base);
+    SchnorrProtocol prot(ecg, public_key, witness);
 
     prot.generateCommitment();
     prot.generateChallenge();
@@ -21,11 +21,11 @@ void TestNormalSchnorrRun()
 
 void TestSimulatedSchnorrRun()
 {    
-    auto elliptic_curve = GenerateECGroup();
-    auto witness = RandomInteger(2, elliptic_curve.order);
-    auto public_key = elliptic_curve.curve.Multiply(witness, 
-                                                    elliptic_curve.base);
-    SchnorrProtocol prot(elliptic_curve, public_key, witness);
+    auto ecg = GenerateECGroup();
+    auto witness = RandomInteger(2, ecg.order);
+    auto public_key = ecg.curve.Multiply(witness, 
+                                                    ecg.base);
+    SchnorrProtocol prot(ecg, public_key, witness);
 
     prot.generateChallenge();
     bool ret = prot.generateSimulation();
@@ -38,11 +38,11 @@ void TestSimulatedSchnorrRun()
 
 void TestSchnorrNIZKP()
 {
-    auto elliptic_curve = GenerateECGroup();
-    auto witness = RandomInteger(2, elliptic_curve.order);
-    auto public_key = elliptic_curve.curve.Multiply(witness, 
-                                                    elliptic_curve.base);
-    SchnorrProtocol prot(elliptic_curve, public_key, witness);
+    auto ecg = GenerateECGroup();
+    auto witness = RandomInteger(2, ecg.order);
+    auto public_key = ecg.curve.Multiply(witness, 
+                                                    ecg.base);
+    SchnorrProtocol prot(ecg, public_key, witness);
 
     bool ret = prot.produceNIZKP();
     assert(ret == true); 

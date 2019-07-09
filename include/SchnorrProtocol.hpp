@@ -10,10 +10,10 @@
 
 class SchnorrProtocol : public SigmaProtocol {
 public:
-    SchnorrProtocol(const EllipticCurve& elliptic_curve,
+    SchnorrProtocol(const ECGroup& elliptic_curve,
                     const CryptoPP::ECPPoint& public_key, 
                     const CryptoPP::Integer& witness);
-    SchnorrProtocol(const EllipticCurve& elliptic_curve,
+    SchnorrProtocol(const ECGroup& elliptic_curve,
                     const CryptoPP::ECPPoint& public_key);
     void generateCommitment() override;
     void generateChallenge(CryptoPP::Integer* e = nullptr) override;

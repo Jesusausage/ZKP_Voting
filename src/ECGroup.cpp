@@ -3,27 +3,30 @@
 
 const int CURVE_A = 0;
 const int CURVE_B = 7;
+const char BASE_X[] = "55066263022277343669578718895168534326250603453777594175500187360389116729240";
+const char BASE_Y[] = "32670510020758816978083085130507043184471273380659243275938904335757337482424";
+const char ORDER[] = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
 
 
-EllipticCurve GenerateECGroup()
+ECGroup GenerateECGroup()
 {
-    EllipticCurve ec;
+    ECGroup ecg;
     auto power1 = CryptoPP::Integer::Power2(256);
     auto power2 = CryptoPP::Integer::Power2(32);
     CryptoPP::Integer p = power1 - power2 - 977;
-    ec.curve = CryptoPP::ECP(p, CURVE_A, CURVE_B);
+    ecg.curve = CryptoPP::ECP(p, CURVE_A, CURVE_B);
 
-    CryptoPP::Integer base_x("55066263022277343669578718895168534326250603453777594175500187360389116729240");
-    CryptoPP::Integer base_y("32670510020758816978083085130507043184471273380659243275938904335757337482424");
-    ec.base = CryptoPP::ECPPoint(base_x, base_y);
-    ec.order = CryptoPP::Integer("115792089237316195423570985008687907852837564279074904382605163141518161494337");
+    CryptoPP::Integer base_x(BASE_X);
+    CryptoPP::Integer base_y(BASE_Y);
+    ecg.base = CryptoPP::ECPPoint(base_x, base_y);
+    ecg.order = CryptoPP::Integer(ORDER);
 
-    return ec;
+    return ecg;
 }
 
 
 CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string, 
-                                   const EllipticCurve& ec)
+                                   const ECGroup& ecg)
 {
     CryptoPP::HexDecoder decoder;
     decoder.Put((CryptoPP::byte*)hex_string.data(), hex_string.size());
@@ -37,7 +40,7 @@ CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string,
     }
 
     CryptoPP::ECPPoint point;
-    ec.curve.DecodePoint(point, (CryptoPP::byte*)decoded.data(), decoded.size());
+    ecg.curve.DecodePoint(point, (CryptoPP::byte*)decoded.data(), decoded.size());
     return point;       
 }
 
@@ -54,11 +57,11 @@ CompressedPoint CompressPoint(const CryptoPP::ECPPoint& point)
 
 
 CryptoPP::ECPPoint DecompressPoint(const CompressedPoint& compressed,
-                                   const EllipticCurve& ec)
+                                   const ECGroup& ecg)
 {
     CryptoPP::Integer x = compressed.x;
 
-    auto p = ec.curve.FieldSize();
+    auto p = ecg.curve.FieldSize();
     auto alpha1 = a_exp_b_mod_c(x, 3, p);
     auto alpha2 = a_times_b_mod_c(x, CURVE_A, p);
     auto alpha = (alpha1 + alpha2 + CURVE_B) % p;
