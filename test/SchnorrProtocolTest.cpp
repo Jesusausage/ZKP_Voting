@@ -5,17 +5,13 @@ void TestNormalSchnorrRun()
 {   
     auto ecg = GenerateECGroup();
     auto witness = RandomInteger(2, ecg.order);
-    auto public_key = ecg.curve.Multiply(witness, 
-                                                    ecg.base);
+    auto public_key = ecg.curve.Multiply(witness, ecg.base);
     SchnorrProtocol prot(ecg, public_key, witness);
 
     prot.generateCommitment();
     prot.generateChallenge();
-    bool ret = prot.generateResponse();
-    assert(ret == true);
-
-    ret = prot.verify();
-    assert(ret == true);
+    prot.generateResponse();
+    assert(prot.verify() == true);
 }
 
 
@@ -23,16 +19,12 @@ void TestSimulatedSchnorrRun()
 {    
     auto ecg = GenerateECGroup();
     auto witness = RandomInteger(2, ecg.order);
-    auto public_key = ecg.curve.Multiply(witness, 
-                                                    ecg.base);
-    SchnorrProtocol prot(ecg, public_key, witness);
+    auto public_key = ecg.curve.Multiply(witness, ecg.base);
+    SchnorrProtocol prot(ecg, public_key /*, witness*/);
 
     prot.generateChallenge();
-    bool ret = prot.generateSimulation();
-    assert(ret == true);
-
-    ret = prot.verify();
-    assert(ret == true);
+    prot.generateSimulation();
+    assert(prot.verify() == true);
 }
 
 
@@ -40,10 +32,10 @@ void TestSchnorrNIZKP()
 {
     auto ecg = GenerateECGroup();
     auto witness = RandomInteger(2, ecg.order);
-    auto public_key = ecg.curve.Multiply(witness, 
-                                                    ecg.base);
+    auto public_key = ecg.curve.Multiply(witness, ecg.base);
     SchnorrProtocol prot(ecg, public_key, witness);
 
-    bool ret = prot.produceNIZKP();
-    assert(ret == true); 
+    prot.generateNIZKP();
+    auto nizkp = prot.getNIZKP();
+    assert(prot.verifyNIZKP(nizkp) == true);
 }

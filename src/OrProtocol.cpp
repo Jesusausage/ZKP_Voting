@@ -1,91 +1,63 @@
 #include "OrProtocol.hpp"
 
 
-OrProtocol::OrProtocol(SigmaProtocol* sigma0, 
-                       SigmaProtocol* sigma1,
-                       bool know0)
+OrProtocol::OrProtocol(std::vector<SigmaProtocol*> sigma_protocols, 
+                       int i_known)
                        :
-                       _sigma0(sigma0),
-                       _sigma1(sigma1),
-                       _know0(know0)
+                       _sigma_prots(sigma_protocols), 
+                       _i_known(i_known)
 {
-    CryptoPP::Integer s0 = _sigma0->challengeSize();
-    CryptoPP::Integer s1 = _sigma1->challengeSize();
-    _e_size = (s0 > s1) ? s0 : s1;
+    _num_prots = sigma_protocols.size();
+    assert(_i_known >= 0 && _i_known < _num_prots);
 }
 
 
 void OrProtocol::generateCommitment()
 {
-    if (_know0) {
-        _sigma0->generateCommitment();
-
-        _sigma1->generateChallenge();
-        _sigma1->generateSimulation();
-    }
-    else {
-        _sigma1->generateCommitment();
-
-        _sigma0->generateChallenge();
-        _sigma0->generateSimulation();
+    for (int i = 0; i < _num_prots; i++) {
+        if (i == _i_known)
+            _sigma_prots[i]->generateCommitment();
+        else {
+            _sigma_prots[i]->generateChallenge();
+            _sigma_prots[i]->generateSimulation();
+        }
     }
 }
 
 
-void OrProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
+void OrProtocol::generateChallenge(CryptoPP::Integer e)
 {
-    if (e) {
-        _e = *e + _e_size;
+    _total_e = 0;
+    for (int i = 0; i < _num_prots; i++) {
+        if (i != _i_known)
+            _total_e += _sigma_prots[i]->challenge();
     }
-    else {
-        _e = RandomInteger(_e_size, 2 * _e_size);
-    }
+    assert(e > _total_e);
+    _e = e;
 }
 
 
-bool OrProtocol::generateResponse()
+void OrProtocol::generateResponse()
 {
-    if (!_e)
-        return false;
+    assert(_e > 0);
 
-    if (_know0) {
-        CryptoPP::Integer e0 = _e - _sigma1->challenge();
-        _sigma0->generateChallenge(&e0);
-        _sigma0->generateResponse();
-    }
-    else {
-        CryptoPP::Integer e1 = _e - _sigma0->challenge();
-        _sigma1->generateChallenge(&e1);
-        _sigma1->generateResponse();
-    }
-    return true;
+    CryptoPP::Integer e_known = _e - _total_e;
+    _sigma_prots[_i_known]->generateChallenge(&e_known);
+    _sigma_prots[_i_known]->generateResponse();
 }
 
 
 bool OrProtocol::verify()
 {
-    if (_e != _sigma0->challenge() + _sigma1->challenge())
-        return false;
-    if (!_sigma0->verify())
-        return false;
-    if (!_sigma1->verify())
-        return false;
+    assert(_e > 0);
 
-    return true;
-}
-
-
-bool OrProtocol::generateSimulation()
-{
-    if (!_e)
+    for (SigmaProtocol* prot : _sigma_prots) {
+        if (!prot->verify())
+            return false;
+    }
+    if (_e != _total_e + _sigma_prots[_i_known]->challenge())
         return false;
 
-    _sigma0->generateChallenge();
-    CryptoPP::Integer e1 = _e - _sigma0->challenge();
-    _sigma1->generateChallenge(&e1);
-
-    _sigma0->generateSimulation();
-    _sigma1->generateSimulation();
     return true;
 }
 
@@ -93,31 +65,12 @@ bool OrProtocol::generateSimulation()
 std::string OrProtocol::getHashData() 
 {
     std::string ret;
-    ret += _sigma0->getHashData();
-    ret += _sigma1->getHashData();
+    for (int i = 0; i < _num_prots; i++)
+        ret += _sigma_prots[i]->getHashData();
     return ret;
 }
 
 
-std::vector<CryptoPP::ECPPoint> OrProtocol::commitment()
-{
-    std::vector<CryptoPP::ECPPoint> commitment;
-
-
-
-
-
-
-    return commitment;
-}
-
-
-CryptoPP::Integer OrProtocol::response()
-{
-    return ;
-}
-
-
-bool OrProtocol::verifyNIZKP(const NIZKP& nizkp)
+void OrProtocol::generateNIZKP()
 {
 }

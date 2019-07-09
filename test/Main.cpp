@@ -13,7 +13,6 @@ int main() {
     std::cout << "SchnorrProtocol test success." << std::endl;
     
     TestNormalOrRun();
-    TestSimulatedOrRun();
     TestOrNIZKP();
     std::cout << "OrProtocol test success." << std::endl;
 

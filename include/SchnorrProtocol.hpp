@@ -8,6 +8,13 @@
 #include <math.h>
 
 
+struct SchnorrNIZKP {
+    CryptoPP::ECPPoint commitment;
+    CryptoPP::Integer challenge;
+    CryptoPP::Integer response;
+};
+
+
 class SchnorrProtocol : public SigmaProtocol {
 public:
     SchnorrProtocol(const ECGroup& ecg,
@@ -17,27 +24,30 @@ public:
                     const CryptoPP::ECPPoint& public_key);
     void generateCommitment() override;
     void generateChallenge(CryptoPP::Integer* e = nullptr) override;
-    bool generateResponse() override;
+    void generateResponse() override;
     bool verify() override;
-    bool generateSimulation() override;
+    void generateSimulation() override;
 
     CryptoPP::Integer challengeSize() override { return *_order; }
     std::string getHashData() override;
+    
+    CryptoPP::ECPPoint commitment() { return _commitment; }
+    CryptoPP::Integer response() { return _s; }
 
-    std::vector<CryptoPP::ECPPoint> commitment() override;
-    CryptoPP::Integer response() override;
-
-    bool verifyNIZKP(const NIZKP& nizkp) override;
+    void generateNIZKP() override;
+    SchnorrNIZKP getNIZKP() { return _nizkp; }
+    bool verifyNIZKP(const SchnorrNIZKP& nizkp);
 
 private:
     const CryptoPP::ECP* _curve;
     const CryptoPP::ECPPoint* _base;
     const CryptoPP::Integer* _order;
     CryptoPP::ECPPoint _pub_key;
-    CryptoPP::Integer _w;
+    CryptoPP::Integer _w;    
     CryptoPP::Integer _u;
     CryptoPP::ECPPoint _commitment;
     CryptoPP::Integer _s;
+    SchnorrNIZKP _nizkp;
 };
 
 

@@ -6,30 +6,30 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <vector>
 
 
-class OrProtocol : public SigmaProtocol {
+class OrProtocol {
 public:
-    OrProtocol(SigmaProtocol* sigma0, SigmaProtocol* sigma1, bool know0);
-    void generateCommitment() override;
-    void generateChallenge(CryptoPP::Integer* e = nullptr) override;
-    bool generateResponse() override;
-    bool verify() override;
-    bool generateSimulation() override;
+    OrProtocol(std::vector<SigmaProtocol*> sigma_protocols, int i_known);
+    void generateCommitment();
+    void generateChallenge(CryptoPP::Integer e);
+    void generateResponse();
+    bool verify();
+    //void generateSimulation();
 
-    CryptoPP::Integer challengeSize() override { return _e_size; }
-    std::string getHashData() override;
+    std::string getHashData();
 
-    std::vector<CryptoPP::ECPPoint> commitment() override;
-    CryptoPP::Integer response() override;
+    void generateNIZKP();
 
-    bool verifyNIZKP(const NIZKP& nizkp) override;
+
 
 private:
-    SigmaProtocol* _sigma0;
-    SigmaProtocol* _sigma1;
-    bool _know0;
-    CryptoPP::Integer _e_size = 0;
+    std::vector<SigmaProtocol*> _sigma_prots;
+    int _i_known;
+    int _num_prots;
+    CryptoPP::Integer _total_e = 0;
+    CryptoPP::Integer _e = 0;
 };
 
 

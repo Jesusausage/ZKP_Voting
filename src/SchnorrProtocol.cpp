@@ -41,19 +41,19 @@ void SchnorrProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
 }
 
 
-bool SchnorrProtocol::generateResponse()
+void SchnorrProtocol::generateResponse()
 {
-    if (_e.IsZero())
-        return false;
+    assert(_e > 0);
 
     auto we = a_times_b_mod_c(_w, _e, *_order);
     _s = (_u + we) % *_order;
-    return true;
 }
 
 
 bool SchnorrProtocol::verify()
 {
+    assert(_e > 0);
+
     auto alpha = _curve->Multiply(_s, *_base);
     auto beta = _curve->Multiply(_e, _curve->Inverse(_pub_key));        
 
@@ -62,17 +62,15 @@ bool SchnorrProtocol::verify()
 }
 
 
-bool SchnorrProtocol::generateSimulation()
+void SchnorrProtocol::generateSimulation()
 {
-    if (!_e)
-        return false;
+    assert(_e > 0);
 
     _s = RandomInteger(1, *_order);
 
     auto alpha = _curve->Multiply(_s, *_base);
     auto beta = _curve->Multiply(_e, _curve->Inverse(_pub_key));
     _commitment = _curve->Add(alpha, beta);
-    return true;
 }
 
 
@@ -87,29 +85,29 @@ std::string SchnorrProtocol::getHashData()
 }
 
 
-std::vector<CryptoPP::ECPPoint> SchnorrProtocol::commitment()
+void SchnorrProtocol::generateNIZKP()
 {
-    std::vector<CryptoPP::ECPPoint> commitment;
-    commitment.push_back(_commitment);
-    return commitment;
+    generateCommitment();
+
+    std::string hash_data = getHashData();
+    auto hash_challenge = _genHashChallenge(hash_data);
+    generateChallenge(&hash_challenge);
+    generateResponse();
+    assert(verify() == true);
+
+    _nizkp = {commitment(), challenge(), response()};
 }
 
 
-CryptoPP::Integer SchnorrProtocol::response()
+bool SchnorrProtocol::verifyNIZKP(const SchnorrNIZKP& nizkp)
 {
-    return _s;
-}
-
-
-bool SchnorrProtocol::verifyNIZKP(const NIZKP& nizkp)
-{
-    _commitment = nizkp.commitment[0];
+    _commitment = nizkp.commitment;
     _e = nizkp.challenge;
     _s = nizkp.response;
     bool verified = this->verify();
 
     std::string hash_data = getHashData();
-    auto challenge = genHashChallenge(hash_data);
+    auto challenge = _genHashChallenge(hash_data);
     bool valid_e = (challenge == _e);
 
     return (verified && valid_e);
