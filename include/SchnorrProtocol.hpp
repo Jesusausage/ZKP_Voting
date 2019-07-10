@@ -11,9 +11,11 @@
 class SchnorrProtocol : public SigmaProtocol {
 public:
     SchnorrProtocol(const ECGroup& ecg,
+                    const CryptoPP::ECPPoint& generator, 
                     const CryptoPP::ECPPoint& public_key, 
                     const CryptoPP::Integer& witness);
     SchnorrProtocol(const ECGroup& ecg,
+                    const CryptoPP::ECPPoint& generator, 
                     const CryptoPP::ECPPoint& public_key);
     void generateCommitment() override;
     void generateChallenge(CryptoPP::Integer* e = nullptr) override;
@@ -24,23 +26,23 @@ public:
     CryptoPP::Integer challengeSize() override { return *_order; }
     std::string getHashData() override;
     
-    CryptoPP::ECPPoint commitment() { return _commitment; }
-    CryptoPP::Integer response() { return _s; }
-
-    void generateNIZKP() override;
-    bool verifyNIZKP(const Transcript& nizkp) override;
-
-    Transcript getTranscript() override;
+    std::vector<CryptoPP::ECPPoint> commitment() override;
+    CryptoPP::Integer challenge() override;
+    CryptoPP::Integer response() override;    
+    
     bool verifyTranscript(const Transcript& transcript) override;
 
 private:
     const CryptoPP::ECP* _curve;
-    const CryptoPP::ECPPoint* _base;
     const CryptoPP::Integer* _order;
+    const CryptoPP::ECPPoint _gen;
+
     CryptoPP::ECPPoint _pub_key;
-    CryptoPP::Integer _w;    
+    CryptoPP::Integer _w;
+
     CryptoPP::Integer _u;
     CryptoPP::ECPPoint _commitment;
+    CryptoPP::Integer _e = 0;
     CryptoPP::Integer _s;
 };
 

@@ -26,8 +26,7 @@ public:
     CryptoPP::Integer challengeSize();
     std::string getHashData();
 
-    void generateNIZKP();
-    OrNIZKP getNIZKP();
+    OrNIZKP generateNIZKP();
     bool verifyNIZKP(const OrNIZKP& or_nizkp);
 
 private:
@@ -36,7 +35,6 @@ private:
     int _num_prots;
     CryptoPP::Integer _total_e = 0;
     CryptoPP::Integer _e = 0;
-    std::vector<Transcript> _transcripts;
 };
 
 

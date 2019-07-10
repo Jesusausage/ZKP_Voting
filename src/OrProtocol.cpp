@@ -77,7 +77,7 @@ std::string OrProtocol::getHashData()
 }
 
 
-void OrProtocol::generateNIZKP()
+OrNIZKP OrProtocol::generateNIZKP()
 {
     generateCommitment();
 
@@ -86,17 +86,15 @@ void OrProtocol::generateNIZKP()
     for (SigmaProtocol* prot : _sigma_prots)
         hash_challenge += prot->challengeSize();
     generateChallenge(hash_challenge);
+
     generateResponse();
     assert(verify() == true);
 
+    std::vector<Transcript> transcripts;
     for (SigmaProtocol* prot : _sigma_prots)
-        _transcripts.push_back(prot->getTranscript());
-}
+        transcripts.push_back(prot->getTranscript());
 
-
-OrNIZKP OrProtocol::getNIZKP()
-{
-    return {_transcripts, _e};
+    return {transcripts, _e};
 }
 
 

@@ -26,19 +26,14 @@ public:
     virtual CryptoPP::Integer challengeSize() = 0;
     virtual std::string getHashData() = 0;
 
-    CryptoPP::Integer challenge() { return _e; }
+    virtual std::vector<CryptoPP::ECPPoint> commitment() = 0;
+    virtual CryptoPP::Integer challenge() = 0;
+    virtual CryptoPP::Integer response() = 0;
 
-    virtual void generateNIZKP() = 0;
-    Transcript getNIZKP() { return _nizkp; }
-    virtual bool verifyNIZKP(const Transcript& nizkp) = 0;
-
-    virtual Transcript getTranscript() = 0;
+    Transcript getTranscript();
+    Transcript generateNIZKP();
     virtual bool verifyTranscript(const Transcript& transcript) = 0;
-
-protected:
-    CryptoPP::Integer _e = 0;
-    Transcript _nizkp;
-    Transcript _transcript;
+    bool verifyNIZKP(const Transcript& nizkp);
 };
 
 
