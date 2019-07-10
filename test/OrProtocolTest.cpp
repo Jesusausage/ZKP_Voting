@@ -1,7 +1,7 @@
 #include "OrProtocolTest.hpp"
 
 
-void TestNormalOrRun()
+void TestSchnorrOrRun()
 {    
     auto ecg = GenerateECGroup();
 
@@ -31,7 +31,36 @@ void TestNormalOrRun()
 }
 
 
-void TestOrNIZKP()
+void TestElGamalOrRun()
+{ 
+    auto ecg = GenerateECGroup();
+
+    auto gen1 = ecg.base;
+    auto gen2 = ecg.curve.Multiply(27, ecg.base);
+    auto witness = RandomInteger(2, ecg.order);
+    auto public_key1 = ecg.curve.Multiply(witness, gen1);
+    auto public_key2 = ecg.curve.Multiply(witness, gen2);
+    ElGamalProtocol prot0(ecg, gen1, gen2, public_key1, public_key2);
+
+    gen1 = ecg.base;
+    gen2 = ecg.curve.Multiply(42, ecg.base);
+    witness = RandomInteger(2, ecg.order);
+    public_key1 = ecg.curve.Multiply(witness, gen1);
+    public_key2 = ecg.curve.Multiply(witness, gen2);
+    ElGamalProtocol prot1(ecg, gen1, gen2, public_key1, public_key2, witness);
+
+    std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
+    OrProtocol prot(prots, 1);
+    prot.generateCommitment();
+    auto challenge = RandomInteger(1 * prot0.challengeSize(), 
+                                   2 * prot0.challengeSize());
+    prot.generateChallenge(challenge);
+    prot.generateResponse();
+    assert(prot.verify() == true);
+}
+
+
+void TestSchnorrOrNIZKP()
 {
     auto ecg = GenerateECGroup();
 
@@ -48,6 +77,32 @@ void TestOrNIZKP()
     std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
     OrProtocol prot(prots, 0);
 
+    auto nizkp = prot.generateNIZKP();
+    assert(prot.verifyNIZKP(nizkp) == true);
+}
+
+
+void TestElGamalOrNIZKP()
+{ 
+    auto ecg = GenerateECGroup();
+
+    auto gen1 = ecg.base;
+    auto gen2 = ecg.curve.Multiply(27, ecg.base);
+    auto witness = RandomInteger(2, ecg.order);
+    auto public_key1 = ecg.curve.Multiply(witness, gen1);
+    auto public_key2 = ecg.curve.Multiply(witness, gen2);
+    ElGamalProtocol prot0(ecg, gen1, gen2, public_key1, public_key2);
+
+    gen1 = ecg.base;
+    gen2 = ecg.curve.Multiply(42, ecg.base);
+    witness = RandomInteger(2, ecg.order);
+    public_key1 = ecg.curve.Multiply(witness, gen1);
+    public_key2 = ecg.curve.Multiply(witness, gen2);
+    ElGamalProtocol prot1(ecg, gen1, gen2, public_key1, public_key2, witness);
+
+    std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
+    OrProtocol prot(prots, 1);
+    
     auto nizkp = prot.generateNIZKP();
     assert(prot.verifyNIZKP(nizkp) == true);
 }

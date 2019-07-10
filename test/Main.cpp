@@ -18,8 +18,10 @@ int main() {
     TestElGamalNIZKP();
     std::cout << "ElGamalProtocol test success." << std::endl;
     
-    TestNormalOrRun();
-    TestOrNIZKP();
+    TestSchnorrOrRun();
+    TestSchnorrOrNIZKP();
+    TestElGamalOrRun();
+    TestElGamalOrNIZKP();
     std::cout << "OrProtocol test success." << std::endl;
 
     TestECGroupAddition();
