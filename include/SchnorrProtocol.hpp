@@ -8,13 +8,6 @@
 #include <math.h>
 
 
-struct SchnorrNIZKP {
-    CryptoPP::ECPPoint commitment;
-    CryptoPP::Integer challenge;
-    CryptoPP::Integer response;
-};
-
-
 class SchnorrProtocol : public SigmaProtocol {
 public:
     SchnorrProtocol(const ECGroup& ecg,
@@ -35,8 +28,10 @@ public:
     CryptoPP::Integer response() { return _s; }
 
     void generateNIZKP() override;
-    SchnorrNIZKP getNIZKP() { return _nizkp; }
-    bool verifyNIZKP(const SchnorrNIZKP& nizkp);
+    bool verifyNIZKP(const Transcript& nizkp) override;
+
+    Transcript getTranscript() override;
+    bool verifyTranscript(const Transcript& transcript) override;
 
 private:
     const CryptoPP::ECP* _curve;
@@ -47,7 +42,6 @@ private:
     CryptoPP::Integer _u;
     CryptoPP::ECPPoint _commitment;
     CryptoPP::Integer _s;
-    SchnorrNIZKP _nizkp;
 };
 
 

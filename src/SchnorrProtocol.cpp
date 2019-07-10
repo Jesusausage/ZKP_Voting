@@ -55,7 +55,7 @@ bool SchnorrProtocol::verify()
     assert(_e > 0);
 
     auto alpha = _curve->Multiply(_s, *_base);
-    auto beta = _curve->Multiply(_e, _curve->Inverse(_pub_key));        
+    auto beta = _curve->Multiply(_e, _curve->Inverse(_pub_key));
 
     auto result = _curve->Add(alpha, beta);
     return (_commitment == result);
@@ -88,6 +88,8 @@ std::string SchnorrProtocol::getHashData()
 void SchnorrProtocol::generateNIZKP()
 {
     generateCommitment();
+    std::vector<CryptoPP::ECPPoint> commitment_vec;
+    commitment_vec.push_back(commitment());
 
     std::string hash_data = getHashData();
     auto hash_challenge = _genHashChallenge(hash_data);
@@ -95,20 +97,41 @@ void SchnorrProtocol::generateNIZKP()
     generateResponse();
     assert(verify() == true);
 
-    _nizkp = {commitment(), challenge(), response()};
+    _nizkp = {commitment_vec, challenge(), response()};
 }
 
 
-bool SchnorrProtocol::verifyNIZKP(const SchnorrNIZKP& nizkp)
+bool SchnorrProtocol::verifyNIZKP(const Transcript& nizkp)
 {
-    _commitment = nizkp.commitment;
+    _commitment = nizkp.commitment[0];
     _e = nizkp.challenge;
     _s = nizkp.response;
-    bool verified = this->verify();
+    if (verify() == false)
+        return false;
 
     std::string hash_data = getHashData();
-    auto challenge = _genHashChallenge(hash_data);
-    bool valid_e = (challenge == _e);
+    auto hash_challenge = _genHashChallenge(hash_data);
+    if (hash_challenge != _e)
+        return false;
 
-    return (verified && valid_e);
+    return true;
+}
+
+
+Transcript SchnorrProtocol::getTranscript() 
+{
+    std::vector<CryptoPP::ECPPoint> commitment_vec;
+    commitment_vec.push_back(_commitment);
+    return { commitment_vec, _e, _s };
+}
+
+
+bool SchnorrProtocol::verifyTranscript(const Transcript& transcript) 
+{
+    auto alpha = _curve->Multiply(transcript.response, *_base);
+    auto beta = _curve->Multiply(transcript.challenge, 
+                                 _curve->Inverse(_pub_key));
+
+    auto result = _curve->Add(alpha, beta);
+    return (transcript.commitment[0] == result);
 }

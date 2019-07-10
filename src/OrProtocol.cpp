@@ -52,13 +52,19 @@ bool OrProtocol::verify()
     assert(_e > 0);
 
     for (SigmaProtocol* prot : _sigma_prots) {
-        if (!prot->verify())
+        if (prot->verify() == false)
             return false;
     }
     if (_e != _total_e + _sigma_prots[_i_known]->challenge())
         return false;
 
     return true;
+}
+
+
+CryptoPP::Integer OrProtocol::challengeSize()
+{ 
+    return _sigma_prots[_i_known]->challengeSize();
 }
 
 
@@ -73,4 +79,64 @@ std::string OrProtocol::getHashData()
 
 void OrProtocol::generateNIZKP()
 {
+    generateCommitment();
+
+    std::string hash_data = getHashData();
+    auto hash_challenge = _genHashChallenge(hash_data);
+    for (SigmaProtocol* prot : _sigma_prots)
+        hash_challenge += prot->challengeSize();
+    generateChallenge(hash_challenge);
+    generateResponse();
+    assert(verify() == true);
+
+    for (SigmaProtocol* prot : _sigma_prots)
+        _transcripts.push_back(prot->getTranscript());
+}
+
+
+OrNIZKP OrProtocol::getNIZKP()
+{
+    return {_transcripts, _e};
+}
+
+
+bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
+{
+    assert(_num_prots == or_nizkp.transcripts.size());
+
+    for (int i = 0; i < _num_prots; i++) {
+        if (_sigma_prots[i]->verifyTranscript(or_nizkp.transcripts[i]) 
+            == false)
+            return false;
+    }
+    
+    std::string hash_data = getHashData();
+    auto hash_challenge = _genHashChallenge(hash_data);
+    CryptoPP::Integer total_challenge = 0;
+    for (SigmaProtocol* prot : _sigma_prots) {
+        hash_challenge += prot->challengeSize();
+        total_challenge += prot->challenge();
+    }
+    if (hash_challenge != or_nizkp.e)
+        return false;
+    if (total_challenge != hash_challenge)
+        return false;
+
+    return true;
+}
+
+
+CryptoPP::Integer OrProtocol::_genHashChallenge(const std::string& hash_data)
+{
+    auto challenge_size = challengeSize().ByteCount();
+    CryptoPP::byte* digest = new CryptoPP::byte[challenge_size];
+
+    CryptoPP::SHA3_256 hash;
+    hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
+    hash.TruncatedFinal(digest, challenge_size);
+
+    auto decoded_int = CryptoPP::Integer(digest, challenge_size);
+    delete digest;
+
+    return decoded_int % challengeSize();
 }
