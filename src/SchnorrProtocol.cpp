@@ -92,7 +92,7 @@ void SchnorrProtocol::generateNIZKP()
     commitment_vec.push_back(commitment());
 
     std::string hash_data = getHashData();
-    auto hash_challenge = _genHashChallenge(hash_data);
+    auto hash_challenge = GenHashChallenge(hash_data, challengeSize());
     generateChallenge(&hash_challenge);
     generateResponse();
     assert(verify() == true);
@@ -110,7 +110,7 @@ bool SchnorrProtocol::verifyNIZKP(const Transcript& nizkp)
         return false;
 
     std::string hash_data = getHashData();
-    auto hash_challenge = _genHashChallenge(hash_data);
+    auto hash_challenge = GenHashChallenge(hash_data, challengeSize());
     if (hash_challenge != _e)
         return false;
 

@@ -11,15 +11,15 @@
 #include <iostream>
 
 
-struct CompressedPoint {
-    CryptoPP::Integer x;
-    bool y;
-};
-
 struct ECGroup {
     CryptoPP::ECP curve;
     CryptoPP::ECPPoint base;
     CryptoPP::Integer order;
+};
+
+struct CompressedPoint {
+    CryptoPP::Integer x;
+    bool y;
 };
 
 

@@ -39,9 +39,11 @@ protected:
     CryptoPP::Integer _e = 0;
     Transcript _nizkp;
     Transcript _transcript;
-
-    CryptoPP::Integer _genHashChallenge(const std::string& hash_data);
 };
+
+
+CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
+                                   const CryptoPP::Integer& challenge_max);
 
 
 #endif

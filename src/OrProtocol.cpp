@@ -82,7 +82,7 @@ void OrProtocol::generateNIZKP()
     generateCommitment();
 
     std::string hash_data = getHashData();
-    auto hash_challenge = _genHashChallenge(hash_data);
+    auto hash_challenge = GenHashChallenge(hash_data, challengeSize());
     for (SigmaProtocol* prot : _sigma_prots)
         hash_challenge += prot->challengeSize();
     generateChallenge(hash_challenge);
@@ -111,7 +111,7 @@ bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
     }
     
     std::string hash_data = getHashData();
-    auto hash_challenge = _genHashChallenge(hash_data);
+    auto hash_challenge = GenHashChallenge(hash_data, challengeSize());
     CryptoPP::Integer total_challenge = 0;
     for (SigmaProtocol* prot : _sigma_prots) {
         hash_challenge += prot->challengeSize();
@@ -123,20 +123,4 @@ bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
         return false;
 
     return true;
-}
-
-
-CryptoPP::Integer OrProtocol::_genHashChallenge(const std::string& hash_data)
-{
-    auto challenge_size = challengeSize().ByteCount();
-    CryptoPP::byte* digest = new CryptoPP::byte[challenge_size];
-
-    CryptoPP::SHA3_256 hash;
-    hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
-    hash.TruncatedFinal(digest, challenge_size);
-
-    auto decoded_int = CryptoPP::Integer(digest, challenge_size);
-    delete digest;
-
-    return decoded_int % challengeSize();
 }

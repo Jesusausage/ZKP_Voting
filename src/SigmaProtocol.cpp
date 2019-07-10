@@ -1,9 +1,10 @@
 #include "SigmaProtocol.hpp"
 
 
-CryptoPP::Integer SigmaProtocol::_genHashChallenge(const std::string& hash_data)
+CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
+                                   const CryptoPP::Integer& challenge_max)
 {
-    auto challenge_size = challengeSize().ByteCount();
+    auto challenge_size = challenge_max.ByteCount();
     CryptoPP::byte* digest = new CryptoPP::byte[challenge_size];
 
     CryptoPP::SHA3_256 hash;
@@ -13,5 +14,5 @@ CryptoPP::Integer SigmaProtocol::_genHashChallenge(const std::string& hash_data)
     auto decoded_int = CryptoPP::Integer(digest, challenge_size);
     delete digest;
 
-    return decoded_int % challengeSize();
+    return decoded_int % challenge_max;
 }

@@ -8,9 +8,6 @@
 #include <math.h>
 
 
-void f();
-
-
 struct OrNIZKP {
     std::vector<Transcript> transcripts;
     CryptoPP::Integer e;
@@ -40,8 +37,6 @@ private:
     CryptoPP::Integer _total_e = 0;
     CryptoPP::Integer _e = 0;
     std::vector<Transcript> _transcripts;
-
-    CryptoPP::Integer _genHashChallenge(const std::string& hash_data);
 };
 
 
