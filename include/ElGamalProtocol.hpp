@@ -14,13 +14,15 @@ public:
                     const CryptoPP::ECPPoint& generator1, 
                     const CryptoPP::ECPPoint& generator2, 
                     const CryptoPP::ECPPoint& public_key1, 
-                    const CryptoPP::ECPPoint& public_key2, 
+                    const CryptoPP::ECPPoint& public_key2,
+                    int message,
                     const CryptoPP::Integer& witness);
     ElGamalProtocol(const ECGroup& ecg,
                     const CryptoPP::ECPPoint& generator1, 
                     const CryptoPP::ECPPoint& generator2, 
                     const CryptoPP::ECPPoint& public_key1, 
-                    const CryptoPP::ECPPoint& public_key2);
+                    const CryptoPP::ECPPoint& public_key2,
+                    int message);
     void generateCommitment() override;
     void generateChallenge(CryptoPP::Integer* e = nullptr) override;
     void generateResponse() override;
@@ -41,6 +43,7 @@ private:
     const CryptoPP::Integer* _order;
     const CryptoPP::ECPPoint _gen1;
     const CryptoPP::ECPPoint _gen2;
+    const int _m;
 
     CryptoPP::ECPPoint _pub_key1;
     CryptoPP::ECPPoint _pub_key2;
@@ -51,6 +54,9 @@ private:
     CryptoPP::ECPPoint _commitment2;
     CryptoPP::Integer _e = 0;
     CryptoPP::Integer _s;
+
+    CryptoPP::ECPPoint computeCommitment1();
+    CryptoPP::ECPPoint computeCommitment2();
 };
 
 
