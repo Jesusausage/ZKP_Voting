@@ -23,7 +23,7 @@ public:
     bool verify() override;
     void generateSimulation() override;
 
-    CryptoPP::Integer challengeSize() override { return *_order; }
+    CryptoPP::Integer challengeSize() override;
     std::string getHashData() override;
     
     std::vector<CryptoPP::ECPPoint> commitment() override;

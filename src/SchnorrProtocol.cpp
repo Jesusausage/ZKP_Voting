@@ -76,6 +76,12 @@ void SchnorrProtocol::generateSimulation()
 }
 
 
+CryptoPP::Integer SchnorrProtocol::challengeSize()
+{
+    return *_order;
+}
+
+
 std::string SchnorrProtocol::getHashData() 
 {
     std::string ret;

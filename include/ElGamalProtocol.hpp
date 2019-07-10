@@ -27,7 +27,7 @@ public:
     bool verify() override;
     void generateSimulation() override;
 
-    CryptoPP::Integer challengeSize() override { return *_order; }
+    CryptoPP::Integer challengeSize() override;
     std::string getHashData() override;
     
     std::vector<CryptoPP::ECPPoint> commitment() override;
@@ -41,12 +41,15 @@ private:
     const CryptoPP::Integer* _order;
     const CryptoPP::ECPPoint _gen1;
     const CryptoPP::ECPPoint _gen2;
+
     CryptoPP::ECPPoint _pub_key1;
     CryptoPP::ECPPoint _pub_key2;
-    CryptoPP::Integer _w;    
+    CryptoPP::Integer _w;   
+
     CryptoPP::Integer _u;
     CryptoPP::ECPPoint _commitment1;
     CryptoPP::ECPPoint _commitment2;
+    CryptoPP::Integer _e = 0;
     CryptoPP::Integer _s;
 };
 

@@ -1,4 +1,5 @@
 #include "SchnorrProtocolTest.hpp"
+#include "ElGamalProtocolTest.hpp"
 #include "OrProtocolTest.hpp"
 #include "ECGroupTest.hpp"
 
@@ -11,6 +12,11 @@ int main() {
     TestSimulatedSchnorrRun();
     TestSchnorrNIZKP();
     std::cout << "SchnorrProtocol test success." << std::endl;
+
+    TestNormalElGamalRun();
+    TestSimulatedElGamalRun();
+    TestElGamalNIZKP();
+    std::cout << "ElGamalProtocol test success." << std::endl;
     
     TestNormalOrRun();
     TestOrNIZKP();
