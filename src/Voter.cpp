@@ -2,44 +2,58 @@
 
 
 Voter::Voter(const ECGroup& ecg,
-             const CryptoPP::ECPPoint& pub_id,
-             const CryptoPP::Integer& priv_id_key,
-             const std::vector<CryptoPP::ECPPoint>& pub_vote_tokens,
-             const std::vector<CryptoPP::Integer>& priv_token_keys)
+             const CryptoPP::ECPPoint& generator,
+             const IDInfo& id_info,
+             const std::vector<VoteTokenInfo>& token_info)
              :
-             _curve(&ecg.curve),
-             _id(pub_id),
-             _id_key(priv_id_key),
-             _tokens(pub_vote_tokens),
-             _token_keys(priv_token_keys)
+             _ecg(&ecg),
+             _gen(generator),
+             _id_info(id_info),
+             _token_info(token_info)
 {
-    _num_options = _tokens.size();
+    _num_options = _token_info.size();
 }
 
 
-void Voter::castVote()
+void Voter::castVote(int option)
 {
+    _selected_option = option;
 
+    auto identity = _ecg->curve.Identity();
+
+    for (int i = 0; i < _num_options; i++) {
+        auto a = (i == option) ? _gen : identity;
+        auto b = _ecg->curve.Multiply(_token_info[i].token_key, 
+                                      _id_info.id_sum);
+        _votes.push_back(_ecg->curve.Add(a, b));
+    }
 }
 
 
 Vote Voter::getVoteAndProofs()
 {
     assert(_selected_option >= 0);
+    
     std::vector<OrNIZKP> proofs;
+    for (int i = 0; i < _num_options; i++)
+        proofs.push_back(_generateProof(i));
 
-    for (int i = 0; i < _num_options; i++) {
-        if (i == _selected_option) 
-            proofs.push_back(_generateProof(i, true));
-        else
-            proofs.push_back(_generateProof(i, false));
-    }
-
-    return {proofs, _vote};
+    return {proofs, _votes};
 }
 
 
-OrNIZKP Voter::_generateProof(int option, bool vote)
+OrNIZKP Voter::_generateProof(int option)
 {
-    
+    auto gen2 = _id_info.id_sum;
+    auto pub1 = _token_info[option].token;
+    auto pub2 = _votes[option];
+    int vote = (option == _selected_option) ? 1 : 0;
+    auto witness = _token_info[option].token_key;
+
+    ElGamalProtocol prot0(*_ecg, _gen, gen2, pub1, pub2, vote, witness);
+    ElGamalProtocol prot1(*_ecg, _gen, gen2, pub1, pub2, 1 - vote);
+    std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
+    OrProtocol prot(prots, 0);
+
+    return prot.generateNIZKP();
 }

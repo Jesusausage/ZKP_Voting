@@ -2,6 +2,7 @@
 #include "ElGamalProtocolTest.hpp"
 #include "OrProtocolTest.hpp"
 #include "ECGroupTest.hpp"
+#include "VoterTest.hpp"
 
 //#include <boost/asio.hpp>
 #include <ecp.h>
@@ -29,6 +30,9 @@ int main() {
     TestPointCompression();
     TestRandomPoint();
     std::cout << "ECGroup test success." << std::endl;
+
+    TestVoting();
+    std::cout << "Voter test success." << std::endl;
 
 	while (!std::cin.get())
     return 0;
