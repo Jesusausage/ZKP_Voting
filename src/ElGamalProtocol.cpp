@@ -7,7 +7,7 @@ ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
                                  const CryptoPP::ECPPoint& public_key1, 
                                  const CryptoPP::ECPPoint& public_key2,  
                                  int message,
-                                 const CryptoPP::Integer& witness)
+                                 const CryptoPP::Integer& witness /*= 0*/)
                                  :
                                  _curve(&ecg.curve), 
                                  _order(&ecg.order), 
@@ -17,23 +17,6 @@ ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
                                  _pub_key2(public_key2),
                                  _m(message),
                                  _w(witness)
-{}
-
-
-ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
-                                 const CryptoPP::ECPPoint& generator1, 
-                                 const CryptoPP::ECPPoint& generator2, 
-                                 const CryptoPP::ECPPoint& public_key1, 
-                                 const CryptoPP::ECPPoint& public_key2,
-                                 int message)
-                                 :
-                                 _curve(&ecg.curve), 
-                                 _order(&ecg.order), 
-                                 _gen1(generator1),
-                                 _gen2(generator2),
-                                 _pub_key1(public_key1),
-                                 _pub_key2(public_key2),
-                                 _m(message)
 {}
 
 
@@ -132,22 +115,29 @@ CryptoPP::Integer ElGamalProtocol::response()
 
 bool ElGamalProtocol::verifyTranscript(const Transcript& transcript) 
 {
-    auto a = _curve->Multiply(transcript.response, _gen1);
-    auto b = _curve->Multiply(transcript.challenge, 
-                              _curve->Inverse(_pub_key1));
-    auto result = _curve->Add(a, b);
-    if (!(transcript.commitment[0] == result))
-        return false;
+    _commitment1 = transcript.commitment[0];
+    _commitment2 = transcript.commitment[1];
+    _e = transcript.challenge;
+    _s = transcript.response;
 
-    a = _curve->Multiply(transcript.response, _gen2);
-    b = _curve->Multiply(transcript.challenge, 
-                         _curve->Inverse(_pub_key2));
-    auto c = _curve->Multiply(transcript.challenge * _m, _gen1);
-    result = _curve->Add(a, _curve->Add(b, c));
-    if (!(transcript.commitment[1] == result))
-        return false;
+    return verify();
 
-    return true;
+    // auto a = _curve->Multiply(transcript.response, _gen1);
+    // auto b = _curve->Multiply(transcript.challenge, 
+    //                           _curve->Inverse(_pub_key1));
+    // auto result = _curve->Add(a, b);
+    // if (!(transcript.commitment[0] == result))
+    //     return false;
+
+    // a = _curve->Multiply(transcript.response, _gen2);
+    // b = _curve->Multiply(transcript.challenge, 
+    //                      _curve->Inverse(_pub_key2));
+    // auto c = _curve->Multiply(transcript.challenge * _m, _gen1);
+    // result = _curve->Add(a, _curve->Add(b, c));
+    // if (!(transcript.commitment[1] == result))
+    //     return false;
+
+    // return true;
 }
 
 

@@ -13,7 +13,7 @@ void TestVoting()
     IDInfo id_info = {id, id_sum, id_key};
 
     std::vector<VoteTokenInfo> token_info;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 20; i++) {
         auto token_key = RandomInteger(2, ecg.order);
         auto token = ecg.curve.Multiply(token_key, gen);
         auto token_sum = ecg.curve.Multiply(42+i, gen);
@@ -22,6 +22,17 @@ void TestVoting()
 
     Voter voter(ecg, gen, id_info, token_info);
 
-    voter.castVote(3);
+    voter.castVote(8);
     Vote vote = voter.getVoteAndProofs();
+
+    // vote.votes[2].x += 1;
+
+    for (int i = 0; i < 20; i++) {
+        ElGamalProtocol prot0(ecg, gen, id_info.id_sum, token_info[i].token, vote.votes[i], 0);
+        ElGamalProtocol prot1(ecg, gen, id_info.id_sum, token_info[i].token, vote.votes[i], 1);
+        std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
+        OrProtocol prot(prots);
+
+        assert(prot.verifyNIZKP(vote.proofs[i]) == true);
+    }
 }

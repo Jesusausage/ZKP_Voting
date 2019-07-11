@@ -13,10 +13,7 @@ public:
     SchnorrProtocol(const ECGroup& ecg,
                     const CryptoPP::ECPPoint& generator, 
                     const CryptoPP::ECPPoint& public_key, 
-                    const CryptoPP::Integer& witness);
-    SchnorrProtocol(const ECGroup& ecg,
-                    const CryptoPP::ECPPoint& generator, 
-                    const CryptoPP::ECPPoint& public_key);
+                    const CryptoPP::Integer& witness = 0);
     void generateCommitment() override;
     void generateChallenge(CryptoPP::Integer* e = nullptr) override;
     void generateResponse() override;

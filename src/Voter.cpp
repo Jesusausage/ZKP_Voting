@@ -47,13 +47,18 @@ OrNIZKP Voter::_generateProof(int option)
     auto gen2 = _id_info.id_sum;
     auto pub1 = _token_info[option].token;
     auto pub2 = _votes[option];
-    int vote = (option == _selected_option) ? 1 : 0;
     auto witness = _token_info[option].token_key;
 
-    ElGamalProtocol prot0(*_ecg, _gen, gen2, pub1, pub2, vote, witness);
-    ElGamalProtocol prot1(*_ecg, _gen, gen2, pub1, pub2, 1 - vote);
-    std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
-    OrProtocol prot(prots, 0);
-
-    return prot.generateNIZKP();
+    if (option == _selected_option) {
+        ElGamalProtocol prot0(*_ecg, _gen, gen2, pub1, pub2, 0);
+        ElGamalProtocol prot1(*_ecg, _gen, gen2, pub1, pub2, 1, witness);
+        OrProtocol prot({&prot0, &prot1}, 1);
+        return prot.generateNIZKP();
+    }
+    else {
+        ElGamalProtocol prot0(*_ecg, _gen, gen2, pub1, pub2, 0, witness);
+        ElGamalProtocol prot1(*_ecg, _gen, gen2, pub1, pub2, 1);
+        OrProtocol prot({&prot0, &prot1}, 0);
+        return prot.generateNIZKP();
+    }    
 }

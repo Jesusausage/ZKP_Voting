@@ -4,24 +4,13 @@
 SchnorrProtocol::SchnorrProtocol(const ECGroup& ecg,
                                  const CryptoPP::ECPPoint& generator, 
                                  const CryptoPP::ECPPoint& public_key, 
-                                 const CryptoPP::Integer& witness)
+                                 const CryptoPP::Integer& witness /*= 0*/)
                                  :
                                  _curve(&ecg.curve), 
                                  _order(&ecg.order), 
                                  _gen(generator),
                                  _pub_key(public_key), 
                                  _w(witness) 
-{}
-
-
-SchnorrProtocol::SchnorrProtocol(const ECGroup& ecg,
-                                 const CryptoPP::ECPPoint& generator, 
-                                 const CryptoPP::ECPPoint& public_key)
-                                 :
-                                 _curve(&ecg.curve), 
-                                 _order(&ecg.order),
-                                 _gen(generator),
-                                 _pub_key(public_key)
 {}
 
 
