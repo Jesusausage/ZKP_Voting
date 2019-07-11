@@ -4,9 +4,6 @@
 #include "ECGroupTest.hpp"
 #include "VoterTest.hpp"
 
-//#include <boost/asio.hpp>
-#include <ecp.h>
-
 
 int main() {
     TestNormalSchnorrRun();

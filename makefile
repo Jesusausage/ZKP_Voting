@@ -1,11 +1,11 @@
-SRC = src/Group.cpp src/ModularInt.cpp src/Schnorr.cpp src/SigmaUtils.cpp src/Elgamal.cpp src/SchnorrProtocol.cpp src/OrProtocol.cpp
-TEST = test/Main.cpp test/GroupTest.cpp test/ModularIntTest.cpp test/SchnorrTest.cpp test/SigmaUtilsTest.cpp test/ElgamalTest.cpp test/SchnorrProtocolTest.cpp test/OrProtocolTest.cpp
+SRC = src/ECGroup.cpp src/ElGamalProtocol.cpp src/OrProtocol.cpp src/SchnorrProtocol.cpp src/SigmaProtocol.cpp src/Voter.cpp
+TEST = test/ECGroupTest.cpp test/ElGamalProtocolTest.cpp test/Main.cpp test/OrProtocolTest.cpp test/SchnorrProtocolTest.cpp test/VoterTest.cpp
 OBJ = $(SRC:src/%.cpp=build/%.o)
 TESTOBJ = $(TEST:test/%.cpp=build/test/%.o)
 DEP = $(OBJ:%.o=%.d)
 TESTDEP = $(TESTOBJ:%.o=%.d)
 FLAGS = -Wall -g -c -MMD
-INC = -I include -I lib
+INC = -I include
 
 runtests: $(OBJ) $(TESTOBJ)
 	g++ $^ -o $@

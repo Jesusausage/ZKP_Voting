@@ -2,11 +2,11 @@
 #define EC_GROUP_HPP
 
 
-#include <integer.h>
-#include <ecp.h>
-#include <hex.h>
-#include <randpool.h>
-#include <osrng.h>
+#include <cryptopp/integer.h>
+#include <cryptopp/ecp.h>
+#include <cryptopp/hex.h>
+#include <cryptopp/randpool.h>
+#include <cryptopp/osrng.h>
 
 #include <iostream>
 
