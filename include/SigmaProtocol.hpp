@@ -3,8 +3,8 @@
 
 
 #include "ECGroup.hpp"
-#include <cryptlib.h>
-#include <sha3.h>
+#include <cryptopp/cryptlib.h>
+#include <cryptopp/sha3.h>
 #include <assert.h>
 
 

@@ -41,8 +41,8 @@ void TestElGamalOrRun()
     auto public_key1 = ecg.curve.Multiply(witness, gen1);
     auto public_key2 = ecg.curve.Multiply(witness, gen2);
     // auto public_key2 = ecg.curve.Add(gen1, ecg.curve.Multiply(witness, gen2));
-    ElGamalProtocol prot0(ecg, gen1, gen2, public_key1, public_key2, 0, witness);
-    ElGamalProtocol prot1(ecg, gen1, gen2, public_key1, public_key2, 1);
+    ElGamalProtocol prot0(ecg, gen1, gen2, 0, public_key1, public_key2, witness);
+    ElGamalProtocol prot1(ecg, gen1, gen2, 1, public_key1, public_key2);
 
     std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
     OrProtocol prot(prots, 0);
@@ -87,8 +87,8 @@ void TestElGamalOrNIZKP()
     auto public_key1 = ecg.curve.Multiply(witness, gen1);
     // auto public_key2 = ecg.curve.Multiply(witness, gen2);
     auto public_key2 = ecg.curve.Add(gen1, ecg.curve.Multiply(witness, gen2));
-    ElGamalProtocol prot0(ecg, gen1, gen2, public_key1, public_key2, 0);
-    ElGamalProtocol prot1(ecg, gen1, gen2, public_key1, public_key2, 1, witness);
+    ElGamalProtocol prot0(ecg, gen1, gen2, 0, public_key1, public_key2);
+    ElGamalProtocol prot1(ecg, gen1, gen2, 1, public_key1, public_key2, witness);
 
     std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
     OrProtocol prot(prots, 1);

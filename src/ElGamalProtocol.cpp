@@ -4,18 +4,18 @@
 ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
                                  const CryptoPP::ECPPoint& generator1, 
                                  const CryptoPP::ECPPoint& generator2, 
+                                 int message,
                                  const CryptoPP::ECPPoint& public_key1, 
                                  const CryptoPP::ECPPoint& public_key2,  
-                                 int message,
                                  const CryptoPP::Integer& witness /*= 0*/)
                                  :
                                  _curve(&ecg.curve), 
                                  _order(&ecg.order), 
                                  _gen1(generator1),
                                  _gen2(generator2),
+                                 _m(message),
                                  _pub_key1(public_key1),
                                  _pub_key2(public_key2),
-                                 _m(message),
                                  _w(witness)
 {}
 

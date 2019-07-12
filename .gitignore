@@ -4,3 +4,4 @@ lib/*
 ZKP*
 Debug/*
 *.json
+*.gch

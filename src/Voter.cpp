@@ -50,14 +50,14 @@ OrNIZKP Voter::_generateProof(int option)
     auto witness = _token_info[option].token_key;
 
     if (option == _selected_option) {
-        ElGamalProtocol prot0(*_ecg, _gen, gen2, pub1, pub2, 0);
-        ElGamalProtocol prot1(*_ecg, _gen, gen2, pub1, pub2, 1, witness);
+        ElGamalProtocol prot0(*_ecg, _gen, gen2, 0, pub1, pub2);
+        ElGamalProtocol prot1(*_ecg, _gen, gen2, 1, pub1, pub2, witness);
         OrProtocol prot({&prot0, &prot1}, 1);
         return prot.generateNIZKP();
     }
     else {
-        ElGamalProtocol prot0(*_ecg, _gen, gen2, pub1, pub2, 0, witness);
-        ElGamalProtocol prot1(*_ecg, _gen, gen2, pub1, pub2, 1);
+        ElGamalProtocol prot0(*_ecg, _gen, gen2, 0, pub1, pub2, witness);
+        ElGamalProtocol prot1(*_ecg, _gen, gen2, 1, pub1, pub2);
         OrProtocol prot({&prot0, &prot1}, 0);
         return prot.generateNIZKP();
     }    

@@ -4,17 +4,18 @@ OBJ = $(SRC:src/%.cpp=build/%.o)
 TESTOBJ = $(TEST:test/%.cpp=build/test/%.o)
 DEP = $(OBJ:%.o=%.d)
 TESTDEP = $(TESTOBJ:%.o=%.d)
-FLAGS = -Wall -g -c -MMD
+FLAGS = -Wall -c -MMD -O3
+LIBS = -lcryptopp
 INC = -I include
 
 runtests: $(OBJ) $(TESTOBJ)
-	g++ $^ -o $@
+	g++ $^ $(LIBS) -o $@
 
 build/test/%.o: test/%.cpp
-	g++ $(FLAGS) $(INC) $< -o $@
+	g++ $< $(FLAGS) $(INC) $(LIBS) -o $@
 
 build/%.o: src/%.cpp
-	g++ $(FLAGS) $(INC) $< -o $@
+	g++ $< $(FLAGS) $(INC) $(LIBS) -o $@
 
 -include $(DEP) $(TESTDEP)
 

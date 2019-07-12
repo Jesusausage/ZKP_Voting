@@ -28,8 +28,8 @@ void TestVoting()
     // vote.votes[2].x += 1;
 
     for (int i = 0; i < 20; i++) {
-        ElGamalProtocol prot0(ecg, gen, id_info.id_sum, token_info[i].token, vote.votes[i], 0);
-        ElGamalProtocol prot1(ecg, gen, id_info.id_sum, token_info[i].token, vote.votes[i], 1);
+        ElGamalProtocol prot0(ecg, gen, id_info.id_sum, 0, token_info[i].token, vote.votes[i]);
+        ElGamalProtocol prot1(ecg, gen, id_info.id_sum, 1, token_info[i].token, vote.votes[i]);
         std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
         OrProtocol prot(prots);
 

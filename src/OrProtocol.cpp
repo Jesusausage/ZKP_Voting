@@ -107,7 +107,7 @@ OrNIZKP OrProtocol::generateNIZKP()
 
 bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
 {
-    assert(_num_prots == or_nizkp.transcripts.size());
+    assert((unsigned int)_num_prots == or_nizkp.transcripts.size());
 
     for (int i = 0; i < _num_prots; i++) {
         if (_sigma_prots[i]->verifyTranscript(or_nizkp.transcripts[i]) 
