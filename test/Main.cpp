@@ -3,6 +3,7 @@
 #include "OrProtocolTest.hpp"
 #include "ECGroupTest.hpp"
 #include "VoterTest.hpp"
+#include "VerifierTest.hpp"
 
 
 int main() {
@@ -30,6 +31,9 @@ int main() {
 
     TestVoting();
     std::cout << "Voter test success." << std::endl;
+
+    TestVerification();
+    std::cout << "Verification test success." << std::endl;
 
 	while (!std::cin.get())
     return 0;

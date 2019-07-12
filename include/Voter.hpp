@@ -7,22 +7,8 @@
 
 
 struct Vote {
-    std::vector<OrNIZKP> proofs;
-    std::vector<CryptoPP::ECPPoint> votes;
-};
-
-
-struct IDInfo {
-    CryptoPP::ECPPoint id;
-    CryptoPP::ECPPoint id_sum;
-    CryptoPP::Integer id_key;
-};
-
-
-struct VoteTokenInfo {
-    CryptoPP::ECPPoint token;
-    CryptoPP::ECPPoint token_sum;
-    CryptoPP::Integer token_key;
+    OrNIZKP proof;
+    CryptoPP::ECPPoint vote;
 };
 
 
@@ -30,18 +16,21 @@ class Voter {
 public:
     Voter(const ECGroup& ecg,
           const CryptoPP::ECPPoint& generator,
-          const IDInfo& id_info,
-          const std::vector<VoteTokenInfo>& token_info);
+          const CryptoPP::ECPPoint& id_sum,
+          const std::vector<CryptoPP::ECPPoint>& tokens);
+    void setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys);
     void castVote(int option);
-    Vote getVoteAndProofs();
+    std::vector<Vote> getVoteAndProofs();
 
 private:
     const ECGroup* _ecg;
     const CryptoPP::ECPPoint _gen;
-    IDInfo _id_info;
-    std::vector<VoteTokenInfo> _token_info;
-
+    const CryptoPP::ECPPoint _id_sum;
+    const std::vector<CryptoPP::ECPPoint> _tokens;
+    
     int _num_options;
+    std::vector<CryptoPP::Integer> _token_keys;
+
     int _selected_option = -1;
     std::vector<CryptoPP::ECPPoint> _votes;
 

@@ -1,7 +1,7 @@
-#include "VoterTest.hpp"
+#include "VerifierTest.hpp"
 
 
-void TestVoting()
+void TestVerification()
 {
     auto ecg = GenerateECGroup();
 
@@ -20,15 +20,10 @@ void TestVoting()
     voter.setTokenKeys(token_keys);
     voter.castVote(8);
     auto votes = voter.getVoteAndProofs();
-
+    
     // votes[8].vote.x += 1;
 
-    for (int i = 0; i < 20; i++) {
-        ElGamalProtocol prot0(ecg, gen, id_sum, 0, tokens[i], votes[i].vote);
-        ElGamalProtocol prot1(ecg, gen, id_sum, 1, tokens[i], votes[i].vote);
-        std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
-        OrProtocol prot(prots);
-
-        assert(prot.verifyNIZKP(votes[i].proof) == true);
-    }
+    Verifier verifier(ecg, gen, id_sum);
+    verifier.setVoterTokens(tokens);
+    assert(verifier.verifyProofs(votes) == true);
 }
