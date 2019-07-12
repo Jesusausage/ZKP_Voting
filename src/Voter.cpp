@@ -12,6 +12,18 @@ Voter::Voter(const ECGroup& ecg,
              _tokens(tokens)
 {
     _num_options = _tokens.size();
+
+    _prots[0] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 0);
+    _prots[1] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 1);
+    _or_prot = new OrProtocol({_prots[0], _prots[1]});
+}
+
+
+Voter::~Voter()
+{
+    delete _prots[0];
+    delete _prots[1];
+    delete _or_prot;
 }
 
 
@@ -51,21 +63,12 @@ std::vector<Vote> Voter::getVoteAndProofs()
 
 OrNIZKP Voter::_generateProof(int option)
 {
-    auto gen2 = _id_sum;
-    auto pub1 = _tokens[option];
-    auto pub2 = _votes[option];
-    auto witness = _token_keys[option];
+    int known = (option == _selected_option) ? 1 : 0;
 
-    if (option == _selected_option) {
-        ElGamalProtocol prot0(*_ecg, _gen, gen2, 0, pub1, pub2);
-        ElGamalProtocol prot1(*_ecg, _gen, gen2, 1, pub1, pub2, witness);
-        OrProtocol prot({&prot0, &prot1}, 1);
-        return prot.generateNIZKP();
-    }
-    else {
-        ElGamalProtocol prot0(*_ecg, _gen, gen2, 0, pub1, pub2, witness);
-        ElGamalProtocol prot1(*_ecg, _gen, gen2, 1, pub1, pub2);
-        OrProtocol prot({&prot0, &prot1}, 0);
-        return prot.generateNIZKP();
-    }    
+    _prots[known]->setKeys(_tokens[option], _votes[option], 
+                           _token_keys[option]);
+    _prots[1 - known]->setKeys(_tokens[option], _votes[option]);
+    _or_prot->setKnown(known);
+
+    return _or_prot->generateNIZKP();
 }

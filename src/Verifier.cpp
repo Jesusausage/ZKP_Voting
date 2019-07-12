@@ -8,7 +8,19 @@ Verifier::Verifier(const ECGroup& ecg,
                    _ecg(&ecg),
                    _gen(generator),
                    _id_sum(id_sum)
-{}
+{
+    _prots[0] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 0);
+    _prots[1] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 1);
+    _or_prot = new OrProtocol({_prots[0], _prots[1]});
+}
+
+
+Verifier::~Verifier()
+{
+    delete _prots[0];
+    delete _prots[1];
+    delete _or_prot;
+}
 
 
 void Verifier::setVoterTokens(const std::vector<CryptoPP::ECPPoint>& tokens)
@@ -20,13 +32,12 @@ void Verifier::setVoterTokens(const std::vector<CryptoPP::ECPPoint>& tokens)
 bool Verifier::verifyProofs(const std::vector<Vote>& votes)
 {
     int num_options = votes.size();
-    for (int i = 0; i < num_options; i++) {
-        ElGamalProtocol prot0(*_ecg, _gen, _id_sum, 0, _tokens[i], votes[i].vote);
-        ElGamalProtocol prot1(*_ecg, _gen, _id_sum, 1, _tokens[i], votes[i].vote);
-        std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
-        OrProtocol prot(prots);
 
-        if (prot.verifyNIZKP(votes[i].proof) == false)
+    for (int i = 0; i < num_options; i++) {
+        _prots[0]->setKeys(_tokens[i], votes[i].vote);
+        _prots[1]->setKeys(_tokens[i], votes[i].vote);
+
+        if (_or_prot->verifyNIZKP(votes[i].proof) == false)
             return false;
     }
 

@@ -18,6 +18,7 @@ public:
           const CryptoPP::ECPPoint& generator,
           const CryptoPP::ECPPoint& id_sum,
           const std::vector<CryptoPP::ECPPoint>& tokens);
+    ~Voter();
     void setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys);
     void castVote(int option);
     std::vector<Vote> getVoteAndProofs();
@@ -33,6 +34,9 @@ private:
 
     int _selected_option = -1;
     std::vector<CryptoPP::ECPPoint> _votes;
+
+    ElGamalProtocol* _prots[2];
+    OrProtocol* _or_prot;
 
     OrNIZKP _generateProof(int option);
 };

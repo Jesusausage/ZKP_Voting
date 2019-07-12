@@ -17,6 +17,7 @@ struct OrNIZKP {
 class OrProtocol {
 public:
     OrProtocol(std::vector<SigmaProtocol*> sigma_protocols, int i_known = 0);
+    void setKnown(int i_known);
     void generateCommitment();
     void generateChallenge(CryptoPP::Integer e);
     void generateResponse();

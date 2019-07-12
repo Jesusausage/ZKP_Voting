@@ -18,6 +18,12 @@ OrProtocol::OrProtocol(std::vector<SigmaProtocol*> sigma_protocols,
 }
 
 
+void OrProtocol::setKnown(int i_known)
+{
+    _i_known = i_known;
+}
+
+
 void OrProtocol::generateCommitment()
 {
     for (int i = 0; i < _num_prots; i++) {

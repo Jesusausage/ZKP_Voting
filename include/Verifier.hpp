@@ -12,7 +12,7 @@ public:
     Verifier(const ECGroup& ecg,
           const CryptoPP::ECPPoint& generator,
           const CryptoPP::ECPPoint& id_sum);
-
+    ~Verifier();
     void setVoterTokens(const std::vector<CryptoPP::ECPPoint>& tokens);
     bool verifyProofs(const std::vector<Vote>& votes);
 
@@ -22,6 +22,9 @@ private:
     const CryptoPP::ECPPoint _id_sum;
 
     std::vector<CryptoPP::ECPPoint> _tokens;
+
+    ElGamalProtocol* _prots[2];
+    OrProtocol* _or_prot;
 };
 
 

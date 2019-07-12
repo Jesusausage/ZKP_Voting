@@ -4,27 +4,31 @@
 ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
                                  const CryptoPP::ECPPoint& generator1, 
                                  const CryptoPP::ECPPoint& generator2, 
-                                 int message,
-                                 const CryptoPP::ECPPoint& public_key1, 
-                                 const CryptoPP::ECPPoint& public_key2,  
-                                 const CryptoPP::Integer& witness /*= 0*/)
+                                 int message)
                                  :
                                  _curve(&ecg.curve), 
                                  _order(&ecg.order), 
-                                 _gen1(generator1),
-                                 _gen2(generator2),
-                                 _m(message),
-                                 _pub_key1(public_key1),
-                                 _pub_key2(public_key2),
-                                 _w(witness)
+                                 _gen1(&generator1),
+                                 _gen2(&generator2),
+                                 _m(message)
 {}
+
+
+void ElGamalProtocol::setKeys(const CryptoPP::ECPPoint& public_key1,
+                              const CryptoPP::ECPPoint& public_key2,
+                              const CryptoPP::Integer& witness /*= 0*/)
+{
+    _pub_key1 = public_key1;
+    _pub_key2 = public_key2;
+    _w = witness;
+}
 
 
 void ElGamalProtocol::generateCommitment()
 {
     _u = RandomInteger(2, *_order);    
-    _commitment1 = _curve->Multiply(_u, _gen1);
-    _commitment2 = _curve->Multiply(_u, _gen2);
+    _commitment1 = _curve->Multiply(_u, *_gen1);
+    _commitment2 = _curve->Multiply(_u, *_gen2);
 }
 
 
@@ -121,29 +125,12 @@ bool ElGamalProtocol::verifyTranscript(const Transcript& transcript)
     _s = transcript.response;
 
     return verify();
-
-    // auto a = _curve->Multiply(transcript.response, _gen1);
-    // auto b = _curve->Multiply(transcript.challenge, 
-    //                           _curve->Inverse(_pub_key1));
-    // auto result = _curve->Add(a, b);
-    // if (!(transcript.commitment[0] == result))
-    //     return false;
-
-    // a = _curve->Multiply(transcript.response, _gen2);
-    // b = _curve->Multiply(transcript.challenge, 
-    //                      _curve->Inverse(_pub_key2));
-    // auto c = _curve->Multiply(transcript.challenge * _m, _gen1);
-    // result = _curve->Add(a, _curve->Add(b, c));
-    // if (!(transcript.commitment[1] == result))
-    //     return false;
-
-    // return true;
 }
 
 
 CryptoPP::ECPPoint ElGamalProtocol::computeCommitment1()
 {
-    auto a = _curve->Multiply(_s, _gen1);
+    auto a = _curve->Multiply(_s, *_gen1);
     auto b = _curve->Multiply(_e, _curve->Inverse(_pub_key1));
 
     return _curve->Add(a, b);
@@ -152,9 +139,9 @@ CryptoPP::ECPPoint ElGamalProtocol::computeCommitment1()
 
 CryptoPP::ECPPoint ElGamalProtocol::computeCommitment2()
 {
-    auto a = _curve->Multiply(_s, _gen2);
+    auto a = _curve->Multiply(_s, *_gen2);
     auto b = _curve->Multiply(_e, _curve->Inverse(_pub_key2));
-    auto c = _curve->Multiply(_e * _m, _gen1);
+    auto c = _curve->Multiply(_e * _m, *_gen1);
 
     return _curve->Add(a, _curve->Add(b, c));
 }
