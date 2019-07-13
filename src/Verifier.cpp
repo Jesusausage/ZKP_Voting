@@ -3,23 +3,29 @@
 
 Verifier::Verifier(const ECGroup& ecg,
                    const CryptoPP::ECPPoint& generator,
-                   const CryptoPP::ECPPoint& id_sum)
+                   const CryptoPP::ECPPoint& id_sum,
+                   const std::vector<CryptoPP::ECPPoint>& token_sums)
                    :
                    _ecg(&ecg),
                    _gen(generator),
-                   _id_sum(id_sum)
+                   _id_sum(id_sum),
+                   _token_sums(token_sums)
 {
-    _prots[0] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 0);
-    _prots[1] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 1);
-    _or_prot = new OrProtocol({_prots[0], _prots[1]});
+    _vote_prots[0] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 0);
+    _vote_prots[1] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 1);
+    _vote_prot = new OrProtocol({_vote_prots[0], _vote_prots[1]});
+
+    _key_prot = new ElGamalProtocol(*_ecg, _gen, 0);
 }
 
 
 Verifier::~Verifier()
 {
-    delete _prots[0];
-    delete _prots[1];
-    delete _or_prot;
+    delete _vote_prots[0];
+    delete _vote_prots[1];
+    delete _vote_prot;
+
+    delete _key_prot;
 }
 
 
@@ -29,15 +35,35 @@ void Verifier::setVoterTokens(const std::vector<CryptoPP::ECPPoint>& tokens)
 }
 
 
-bool Verifier::verifyProofs(const std::vector<Vote>& votes)
+void Verifier::setID(const CryptoPP::ECPPoint& id)
 {
-    int num_options = votes.size();
+    _id = id;
+}
+
+
+bool Verifier::verifyVoteProofs(const Vote& votes)
+{
+    int num_options = votes.values.size();
 
     for (int i = 0; i < num_options; i++) {
-        _prots[0]->setKeys(_tokens[i], votes[i].vote);
-        _prots[1]->setKeys(_tokens[i], votes[i].vote);
+        _vote_prots[0]->setKeys(_tokens[i], votes.values[i]);
+        _vote_prots[1]->setKeys(_tokens[i], votes.values[i]);
 
-        if (_or_prot->verifyNIZKP(votes[i].proof) == false)
+        if (_vote_prot->verifyNIZKP(votes.proofs[i]) == false)
+            return false;
+    }
+
+    return true;
+}
+
+
+bool Verifier::verifyKeyProofs(const Key& keys)
+{
+    int num_options = keys.values.size();
+
+    for (int i = 0; i < num_options; i++) {
+        _key_prot->setParams(_token_sums[i], _id, keys.values[i]);
+        if (_key_prot->verifyNIZKP(keys.proofs[i]) == false)
             return false;
     }
 

@@ -7,14 +7,14 @@ Voter::Voter(const ECGroup& ecg,
              const std::vector<CryptoPP::ECPPoint>& tokens)
              :
              _ecg(&ecg),
-             _gen(generator),
+             _gen(&generator),
              _id_sum(id_sum),
              _tokens(tokens)
 {
     _num_options = _tokens.size();
 
-    _prots[0] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 0);
-    _prots[1] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 1);
+    _prots[0] = new ElGamalProtocol(*_ecg, *_gen, _id_sum, 0);
+    _prots[1] = new ElGamalProtocol(*_ecg, *_gen, _id_sum, 1);
     _or_prot = new OrProtocol({_prots[0], _prots[1]});
 }
 
@@ -29,7 +29,7 @@ Voter::~Voter()
 
 void Voter::setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys)
 {
-    assert(token_keys.size() == _num_options);
+    assert(token_keys.size() == (unsigned int)_num_options);
     _token_keys = token_keys;
 }
 
@@ -41,7 +41,7 @@ void Voter::castVote(int option)
     auto identity = _ecg->curve.Identity();
 
     for (int i = 0; i < _num_options; i++) {
-        auto a = (i == option) ? _gen : identity;
+        auto a = (i == option) ? *_gen : identity;
         auto b = _ecg->curve.Multiply(_token_keys[i], 
                                       _id_sum);
         _votes.push_back(_ecg->curve.Add(a, b));
@@ -49,15 +49,15 @@ void Voter::castVote(int option)
 }
 
 
-std::vector<Vote> Voter::getVoteAndProofs()
+Vote Voter::getVoteAndProofs()
 {
     assert(_selected_option >= 0);
     
-    std::vector<Vote> votes;
+    std::vector<OrNIZKP> proofs;
     for (int i = 0; i < _num_options; i++)
-        votes.push_back({_generateProof(i), _votes[i]});
+        proofs.push_back(_generateProof(i));
 
-    return votes;
+    return {_votes, proofs};
 }
 
 

@@ -3,6 +3,7 @@
 #include "OrProtocolTest.hpp"
 #include "ECGroupTest.hpp"
 #include "VoterTest.hpp"
+#include "KeyGenTest.hpp"
 #include "VerifierTest.hpp"
 
 
@@ -31,6 +32,9 @@ int main() {
 
     TestVoting();
     std::cout << "Voter test success." << std::endl;
+
+    TestKeyGeneration();
+    std::cout << "KeyGen test success." << std::endl;
 
     TestVerification();
     std::cout << "Verification test success." << std::endl;

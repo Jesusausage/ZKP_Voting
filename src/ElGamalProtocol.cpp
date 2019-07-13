@@ -9,7 +9,18 @@ ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
                                  _curve(&ecg.curve), 
                                  _order(&ecg.order), 
                                  _gen1(&generator1),
-                                 _gen2(&generator2),
+                                 _m(message),
+                                 _gen2(generator2)
+{}    
+
+
+ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
+                                 const CryptoPP::ECPPoint& generator1,
+                                 int message)
+                                 :
+                                 _curve(&ecg.curve), 
+                                 _order(&ecg.order), 
+                                 _gen1(&generator1),
                                  _m(message)
 {}
 
@@ -24,11 +35,24 @@ void ElGamalProtocol::setKeys(const CryptoPP::ECPPoint& public_key1,
 }
 
 
+
+void ElGamalProtocol::setParams(const CryptoPP::ECPPoint& generator2,
+                                const CryptoPP::ECPPoint& public_key1,
+                                const CryptoPP::ECPPoint& public_key2,
+                                const CryptoPP::Integer& witness /*= 0*/)
+{
+    _gen2 = generator2;
+    _pub_key1 = public_key1;
+    _pub_key2 = public_key2;
+    _w = witness;
+}
+
+
 void ElGamalProtocol::generateCommitment()
 {
     _u = RandomInteger(2, *_order);    
     _commitment1 = _curve->Multiply(_u, *_gen1);
-    _commitment2 = _curve->Multiply(_u, *_gen2);
+    _commitment2 = _curve->Multiply(_u, _gen2);
 }
 
 
@@ -139,7 +163,7 @@ CryptoPP::ECPPoint ElGamalProtocol::computeCommitment1()
 
 CryptoPP::ECPPoint ElGamalProtocol::computeCommitment2()
 {
-    auto a = _curve->Multiply(_s, *_gen2);
+    auto a = _curve->Multiply(_s, _gen2);
     auto b = _curve->Multiply(_e, _curve->Inverse(_pub_key2));
     auto c = _curve->Multiply(_e * _m, *_gen1);
 
