@@ -8,6 +8,7 @@
 
 
 void TestVerification();
+void TestVoteDecryption();
 
 
 #endif

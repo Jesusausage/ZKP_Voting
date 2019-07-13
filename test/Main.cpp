@@ -37,6 +37,7 @@ int main() {
     std::cout << "KeyGen test success." << std::endl;
 
     TestVerification();
+    TestVoteDecryption();
     std::cout << "Verification test success." << std::endl;
 
 	while (!std::cin.get())
