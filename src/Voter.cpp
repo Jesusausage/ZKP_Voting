@@ -36,8 +36,6 @@ void Voter::setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys)
 
 void Voter::castVote(int option)
 {
-    _selected_option = option;
-
     auto identity = _ecg->curve.Identity();
 
     for (int i = 0; i < _num_options; i++) {
@@ -45,30 +43,29 @@ void Voter::castVote(int option)
         auto b = _ecg->curve.Multiply(_token_keys[i], 
                                       _id_sum);
         _votes.push_back(_ecg->curve.Add(a, b));
+
+        int known = (i == option) ? 1 : 0;
+        _prots[known]->setKeys(_tokens[i], _votes[i], _token_keys[i]);
+        _prots[1 - known]->setKeys(_tokens[i], _votes[i]);
+        _or_prot->setKnown(known);
+        _proofs.push_back(_or_prot->generateNIZKP());
     }
 }
 
 
 Vote Voter::getVoteAndProofs()
 {
-    assert(_selected_option >= 0);
-    
-    std::vector<OrNIZKP> proofs;
-    for (int i = 0; i < _num_options; i++)
-        proofs.push_back(_generateProof(i));
-
-    return {_votes, proofs};
+    return {_votes, _proofs};
 }
 
 
-OrNIZKP Voter::_generateProof(int option)
+CompressedVote Voter::getCompressedVote()
 {
-    int known = (option == _selected_option) ? 1 : 0;
+    CompressedVote ret;
+    for (int i = 0; i < _num_options; i++) {
+        ret.values.push_back(CompressPoint(_votes[i]));
+        ret.proofs.push_back(compressOrNIZKP(_proofs[i]));
+    }
 
-    _prots[known]->setKeys(_tokens[option], _votes[option], 
-                           _token_keys[option]);
-    _prots[1 - known]->setKeys(_tokens[option], _votes[option]);
-    _or_prot->setKnown(known);
-
-    return _or_prot->generateNIZKP();
+    return ret;
 }

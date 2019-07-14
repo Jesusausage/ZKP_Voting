@@ -45,4 +45,10 @@ private:
 };
 
 
+CompressedOrNIZKP compressOrNIZKP(const OrNIZKP& or_nizkp);
+
+OrNIZKP decompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
+                          const CryptoPP::ECP& curve);
+
+
 #endif

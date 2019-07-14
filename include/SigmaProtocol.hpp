@@ -59,5 +59,10 @@ protected:
 CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
                                    const CryptoPP::Integer& challenge_max);
 
+CompressedTranscript CompressTranscript(const Transcript& transcript);
+
+Transcript DecompressTranscript(const CompressedTranscript& compressed_transcript,
+                                const CryptoPP::ECP& curve);
+
 
 #endif

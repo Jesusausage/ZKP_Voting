@@ -31,25 +31,12 @@ void KeyGen::setIDKey(const CryptoPP::Integer& id_key)
 
 Key KeyGen::getKeysAndProofs()
 {   
-    _generateKeys();
-
-    std::vector<Transcript> proofs;
-    for (int i = 0; i < _num_options; i++)
-        proofs.push_back(_generateProof(i));
-
-    return {_keys, proofs};
-}
-
-
-void KeyGen::_generateKeys()
-{
-    for (int i = 0; i < _num_options; i++)
+    for (int i = 0; i < _num_options; i++) {
         _keys.push_back(_ecg->curve.Multiply(_id_key, _token_sums[i]));
-}
 
+        _prot->setParams(_token_sums[i], _id, _keys[i], _id_key);
+        _proofs.push_back(_prot->generateNIZKP());
+    }
 
-Transcript KeyGen::_generateProof(int option)
-{
-    _prot->setParams(_token_sums[option], _id, _keys[option], _id_key);
-    return _prot->generateNIZKP();
+    return {_keys, _proofs};
 }

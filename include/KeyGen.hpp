@@ -32,11 +32,9 @@ private:
     CryptoPP::Integer _id_key;
 
     std::vector<CryptoPP::ECPPoint> _keys;
+    std::vector<Transcript> _proofs;
 
     ElGamalProtocol* _prot = nullptr;
-
-    void _generateKeys();
-    Transcript _generateProof(int option);
 };
 
 

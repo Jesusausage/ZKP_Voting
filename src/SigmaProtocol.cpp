@@ -103,3 +103,30 @@ CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
 
     return decoded_int % challenge_max;
 }
+
+
+CompressedTranscript CompressTranscript(const Transcript& transcript)
+{
+    CompressedTranscript ret;
+    for (auto com : transcript.commitment) {
+        ret.commitment.push_back(CompressPoint(com));
+    }
+    ret.challenge = transcript.challenge;
+    ret.response = transcript.response;
+
+    return ret;
+}
+
+
+Transcript DecompressTranscript(const CompressedTranscript& compressed_transcript,
+                                const CryptoPP::ECP& curve)
+{
+    Transcript ret;
+    for (auto com : compressed_transcript.commitment) {
+        ret.commitment.push_back(DecompressPoint(com, curve));
+    }
+    ret.challenge = compressed_transcript.challenge;
+    ret.response = compressed_transcript.response;
+
+    return ret;
+}

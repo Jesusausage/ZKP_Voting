@@ -28,6 +28,7 @@ public:
     void setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys);
     void castVote(int option);
     Vote getVoteAndProofs();
+    CompressedVote getCompressedVote();
 
 private:
     const ECGroup* _ecg;
@@ -38,13 +39,11 @@ private:
     int _num_options;
     std::vector<CryptoPP::Integer> _token_keys;
 
-    int _selected_option = -1;
     std::vector<CryptoPP::ECPPoint> _votes;
+    std::vector<OrNIZKP> _proofs;
 
     ElGamalProtocol* _prots[2];
     OrProtocol* _or_prot;
-
-    OrNIZKP _generateProof(int option);
 };
 
 
