@@ -12,6 +12,12 @@ struct Vote {
 };
 
 
+struct CompressedVote {
+    std::vector<CompressedPoint> values;
+    std::vector<CompressedOrNIZKP> proofs;
+};
+
+
 class Voter {
 public:
     Voter(const ECGroup& ecg,
@@ -22,6 +28,7 @@ public:
     void setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys);
     void castVote(int option);
     Vote getVoteAndProofs();
+
 
 private:
     const ECGroup* _ecg;

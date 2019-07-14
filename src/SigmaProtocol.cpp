@@ -1,26 +1,63 @@
 #include "SigmaProtocol.hpp"
 
 
-CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
-                                   const CryptoPP::Integer& challenge_max)
+SigmaProtocol::SigmaProtocol(const ECGroup& ecg, 
+                             const CryptoPP::ECPPoint& generator)
+                             :
+                             _curve(&ecg.curve),
+                             _order(&ecg.order),
+                             _gen(&generator)
+{}
+
+
+void SigmaProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
 {
-    auto challenge_size = challenge_max.ByteCount();
-    CryptoPP::byte* digest = new CryptoPP::byte[challenge_size];
+    if (e) {
+        _e = *e;
+    }
+    else {
+        _e = RandomInteger(1, *_order);
+    }
+}
 
-    CryptoPP::SHA3_256 hash;
-    hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
-    hash.TruncatedFinal(digest, challenge_size);
 
-    auto decoded_int = CryptoPP::Integer(digest, challenge_size);
-    delete digest;
+CryptoPP::Integer SigmaProtocol::challengeSize()
+{
+    return *_order;
+}
 
-    return decoded_int % challenge_max;
+
+std::vector<CryptoPP::ECPPoint> SigmaProtocol::commitment()
+{
+    return _commitment;
+}
+
+
+CryptoPP::Integer SigmaProtocol::challenge() 
+{
+    return _e;
+}
+
+
+CryptoPP::Integer SigmaProtocol::response()
+{
+    return _s;
 }
 
 
 Transcript SigmaProtocol::getTranscript()
 {
     return {commitment(), challenge(), response()};
+}
+
+
+bool SigmaProtocol::verifyTranscript(const Transcript& transcript) 
+{
+    _commitment = transcript.commitment;
+    _e = transcript.challenge;
+    _s = transcript.response;
+
+    return verify();
 }
 
 
@@ -48,4 +85,21 @@ bool SigmaProtocol::verifyNIZKP(const Transcript& nizkp)
         return false;
 
     return true;
+}
+
+
+CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
+                                   const CryptoPP::Integer& challenge_max)
+{
+    auto challenge_size = challenge_max.ByteCount();
+    CryptoPP::byte* digest = new CryptoPP::byte[challenge_size];
+
+    CryptoPP::SHA3_256 hash;
+    hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
+    hash.TruncatedFinal(digest, challenge_size);
+
+    auto decoded_int = CryptoPP::Integer(digest, challenge_size);
+    delete digest;
+
+    return decoded_int % challenge_max;
 }

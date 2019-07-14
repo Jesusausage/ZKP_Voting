@@ -15,32 +15,15 @@ public:
                     const CryptoPP::ECPPoint& public_key, 
                     const CryptoPP::Integer& witness = 0);
     void generateCommitment() override;
-    void generateChallenge(CryptoPP::Integer* e = nullptr) override;
     void generateResponse() override;
     bool verify() override;
     void generateSimulation() override;
 
-    CryptoPP::Integer challengeSize() override;
     std::string getHashData() override;
-    
-    std::vector<CryptoPP::ECPPoint> commitment() override;
-    CryptoPP::Integer challenge() override;
-    CryptoPP::Integer response() override;    
-    
-    bool verifyTranscript(const Transcript& transcript) override;
 
 private:
-    const CryptoPP::ECP* _curve;
-    const CryptoPP::Integer* _order;
-    const CryptoPP::ECPPoint _gen;
-
     CryptoPP::ECPPoint _pub_key;
     CryptoPP::Integer _w;
-
-    CryptoPP::Integer _u;
-    CryptoPP::ECPPoint _commitment;
-    CryptoPP::Integer _e = 0;
-    CryptoPP::Integer _s;
 };
 
 

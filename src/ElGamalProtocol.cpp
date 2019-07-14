@@ -6,23 +6,23 @@ ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
                                  const CryptoPP::ECPPoint& generator2, 
                                  int message)
                                  :
-                                 _curve(&ecg.curve), 
-                                 _order(&ecg.order), 
-                                 _gen1(&generator1),
+                                 SigmaProtocol(ecg, generator1),
                                  _m(message),
                                  _gen2(generator2)
-{}    
+{
+    _commitment.resize(2);
+}    
 
 
 ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
                                  const CryptoPP::ECPPoint& generator1,
                                  int message)
                                  :
-                                 _curve(&ecg.curve), 
-                                 _order(&ecg.order), 
-                                 _gen1(&generator1),
+                                 SigmaProtocol(ecg, generator1),
                                  _m(message)
-{}
+{
+    _commitment.resize(2);
+}
 
 
 void ElGamalProtocol::setKeys(const CryptoPP::ECPPoint& public_key1,
@@ -51,19 +51,8 @@ void ElGamalProtocol::setParams(const CryptoPP::ECPPoint& generator2,
 void ElGamalProtocol::generateCommitment()
 {
     _u = RandomInteger(2, *_order);    
-    _commitment1 = _curve->Multiply(_u, *_gen1);
-    _commitment2 = _curve->Multiply(_u, _gen2);
-}
-
-
-void ElGamalProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
-{
-    if (e) {
-        _e = *e;
-    }
-    else {
-        _e = RandomInteger(1, *_order);
-    }
+    _commitment[0] = _curve->Multiply(_u, *_gen);
+    _commitment[1] = _curve->Multiply(_u, _gen2);
 }
 
 
@@ -80,9 +69,9 @@ bool ElGamalProtocol::verify()
 {
     assert(_e > 0);
 
-    if (!(computeCommitment1() == _commitment1))
+    if (!(computeCommitment1() == _commitment[0]))
         return false;
-    if (!(computeCommitment2() == _commitment2))
+    if (!(computeCommitment2() == _commitment[1]))
         return false;
 
     return true;
@@ -94,67 +83,29 @@ void ElGamalProtocol::generateSimulation()
     assert(_e > 0);
 
     _s = RandomInteger(1, *_order);
-    _commitment1 = computeCommitment1();    
-    _commitment2 = computeCommitment2();
-}
-
-
-CryptoPP::Integer ElGamalProtocol::challengeSize()
-{
-    return *_order;
+    _commitment[0] = computeCommitment1();    
+    _commitment[1] = computeCommitment2();
 }
 
 
 std::string ElGamalProtocol::getHashData()
 {
     std::string ret;
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment1.x);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment1.y);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment[0].x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment[0].y);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key1.x);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key1.y);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment2.x);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment2.y);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment[1].x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(_commitment[1].y);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key2.x);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key2.y);
     return ret;
 }
 
 
-std::vector<CryptoPP::ECPPoint> ElGamalProtocol::commitment()
-{
-    std::vector<CryptoPP::ECPPoint> commitment;
-    commitment.push_back(_commitment1);
-    commitment.push_back(_commitment2);
-    return commitment;
-}
-
-
-CryptoPP::Integer ElGamalProtocol::challenge() 
-{
-    return _e;
-}
-
-
-CryptoPP::Integer ElGamalProtocol::response()
-{
-    return _s;
-}
-
-
-bool ElGamalProtocol::verifyTranscript(const Transcript& transcript) 
-{
-    _commitment1 = transcript.commitment[0];
-    _commitment2 = transcript.commitment[1];
-    _e = transcript.challenge;
-    _s = transcript.response;
-
-    return verify();
-}
-
-
 CryptoPP::ECPPoint ElGamalProtocol::computeCommitment1()
 {
-    auto a = _curve->Multiply(_s, *_gen1);
+    auto a = _curve->Multiply(_s, *_gen);
     auto b = _curve->Multiply(_e, _curve->Inverse(_pub_key1));
 
     return _curve->Add(a, b);
@@ -165,7 +116,7 @@ CryptoPP::ECPPoint ElGamalProtocol::computeCommitment2()
 {
     auto a = _curve->Multiply(_s, _gen2);
     auto b = _curve->Multiply(_e, _curve->Inverse(_pub_key2));
-    auto c = _curve->Multiply(_e * _m, *_gen1);
+    auto c = _curve->Multiply(_e * _m, *_gen);
 
     return _curve->Add(a, _curve->Add(b, c));
 }

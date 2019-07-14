@@ -15,25 +15,44 @@ struct Transcript {
 };
 
 
+struct CompressedTranscript {
+    std::vector<CompressedPoint> commitment;
+    CryptoPP::Integer challenge;
+    CryptoPP::Integer response;
+};
+
+
 class SigmaProtocol {
 public:
+    SigmaProtocol(const ECGroup& ecg, const CryptoPP::ECPPoint& generator);
+
     virtual void generateCommitment() = 0;
-    virtual void generateChallenge(CryptoPP::Integer* e = nullptr) = 0;
+    void generateChallenge(CryptoPP::Integer* e = nullptr);
     virtual void generateResponse() = 0;
     virtual bool verify() = 0;
     virtual void generateSimulation() = 0;
     
-    virtual CryptoPP::Integer challengeSize() = 0;
+    CryptoPP::Integer challengeSize();
     virtual std::string getHashData() = 0;
 
-    virtual std::vector<CryptoPP::ECPPoint> commitment() = 0;
-    virtual CryptoPP::Integer challenge() = 0;
-    virtual CryptoPP::Integer response() = 0;
+    std::vector<CryptoPP::ECPPoint> commitment();
+    CryptoPP::Integer challenge();
+    CryptoPP::Integer response();
 
     Transcript getTranscript();
+    bool verifyTranscript(const Transcript& transcript);
     Transcript generateNIZKP();
-    virtual bool verifyTranscript(const Transcript& transcript) = 0;
     bool verifyNIZKP(const Transcript& nizkp);
+
+protected:    
+    const CryptoPP::ECP* _curve;
+    const CryptoPP::Integer* _order;
+    const CryptoPP::ECPPoint* _gen;
+
+    CryptoPP::Integer _u;
+    std::vector<CryptoPP::ECPPoint> _commitment;
+    CryptoPP::Integer _e = 0;
+    CryptoPP::Integer _s;
 };
 
 

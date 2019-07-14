@@ -14,6 +14,12 @@ struct OrNIZKP {
 };
 
 
+struct CompressedOrNIZKP {
+    std::vector<CompressedTranscript> transcripts;
+    CryptoPP::Integer e;
+};
+
+
 class OrProtocol {
 public:
     OrProtocol(std::vector<SigmaProtocol*> sigma_protocols, int i_known = 0);
