@@ -12,6 +12,12 @@ struct Key {
 };
 
 
+struct CompressedKey {
+    std::vector<CompressedPoint> values;
+    std::vector<CompressedTranscript> proofs;
+};
+
+
 class KeyGen {
 public:
     KeyGen(const ECGroup& ecg,
@@ -21,6 +27,7 @@ public:
     ~KeyGen();
     void setIDKey(const CryptoPP::Integer& id_key);
     Key getKeysAndProofs();
+    CompressedKey getCompressedKey();
 
 private:
     const ECGroup* _ecg;
@@ -35,6 +42,8 @@ private:
     std::vector<Transcript> _proofs;
 
     ElGamalProtocol* _prot = nullptr;
+
+    void _generateKeys();
 };
 
 
