@@ -26,7 +26,7 @@ ECGroup GenerateECGroup()
 
 
 CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string, 
-                                   const ECGroup& ecg)
+                                   const CryptoPP::ECP& ec)
 {
     CryptoPP::HexDecoder decoder;
     decoder.Put((CryptoPP::byte*)hex_string.data(), hex_string.size());
@@ -40,7 +40,7 @@ CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string,
     }
 
     CryptoPP::ECPPoint point;
-    ecg.curve.DecodePoint(point, (CryptoPP::byte*)decoded.data(), decoded.size());
+    ec.DecodePoint(point, (CryptoPP::byte*)decoded.data(), decoded.size());
     return point;       
 }
 
@@ -57,14 +57,14 @@ CompressedPoint CompressPoint(const CryptoPP::ECPPoint& point)
 
 
 CryptoPP::ECPPoint DecompressPoint(const CompressedPoint& compressed,
-                                   const ECGroup& ecg)
+                                   const CryptoPP::ECP& ec)
 {
     CryptoPP::Integer x = compressed.x;
 
-    auto p = ecg.curve.FieldSize();
+    auto p = ec.FieldSize();
     auto alpha1 = a_exp_b_mod_c(x, 3, p);
-    auto alpha2 = a_times_b_mod_c(x, CURVE_A, p);
-    auto alpha = (alpha1 + alpha2 + CURVE_B) % p;
+    auto alpha2 = a_times_b_mod_c(x, ec.GetA(), p);
+    auto alpha = (alpha1 + alpha2 + ec.GetB()) % p;
 
     auto beta = TonelliShanks(alpha, p);
 

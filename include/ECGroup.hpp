@@ -26,12 +26,12 @@ struct CompressedPoint {
 ECGroup GenerateECGroup();
 
 CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string, 
-                                   const ECGroup& ec);
+                                   const CryptoPP::ECP& ec);
 
 CompressedPoint CompressPoint(const CryptoPP::ECPPoint& point);
 
 CryptoPP::ECPPoint DecompressPoint(const CompressedPoint& compressed,
-                                   const ECGroup& ec);
+                                   const CryptoPP::ECP& ec);
 
 CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a, 
                                 const CryptoPP::Integer& p);    

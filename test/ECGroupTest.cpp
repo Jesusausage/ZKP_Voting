@@ -21,7 +21,7 @@ void TestDecodePoint()
     
     auto ecg = GenerateECGroup();
 
-    auto g = DecodeHexString(hex_string, ecg);
+    auto g = DecodeHexString(hex_string, ecg.curve);
     assert(g == ecg.base);
 }
 
@@ -55,7 +55,7 @@ void TestPointCompression()
         P = ecg.curve.Multiply(p, ecg.base);
 
         P_comp = CompressPoint(P);
-        P_decomp = DecompressPoint(P_comp, ecg);
+        P_decomp = DecompressPoint(P_comp, ecg.curve);
 
         assert(P == P_decomp);
     }

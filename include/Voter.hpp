@@ -29,7 +29,6 @@ public:
     void castVote(int option);
     Vote getVoteAndProofs();
 
-
 private:
     const ECGroup* _ecg;
     const CryptoPP::ECPPoint* _gen;
