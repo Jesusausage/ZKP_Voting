@@ -19,6 +19,8 @@ public:
     bool verifyVoteProofs(const Vote& votes);
     void setID(const CryptoPP::ECPPoint& id);
     bool verifyKeyProofs(const Key& keys);
+    Vote decompressVote(const CompressedVote& compressed_vote);
+    Key decompressKey(const CompressedKey& compressed_key);
 
 private:
     const ECGroup* _ecg;

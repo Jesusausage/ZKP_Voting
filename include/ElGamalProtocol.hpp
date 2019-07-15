@@ -17,6 +17,7 @@ public:
     ElGamalProtocol(const ECGroup& ecg,
                     const CryptoPP::ECPPoint& generator1,
                     int message);
+    ~ElGamalProtocol() override {}
     void setKeys(const CryptoPP::ECPPoint& public_key1,
                  const CryptoPP::ECPPoint& public_key2,
                  const CryptoPP::Integer& witness = 0);

@@ -38,6 +38,7 @@ int main() {
 
     TestVerification();
     TestVoteDecryption();
+    TestVoteCompression();
     std::cout << "Verification test success." << std::endl;
 
 	while (!std::cin.get())

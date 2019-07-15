@@ -116,20 +116,19 @@ CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a,
 
 
 CryptoPP::Integer RandomInteger(const CryptoPP::Integer& min, 
-                                const CryptoPP::Integer& max, 
-                                CryptoPP::byte* seed /*= nullptr*/, 
-                                size_t size /*= 0*/)
+                                const CryptoPP::Integer& max,
+                                CryptoPP::byte* seed /*= nullptr*/,
+                                const size_t size /*= 32*/)
 {        
-    CryptoPP::byte* block;
-    if (!seed) {
-        block = new CryptoPP::byte[32];
-        CryptoPP::OS_GenerateRandomBlock(false, block, 32);
-    } 
+    CryptoPP::byte block[32];
+    CryptoPP::OS_GenerateRandomBlock(false, block, 32);
 
     CryptoPP::RandomPool rng;
-    block = new CryptoPP::byte[size];
-    rng.IncorporateEntropy(block, size);
+    rng.IncorporateEntropy(block, 32);
+    if (seed)
+        rng.IncorporateEntropy(seed, size);
 
-    delete block;
-    return CryptoPP::Integer(rng, min, max);
+    auto rand_integer = CryptoPP::Integer(rng, min, max);
+
+    return rand_integer;
 }

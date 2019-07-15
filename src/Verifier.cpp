@@ -69,3 +69,33 @@ bool Verifier::verifyKeyProofs(const Key& keys)
 
     return true;
 }
+
+
+Vote Verifier::decompressVote(const CompressedVote& compressed_vote)
+{
+    Vote ret;
+    int num_options = compressed_vote.values.size();
+    for (int i = 0; i < num_options; i++) {
+        ret.values.push_back(DecompressPoint(compressed_vote.values[i], 
+                                             _ecg->curve));
+        ret.proofs.push_back(DecompressOrNIZKP(compressed_vote.proofs[i],
+                                               _ecg->curve));
+    }
+
+    return ret;
+}
+
+
+Key Verifier::decompressKey(const CompressedKey& compressed_key)
+{
+    Key ret;
+    int num_options = compressed_key.values.size();
+    for (int i = 0; i < num_options; i++) {
+        ret.values.push_back(DecompressPoint(compressed_key.values[i],
+                                             _ecg->curve));
+        ret.proofs.push_back(DecompressTranscript(compressed_key.proofs[i],
+                                                  _ecg->curve));
+    }
+
+    return ret;
+}

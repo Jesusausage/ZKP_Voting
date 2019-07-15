@@ -25,6 +25,7 @@ struct CompressedTranscript {
 class SigmaProtocol {
 public:
     SigmaProtocol(const ECGroup& ecg, const CryptoPP::ECPPoint& generator);
+    virtual ~SigmaProtocol() {}
 
     virtual void generateCommitment() = 0;
     void generateChallenge(CryptoPP::Integer* e = nullptr);

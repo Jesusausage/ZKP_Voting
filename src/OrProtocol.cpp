@@ -138,7 +138,7 @@ bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
 }
 
 
-CompressedOrNIZKP compressOrNIZKP(const OrNIZKP& or_nizkp)
+CompressedOrNIZKP CompressOrNIZKP(const OrNIZKP& or_nizkp)
 {
     CompressedOrNIZKP ret;
     for (auto transcript : or_nizkp.transcripts) {
@@ -150,7 +150,7 @@ CompressedOrNIZKP compressOrNIZKP(const OrNIZKP& or_nizkp)
 }
 
 
-OrNIZKP decompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
+OrNIZKP DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
                           const CryptoPP::ECP& curve)
 {
     OrNIZKP ret;

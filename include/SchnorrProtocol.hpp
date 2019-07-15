@@ -14,6 +14,7 @@ public:
                     const CryptoPP::ECPPoint& generator, 
                     const CryptoPP::ECPPoint& public_key, 
                     const CryptoPP::Integer& witness = 0);
+    ~SchnorrProtocol() override {}
     void generateCommitment() override;
     void generateResponse() override;
     bool verify() override;
