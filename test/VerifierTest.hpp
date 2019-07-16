@@ -9,7 +9,7 @@
 
 void TestVerification();
 void TestVoteDecryption();
-void TestVoteCompression();
+// void TestVoteCompression();
 
 
 #endif

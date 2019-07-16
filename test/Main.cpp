@@ -2,9 +2,9 @@
 #include "SchnorrProtocolTest.hpp"
 #include "ElGamalProtocolTest.hpp"
 #include "OrProtocolTest.hpp"
-// #include "VoterTest.hpp"
-// #include "KeyGenTest.hpp"
-// #include "VerifierTest.hpp"
+#include "VoterTest.hpp"
+#include "KeyGenTest.hpp"
+#include "VerifierTest.hpp"
 
 
 int main() {
@@ -30,16 +30,16 @@ int main() {
     TestElGamalOrNIZKP();
     std::cout << "OrProtocol test success." << std::endl;
 
-    // TestVoting();
-    // std::cout << "Voter test success." << std::endl;
+    TestVoting();
+    std::cout << "Voter test success." << std::endl;
 
-    // TestKeyGeneration();
-    // std::cout << "KeyGen test success." << std::endl;
+    TestKeyGeneration();
+    std::cout << "KeyGen test success." << std::endl;
 
-    // TestVerification();
-    // TestVoteDecryption();
+    TestVerification();
+    TestVoteDecryption();
     // TestVoteCompression();
-    // std::cout << "Verification test success." << std::endl;
+    std::cout << "Verification test success." << std::endl;
 
 	while (!std::cin.get())
     return 0;

@@ -111,39 +111,39 @@ void TestVoteDecryption()
 }
 
 
-void TestVoteCompression()
-{
-    auto ecg = GenerateECGroup();
-    auto gen = ecg.base;
+// void TestVoteCompression()
+// {
+//     auto ecg = GenerateECGroup();
+//     auto gen = ecg.base;
 
-    auto id_key = RandomInteger(2, ecg.order);
-    auto id = ecg.curve.Multiply(id_key, gen);
-    auto id_sum = id;
+//     auto id_key = RandomInteger(2, ecg.order);
+//     auto id = ecg.curve.Multiply(id_key, gen);
+//     auto id_sum = id;
 
-    std::vector<CryptoPP::Integer> token_keys;
-    std::vector<CryptoPP::ECPPoint> tokens;
-    for (int i = 0; i < 10; i++) {
-        token_keys.push_back(RandomInteger(2, ecg.order));
-        tokens.push_back(ecg.curve.Multiply(token_keys[i], gen));
-    }
-    std::vector<CryptoPP::ECPPoint> token_sums = tokens;
+//     std::vector<CryptoPP::Integer> token_keys;
+//     std::vector<CryptoPP::ECPPoint> tokens;
+//     for (int i = 0; i < 10; i++) {
+//         token_keys.push_back(RandomInteger(2, ecg.order));
+//         tokens.push_back(ecg.curve.Multiply(token_keys[i], gen));
+//     }
+//     std::vector<CryptoPP::ECPPoint> token_sums = tokens;
 
-    Voter voter(ecg, gen, id_sum, tokens);
-    voter.setTokenKeys(token_keys);
-    voter.castVote(8);
-    CompressedVote c_vote = voter.getCompressedVote();
-    // c_vote.values[0].x += 1;
+//     Voter voter(ecg, gen, id_sum, tokens);
+//     voter.setTokenKeys(token_keys);
+//     voter.castVote(8);
+//     CompressedVote c_vote = voter.getCompressedVote();
+//     // c_vote.values[0].x += 1;
 
-    KeyGen key_gen(ecg, gen, token_sums, id);
-    key_gen.setIDKey(id_key);
-    CompressedKey c_key = key_gen.getCompressedKey();
-    // c_key.values[0].x += 1;
+//     KeyGen key_gen(ecg, gen, token_sums, id);
+//     key_gen.setIDKey(id_key);
+//     CompressedKey c_key = key_gen.getCompressedKey();
+//     // c_key.values[0].x += 1;
 
-    Verifier verifier(ecg, gen, id_sum, token_sums);
-    verifier.setVoterTokens(tokens);
-    Vote vote = verifier.decompressVote(c_vote);
-    assert(verifier.verifyVoteProofs(vote) == true);
-    verifier.setID(id);
-    Key key = verifier.decompressKey(c_key);
-    assert(verifier.verifyKeyProofs(key) == true);
-}
+//     Verifier verifier(ecg, gen, id_sum, token_sums);
+//     verifier.setVoterTokens(tokens);
+//     Vote vote = verifier.decompressVote(c_vote);
+//     assert(verifier.verifyVoteProofs(vote) == true);
+//     verifier.setID(id);
+//     Key key = verifier.decompressKey(c_key);
+//     assert(verifier.verifyKeyProofs(key) == true);
+// }

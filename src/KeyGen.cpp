@@ -36,18 +36,18 @@ Key KeyGen::getKeysAndProofs()
 }
 
 
-CompressedKey KeyGen::getCompressedKey()
-{
-    _generateKeys();
+// CompressedKey KeyGen::getCompressedKey()
+// {
+//     _generateKeys();
     
-    CompressedKey ret;
-    for (int i = 0; i < _num_options; i++) {
-        ret.values.push_back(CompressPoint(_keys[i]));
-        ret.proofs.push_back(CompressTranscript(_proofs[i]));
-    }
+//     CompressedKey ret;
+//     for (int i = 0; i < _num_options; i++) {
+//         ret.values.push_back(CompressPoint(_keys[i]));
+//         ret.proofs.push_back(CompressTranscript(_proofs[i]));
+//     }
 
-    return ret;
-}
+//     return ret;
+// }
 
 
 void KeyGen::_generateKeys()

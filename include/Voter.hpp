@@ -8,13 +8,7 @@
 
 struct Vote {
     std::vector<CryptoPP::ECPPoint> values;
-    std::vector<OrNIZKP> proofs;
-};
-
-
-struct CompressedVote {
-    std::vector<CompressedPoint> values;
-    std::vector<CompressedOrNIZKP> proofs;
+    std::vector<OrTranscript> proofs;
 };
 
 
@@ -28,7 +22,7 @@ public:
     void setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys);
     void castVote(int option);
     Vote getVoteAndProofs();
-    CompressedVote getCompressedVote();
+    // CompressedVote getCompressedVote();
 
 private:
     const ECGroup* _ecg;
@@ -40,7 +34,7 @@ private:
     std::vector<CryptoPP::Integer> _token_keys;
 
     std::vector<CryptoPP::ECPPoint> _votes;
-    std::vector<OrNIZKP> _proofs;
+    std::vector<OrTranscript> _proofs;
 
     ElGamalProtocol* _prots[2];
     OrProtocol* _or_prot;
