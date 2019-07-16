@@ -14,12 +14,6 @@ struct OrNIZKP {
 };
 
 
-struct CompressedOrNIZKP {
-    std::vector<CompressedTranscript> transcripts;
-    CryptoPP::Integer e;
-};
-
-
 class OrProtocol {
 public:
     OrProtocol(std::vector<SigmaProtocol*> sigma_protocols, int i_known = 0);
@@ -44,10 +38,10 @@ private:
 };
 
 
-CompressedOrNIZKP CompressOrNIZKP(const OrNIZKP& or_nizkp);
+// CompressedOrNIZKP CompressOrNIZKP(const OrNIZKP& or_nizkp);
 
-OrNIZKP DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
-                          const CryptoPP::ECP& curve);
+// OrNIZKP DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
+//                           const CryptoPP::ECP& curve);
 
 
 #endif

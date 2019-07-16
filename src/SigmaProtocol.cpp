@@ -13,60 +13,67 @@ SigmaProtocol::SigmaProtocol(const ECGroup& ecg,
 void SigmaProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
 {
     if (e) {
-        _e = *e;
+        _transcript.setChallenge(*e);
     }
     else {
-        _e = RandomInteger(1, *_order);
+        _transcript.setChallenge(RandomInteger(1, *_order));
     }
 }
 
 
-CryptoPP::Integer SigmaProtocol::challengeSize()
+CryptoPP::Integer SigmaProtocol::challengeSize() const
 {
     return *_order;
 }
 
 
-std::vector<CryptoPP::ECPPoint> SigmaProtocol::commitment()
+CryptoPP::ECPPoint* SigmaProtocol::commitment() const
 {
-    return _commitment;
+    return _transcript.commitment();
 }
 
 
-CryptoPP::Integer SigmaProtocol::challenge() 
+int SigmaProtocol::commitmentSize() const
 {
-    return _e;
+    return _transcript.commitmentSize();
 }
 
 
-CryptoPP::Integer SigmaProtocol::response()
+CryptoPP::Integer SigmaProtocol::challenge() const
 {
-    return _s;
+    return _transcript.challenge();
 }
 
 
-Transcript SigmaProtocol::getTranscript()
+CryptoPP::Integer SigmaProtocol::response() const
 {
-    return {commitment(), challenge(), response()};
+    return _transcript.response();
+}
+
+
+Transcript SigmaProtocol::getTranscript() const
+{
+    return _transcript;
 }
 
 
 void SigmaProtocol::setTranscript(const Transcript& transcript) 
 {
-    _commitment = transcript.commitment;
-    _e = transcript.challenge;
-    _s = transcript.response;
+    _transcript.setCommitment(transcript.commitment(),
+                              transcript.commitmentSize());
+    _transcript.setChallenge(transcript.challenge());
+    _transcript.setResponse(transcript.response());
 }
 
 
 Transcript SigmaProtocol::generateNIZKP()
 {
     generateCommitment();
-    auto hash_e = GenHashChallenge(getHashData(), challengeSize());
+    auto hash_e = GenHashChallenge(getHashData(), *_order);
     generateChallenge(&hash_e);
     generateResponse();
 
-    return {commitment(), challenge(), response()};
+    return _transcript;
 }
 
 
@@ -77,8 +84,8 @@ bool SigmaProtocol::verifyNIZKP(const Transcript& nizkp)
     if (verify() == false)
         return false;
 
-    auto hash_e = GenHashChallenge(getHashData(), challengeSize());
-    if (hash_e != challenge())
+    auto hash_e = GenHashChallenge(getHashData(), *_order);
+    if (hash_e != _transcript.challenge())
         return false;
 
     return true;
@@ -101,28 +108,28 @@ CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
 }
 
 
-CompressedTranscript CompressTranscript(const Transcript& transcript)
-{
-    CompressedTranscript ret;
-    for (auto com : transcript.commitment) {
-        ret.commitment.push_back(CompressPoint(com));
-    }
-    ret.challenge = transcript.challenge;
-    ret.response = transcript.response;
+// CompressedTranscript CompressTranscript(const Transcript& transcript)
+// {
+//     CompressedTranscript ret;
+//     for (auto com : transcript.commitment) {
+//         ret.commitment.push_back(CompressPoint(com));
+//     }
+//     ret.challenge = transcript.challenge;
+//     ret.response = transcript.response;
 
-    return ret;
-}
+//     return ret;
+// }
 
 
-Transcript DecompressTranscript(const CompressedTranscript& compressed_transcript,
-                                const CryptoPP::ECP& curve)
-{
-    Transcript ret;
-    for (auto com : compressed_transcript.commitment) {
-        ret.commitment.push_back(DecompressPoint(com, curve));
-    }
-    ret.challenge = compressed_transcript.challenge;
-    ret.response = compressed_transcript.response;
+// Transcript DecompressTranscript(const CompressedTranscript& compressed_transcript,
+//                                 const CryptoPP::ECP& curve)
+// {
+//     Transcript ret;
+//     for (auto com : compressed_transcript.commitment) {
+//         ret.commitment.push_back(DecompressPoint(com, curve));
+//     }
+//     ret.challenge = compressed_transcript.challenge;
+//     ret.response = compressed_transcript.response;
 
-    return ret;
-}
+//     return ret;
+// }

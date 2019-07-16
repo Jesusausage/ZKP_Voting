@@ -3,23 +3,10 @@
 
 
 #include "ECGroup.hpp"
+#include "Transcript.hpp"
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/sha3.h>
 #include <assert.h>
-
-
-struct Transcript {
-    std::vector<CryptoPP::ECPPoint> commitment;
-    CryptoPP::Integer challenge;
-    CryptoPP::Integer response;
-};
-
-
-struct CompressedTranscript {
-    std::vector<CompressedPoint> commitment;
-    CryptoPP::Integer challenge;
-    CryptoPP::Integer response;
-};
 
 
 class SigmaProtocol {
@@ -33,16 +20,17 @@ public:
     virtual bool verify() = 0;
     virtual void generateSimulation() = 0;
     
-    CryptoPP::Integer challengeSize();
+    CryptoPP::Integer challengeSize() const;
     virtual std::string getHashData() = 0;
 
-    std::vector<CryptoPP::ECPPoint> commitment();
-    CryptoPP::Integer challenge();
-    CryptoPP::Integer response();
+    CryptoPP::ECPPoint* commitment() const;
+    int commitmentSize() const;
+    CryptoPP::Integer challenge() const;
+    CryptoPP::Integer response() const;
 
-    Transcript getTranscript();
+    Transcript getTranscript() const;
     void setTranscript(const Transcript& transcript);
-    
+
     Transcript generateNIZKP();
     bool verifyNIZKP(const Transcript& nizkp);
 
@@ -51,20 +39,13 @@ protected:
     const CryptoPP::Integer* _order;
     const CryptoPP::ECPPoint* _gen;
 
-    CryptoPP::Integer _u;
-    std::vector<CryptoPP::ECPPoint> _commitment;
-    CryptoPP::Integer _e = 0;
-    CryptoPP::Integer _s;
+    CryptoPP::Integer _commitment_seed;
+    Transcript _transcript;
 };
 
 
 CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
                                    const CryptoPP::Integer& challenge_max);
-
-CompressedTranscript CompressTranscript(const Transcript& transcript);
-
-Transcript DecompressTranscript(const CompressedTranscript& compressed_transcript,
-                                const CryptoPP::ECP& curve);
 
 
 #endif

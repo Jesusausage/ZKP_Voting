@@ -138,26 +138,26 @@ bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
 }
 
 
-CompressedOrNIZKP CompressOrNIZKP(const OrNIZKP& or_nizkp)
-{
-    CompressedOrNIZKP ret;
-    for (auto transcript : or_nizkp.transcripts) {
-        ret.transcripts.push_back(CompressTranscript(transcript));
-    }
-    ret.e = or_nizkp.e;
+// CompressedOrNIZKP CompressOrNIZKP(const OrNIZKP& or_nizkp)
+// {
+//     CompressedOrNIZKP ret;
+//     for (auto transcript : or_nizkp.transcripts) {
+//         ret.transcripts.push_back(CompressTranscript(transcript));
+//     }
+//     ret.e = or_nizkp.e;
 
-    return ret;
-}
+//     return ret;
+// }
 
 
-OrNIZKP DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
-                          const CryptoPP::ECP& curve)
-{
-    OrNIZKP ret;
-    for (auto transcript : compressed_or_nizkp.transcripts) {
-        ret.transcripts.push_back(DecompressTranscript(transcript, curve));
-    }
-    ret.e = compressed_or_nizkp.e;
+// OrNIZKP DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
+//                           const CryptoPP::ECP& curve)
+// {
+//     OrNIZKP ret;
+//     for (auto transcript : compressed_or_nizkp.transcripts) {
+//         ret.transcripts.push_back(DecompressTranscript(transcript, curve));
+//     }
+//     ret.e = compressed_or_nizkp.e;
 
-    return ret;
-}
+//     return ret;
+// }
