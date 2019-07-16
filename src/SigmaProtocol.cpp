@@ -59,10 +59,7 @@ Transcript SigmaProtocol::getTranscript() const
 
 void SigmaProtocol::setTranscript(const Transcript& transcript) 
 {
-    _transcript.setCommitment(transcript.commitment(),
-                              transcript.commitmentSize());
-    _transcript.setChallenge(transcript.challenge());
-    _transcript.setResponse(transcript.response());
+    _transcript = transcript;
 }
 
 

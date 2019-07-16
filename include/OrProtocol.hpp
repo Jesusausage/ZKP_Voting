@@ -3,15 +3,10 @@
 
 
 #include "SigmaProtocol.hpp"
+#include "OrTranscript.hpp"
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-
-
-struct OrNIZKP {
-    std::vector<Transcript> transcripts;
-    CryptoPP::Integer e;
-};
 
 
 class OrProtocol {
@@ -26,8 +21,8 @@ public:
     CryptoPP::Integer challengeSize();
     std::string getHashData();
 
-    OrNIZKP generateNIZKP();
-    bool verifyNIZKP(const OrNIZKP& or_nizkp);
+    OrTranscript generateNIZKP();
+    bool verifyNIZKP(const OrTranscript& or_nizkp);
 
 private:
     std::vector<SigmaProtocol*> _sigma_prots;
@@ -38,9 +33,9 @@ private:
 };
 
 
-// CompressedOrNIZKP CompressOrNIZKP(const OrNIZKP& or_nizkp);
+// CompressedOrNIZKP CompressOrNIZKP(const OrTranscript& or_nizkp);
 
-// OrNIZKP DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
+// OrTranscript DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
 //                           const CryptoPP::ECP& curve);
 
 

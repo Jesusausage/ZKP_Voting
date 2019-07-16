@@ -1,7 +1,7 @@
 #include "ECGroupTest.hpp"
 #include "SchnorrProtocolTest.hpp"
 #include "ElGamalProtocolTest.hpp"
-// #include "OrProtocolTest.hpp"
+#include "OrProtocolTest.hpp"
 // #include "VoterTest.hpp"
 // #include "KeyGenTest.hpp"
 // #include "VerifierTest.hpp"
@@ -24,11 +24,11 @@ int main() {
     TestElGamalNIZKP();
     std::cout << "ElGamalProtocol test success." << std::endl;
     
-    // TestSchnorrOrRun();
-    // TestSchnorrOrNIZKP();
-    // TestElGamalOrRun();
-    // TestElGamalOrNIZKP();
-    // std::cout << "OrProtocol test success." << std::endl;
+    TestSchnorrOrRun();
+    TestSchnorrOrNIZKP();
+    TestElGamalOrRun();
+    TestElGamalOrNIZKP();
+    std::cout << "OrProtocol test success." << std::endl;
 
     // TestVoting();
     // std::cout << "Voter test success." << std::endl;

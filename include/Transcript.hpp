@@ -16,6 +16,8 @@ public:
     Transcript();
     ~Transcript();
 
+    Transcript& operator=(const Transcript& transcript);
+
     void setCommitment(CryptoPP::ECPPoint* commitment, 
                        int commitment_size);
     void setChallenge(const CryptoPP::Integer& challenge);

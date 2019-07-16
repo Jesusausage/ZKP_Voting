@@ -91,7 +91,7 @@ std::string OrProtocol::getHashData()
 }
 
 
-OrNIZKP OrProtocol::generateNIZKP()
+OrTranscript OrProtocol::generateNIZKP()
 {
     generateCommitment();
 
@@ -103,20 +103,21 @@ OrNIZKP OrProtocol::generateNIZKP()
     generateResponse();
     assert(verify() == true);
 
-    std::vector<Transcript> transcripts;
-    for (SigmaProtocol* prot : _sigma_prots)
-        transcripts.push_back(prot->getTranscript());
+    Transcript transcripts[_num_prots];
+    for (int i = 0; i < _num_prots; i++) {
+        transcripts[i] = _sigma_prots[i]->getTranscript();
+    }
 
-    return {transcripts, _e};
+    return OrTranscript(transcripts, _num_prots, _e);
 }
 
 
-bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
+bool OrProtocol::verifyNIZKP(const OrTranscript& or_nizkp)
 {
-    assert((unsigned int)_num_prots == or_nizkp.transcripts.size());
+    assert(_num_prots == or_nizkp.num_prots());
 
     for (int i = 0; i < _num_prots; i++) {
-        _sigma_prots[i]->setTranscript(or_nizkp.transcripts[i]);
+        _sigma_prots[i]->setTranscript(or_nizkp.transcript(i));
         if (_sigma_prots[i]->verify() == false)
             return false;
     }
@@ -129,7 +130,7 @@ bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
     for (SigmaProtocol* prot : _sigma_prots)
         total_challenge += prot->challenge();
         
-    if (hash_challenge != or_nizkp.e)
+    if (hash_challenge != or_nizkp.e())
         return false;
     if (total_challenge != hash_challenge)
         return false;
@@ -138,7 +139,7 @@ bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
 }
 
 
-// CompressedOrNIZKP CompressOrNIZKP(const OrNIZKP& or_nizkp)
+// CompressedOrNIZKP CompressOrNIZKP(const OrTranscript& or_nizkp)
 // {
 //     CompressedOrNIZKP ret;
 //     for (auto transcript : or_nizkp.transcripts) {
@@ -150,10 +151,10 @@ bool OrProtocol::verifyNIZKP(const OrNIZKP& or_nizkp)
 // }
 
 
-// OrNIZKP DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
+// OrTranscript DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
 //                           const CryptoPP::ECP& curve)
 // {
-//     OrNIZKP ret;
+//     OrTranscript ret;
 //     for (auto transcript : compressed_or_nizkp.transcripts) {
 //         ret.transcripts.push_back(DecompressTranscript(transcript, curve));
 //     }
