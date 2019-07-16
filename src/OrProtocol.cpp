@@ -94,21 +94,20 @@ std::string OrProtocol::getHashData()
 OrTranscript OrProtocol::generateNIZKP()
 {
     generateCommitment();
-
     std::string hash_data = getHashData();
     auto hash_challenge = GenHashChallenge(hash_data, challengeSize());
     hash_challenge += (_num_prots - 1) * challengeSize();
     generateChallenge(hash_challenge);
-
     generateResponse();
     assert(verify() == true);
 
-    Transcript transcripts[_num_prots];
+    auto* transcripts = new Transcript[_num_prots];
     for (int i = 0; i < _num_prots; i++) {
         transcripts[i] = _sigma_prots[i]->getTranscript();
     }
-
-    return OrTranscript(transcripts, _num_prots, _e);
+    auto ret = OrTranscript(transcripts, _num_prots, _e);
+    delete [] transcripts;
+    return ret;
 }
 
 
