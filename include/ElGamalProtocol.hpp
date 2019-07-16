@@ -11,16 +11,9 @@
 class ElGamalProtocol : public SigmaProtocol {
 public:
     ElGamalProtocol(const ECGroup& ecg,
-                    const CryptoPP::ECPPoint& generator1, 
-                    const CryptoPP::ECPPoint& generator2, 
-                    int message);
-    ElGamalProtocol(const ECGroup& ecg,
                     const CryptoPP::ECPPoint& generator1,
                     int message);
     ~ElGamalProtocol() override {}
-    void setKeys(const CryptoPP::ECPPoint& public_key1,
-                 const CryptoPP::ECPPoint& public_key2,
-                 const CryptoPP::Integer& witness = 0);
     void setParams(const CryptoPP::ECPPoint& generator2,
                    const CryptoPP::ECPPoint& public_key1,
                    const CryptoPP::ECPPoint& public_key2,

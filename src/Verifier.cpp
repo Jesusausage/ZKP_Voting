@@ -11,8 +11,8 @@ Verifier::Verifier(const ECGroup& ecg,
                    _id_sum(id_sum),
                    _token_sums(token_sums)
 {
-    _vote_prots[0] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 0);
-    _vote_prots[1] = new ElGamalProtocol(*_ecg, _gen, _id_sum, 1);
+    _vote_prots[0] = new ElGamalProtocol(*_ecg, _gen, 0);
+    _vote_prots[1] = new ElGamalProtocol(*_ecg, _gen, 1);
     _vote_prot = new OrProtocol({_vote_prots[0], _vote_prots[1]});
 
     _key_prot = new ElGamalProtocol(*_ecg, _gen, 0);
@@ -46,8 +46,8 @@ bool Verifier::verifyVoteProofs(const Vote& votes)
     int num_options = votes.values.size();
 
     for (int i = 0; i < num_options; i++) {
-        _vote_prots[0]->setKeys(_tokens[i], votes.values[i]);
-        _vote_prots[1]->setKeys(_tokens[i], votes.values[i]);
+        _vote_prots[0]->setParams(_id_sum, _tokens[i], votes.values[i]);
+        _vote_prots[1]->setParams(_id_sum, _tokens[i], votes.values[i]);
 
         if (_vote_prot->verifyNIZKP(votes.proofs[i]) == false)
             return false;

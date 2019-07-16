@@ -41,7 +41,8 @@ public:
     CryptoPP::Integer response();
 
     Transcript getTranscript();
-    bool verifyTranscript(const Transcript& transcript);
+    void setTranscript(const Transcript& transcript);
+    
     Transcript generateNIZKP();
     bool verifyNIZKP(const Transcript& nizkp);
 

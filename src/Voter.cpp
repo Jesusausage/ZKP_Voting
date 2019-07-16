@@ -13,8 +13,8 @@ Voter::Voter(const ECGroup& ecg,
 {
     _num_options = _tokens.size();
 
-    _prots[0] = new ElGamalProtocol(*_ecg, *_gen, _id_sum, 0);
-    _prots[1] = new ElGamalProtocol(*_ecg, *_gen, _id_sum, 1);
+    _prots[0] = new ElGamalProtocol(*_ecg, *_gen, 0);
+    _prots[1] = new ElGamalProtocol(*_ecg, *_gen, 1);
     _or_prot = new OrProtocol({_prots[0], _prots[1]});
 }
 
@@ -45,8 +45,8 @@ void Voter::castVote(int option)
         _votes.push_back(_ecg->curve.Add(a, b));
 
         int known = (i == option) ? 1 : 0;
-        _prots[known]->setKeys(_tokens[i], _votes[i], _token_keys[i]);
-        _prots[1 - known]->setKeys(_tokens[i], _votes[i]);
+        _prots[known]->setParams(_id_sum, _tokens[i], _votes[i], _token_keys[i]);
+        _prots[1 - known]->setParams(_id_sum, _tokens[i], _votes[i]);
         _or_prot->setKnown(known);
         _proofs.push_back(_or_prot->generateNIZKP());
     }

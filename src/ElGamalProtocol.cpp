@@ -2,19 +2,6 @@
 
 
 ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
-                                 const CryptoPP::ECPPoint& generator1, 
-                                 const CryptoPP::ECPPoint& generator2, 
-                                 int message)
-                                 :
-                                 SigmaProtocol(ecg, generator1),
-                                 _m(message),
-                                 _gen2(generator2)
-{
-    _commitment.resize(2);
-}    
-
-
-ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
                                  const CryptoPP::ECPPoint& generator1,
                                  int message)
                                  :
@@ -23,17 +10,6 @@ ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
 {
     _commitment.resize(2);
 }
-
-
-void ElGamalProtocol::setKeys(const CryptoPP::ECPPoint& public_key1,
-                              const CryptoPP::ECPPoint& public_key2,
-                              const CryptoPP::Integer& witness /*= 0*/)
-{
-    _pub_key1 = public_key1;
-    _pub_key2 = public_key2;
-    _w = witness;
-}
-
 
 
 void ElGamalProtocol::setParams(const CryptoPP::ECPPoint& generator2,

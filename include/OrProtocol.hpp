@@ -28,7 +28,6 @@ public:
     void generateChallenge(CryptoPP::Integer e);
     void generateResponse();
     bool verify();
-    //void generateSimulation();
 
     CryptoPP::Integer challengeSize();
     std::string getHashData();

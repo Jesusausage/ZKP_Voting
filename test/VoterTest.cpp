@@ -24,10 +24,10 @@ void TestVoting()
     // votes.values[8].x += 1;
 
     for (int i = 0; i < 10; i++) {
-        ElGamalProtocol prot0(ecg, gen, id_sum, 0);
-        ElGamalProtocol prot1(ecg, gen, id_sum, 1);
-        prot0.setKeys(tokens[i], votes.values[i]);
-        prot1.setKeys(tokens[i], votes.values[i]);
+        ElGamalProtocol prot0(ecg, gen, 0);
+        ElGamalProtocol prot1(ecg, gen, 1);
+        prot0.setParams(id_sum, tokens[i], votes.values[i]);
+        prot1.setParams(id_sum, tokens[i], votes.values[i]);
 
         OrProtocol prot({&prot0, &prot1});
         assert(prot.verifyNIZKP(votes.proofs[i]) == true);

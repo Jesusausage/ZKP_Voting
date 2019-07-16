@@ -51,24 +51,20 @@ Transcript SigmaProtocol::getTranscript()
 }
 
 
-bool SigmaProtocol::verifyTranscript(const Transcript& transcript) 
+void SigmaProtocol::setTranscript(const Transcript& transcript) 
 {
     _commitment = transcript.commitment;
     _e = transcript.challenge;
     _s = transcript.response;
-
-    return verify();
 }
 
 
 Transcript SigmaProtocol::generateNIZKP()
 {
     generateCommitment();
-    std::string hash_data = getHashData();
-    auto hash_challenge = GenHashChallenge(hash_data, challengeSize());
-    generateChallenge(&hash_challenge);
+    auto hash_e = GenHashChallenge(getHashData(), challengeSize());
+    generateChallenge(&hash_e);
     generateResponse();
-    assert(verify() == true);
 
     return {commitment(), challenge(), response()};
 }
@@ -76,12 +72,13 @@ Transcript SigmaProtocol::generateNIZKP()
 
 bool SigmaProtocol::verifyNIZKP(const Transcript& nizkp)
 {
-    if (verifyTranscript(nizkp) == false)
+    setTranscript(nizkp);
+
+    if (verify() == false)
         return false;
 
-    std::string hash_data = getHashData();
-    auto hash_challenge = GenHashChallenge(hash_data, challengeSize());
-    if (hash_challenge != challenge())
+    auto hash_e = GenHashChallenge(getHashData(), challengeSize());
+    if (hash_e != challenge())
         return false;
 
     return true;
@@ -92,13 +89,14 @@ CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
                                    const CryptoPP::Integer& challenge_max)
 {
     const auto challenge_size = challenge_max.ByteCount();
-    CryptoPP::byte digest[challenge_size];
+    CryptoPP::byte* digest = new CryptoPP::byte[challenge_size];
 
     CryptoPP::SHA3_256 hash;
     hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
     hash.TruncatedFinal(digest, challenge_size);
 
     auto decoded_int = CryptoPP::Integer(digest, challenge_size);
+    delete [] digest;
     return decoded_int % challenge_max;
 }
 
