@@ -2,14 +2,8 @@
 #define KEY_GEN_HPP
 
 
-#include "OrProtocol.hpp"
 #include "ElGamalProtocol.hpp"
-
-
-struct Key {
-    std::vector<CryptoPP::ECPPoint> values;
-    std::vector<Transcript> proofs;
-};
+#include "Key.hpp"
 
 
 class KeyGen {
@@ -32,8 +26,7 @@ private:
     int _num_options;
     CryptoPP::Integer _id_key;
 
-    std::vector<CryptoPP::ECPPoint> _keys;
-    std::vector<Transcript> _proofs;
+    Key _key;
 
     ElGamalProtocol* _prot = nullptr;
 

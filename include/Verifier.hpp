@@ -16,9 +16,9 @@ public:
              const std::vector<CryptoPP::ECPPoint>& token_sums);
     ~Verifier();
     void setVoterTokens(const std::vector<CryptoPP::ECPPoint>& tokens);
-    bool verifyVoteProofs(const Vote& votes);
+    bool verifyVoteProofs(const Vote& vote);
     void setID(const CryptoPP::ECPPoint& id);
-    bool verifyKeyProofs(const Key& keys);
+    bool verifyKeyProofs(const Key& key);
     // Vote decompressVote(const CompressedVote& compressed_vote);
     // Key decompressKey(const CompressedKey& compressed_key);
 

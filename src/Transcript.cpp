@@ -45,13 +45,12 @@ Transcript& Transcript::operator=(const Transcript& transcript)
 {
     if (this == &transcript)
         return *this;
-    if (_r)
-        delete [] _r;
 
     _r_size = transcript._r_size;
     _e = transcript._e;
     _s = transcript._s;
-
+    if (_r)
+        delete [] _r;
     _r = new CryptoPP::ECPPoint[_r_size];
     for (int i = 0; i < _r_size; i++) {
         _r[i] = transcript._r[i];

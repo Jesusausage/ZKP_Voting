@@ -52,13 +52,11 @@ Vote& Vote::operator=(const Vote& vote)
     if (this == &vote)
         return *this;
 
-
+    _num_options = vote._num_options;
     if (_values)
         delete [] _values;
     if (_proofs)
         delete [] _proofs;
-
-    _num_options = vote._num_options;
     _proofs = new OrTranscript[_num_options];
     _values = new CryptoPP::ECPPoint[_num_options];
     for (int i = 0; i < _num_options; i++) {

@@ -57,13 +57,13 @@ bool Verifier::verifyVoteProofs(const Vote& vote)
 }
 
 
-bool Verifier::verifyKeyProofs(const Key& keys)
+bool Verifier::verifyKeyProofs(const Key& key)
 {
-    int num_options = keys.values.size();
+    int num_options = key.num_options();
 
     for (int i = 0; i < num_options; i++) {
-        _key_prot->setParams(_token_sums[i], _id, keys.values[i]);
-        if (_key_prot->verifyNIZKP(keys.proofs[i]) == false)
+        _key_prot->setParams(_token_sums[i], _id, key.value(i));
+        if (_key_prot->verifyNIZKP(key.proof(i)) == false)
             return false;
     }
 

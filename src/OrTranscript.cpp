@@ -42,12 +42,11 @@ OrTranscript& OrTranscript::operator=(const OrTranscript& transcript)
 {
     if (this == &transcript)
         return *this;
-    if (_transcripts)
-        delete [] _transcripts;
-
+        
     _num_prots = transcript._num_prots;
     _e = transcript._e;
-
+    if (_transcripts)
+        delete [] _transcripts;
     _transcripts = new Transcript[_num_prots];
     for (int i = 0; i < _num_prots; i++) {
         _transcripts[i] = transcript._transcripts[i];

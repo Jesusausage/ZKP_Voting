@@ -9,10 +9,10 @@ KeyGen::KeyGen(const ECGroup& ecg,
                _ecg(&ecg),
                _gen(&generator),
                _token_sums(token_sums),
-               _id(id)
+               _id(id),
+               _num_options(_token_sums.size()),
+               _key(_token_sums.size())
 {
-    _num_options = _token_sums.size();
-
     _prot = new ElGamalProtocol(*_ecg, *_gen, 0);
 }
 
@@ -32,7 +32,7 @@ void KeyGen::setIDKey(const CryptoPP::Integer& id_key)
 Key KeyGen::getKeysAndProofs()
 {   
     _generateKeys();
-    return {_keys, _proofs};
+    return _key;
 }
 
 
@@ -53,9 +53,9 @@ Key KeyGen::getKeysAndProofs()
 void KeyGen::_generateKeys()
 {
     for (int i = 0; i < _num_options; i++) {
-        _keys.push_back(_ecg->curve.Multiply(_id_key, _token_sums[i]));
+        _key.setValue(i, _ecg->curve.Multiply(_id_key, _token_sums[i]));
 
-        _prot->setParams(_token_sums[i], _id, _keys[i], _id_key);
-        _proofs.push_back(_prot->generateNIZKP());
+        _prot->setParams(_token_sums[i], _id, _key.value(i), _id_key);
+        _key.setProof(i, _prot->generateNIZKP());
     }
 }

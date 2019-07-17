@@ -86,7 +86,7 @@ void TestVoteDecryption()
     for (int j = 0; j < 6; j++) {
         for (int i = 0; i < no_voters; i++) {
             vote_t[j] = ecg.curve.Add(vote_t[j], votes[i].value(j));
-            key_t[j] = ecg.curve.Add(key_t[j], keys[i].values[j]);
+            key_t[j] = ecg.curve.Add(key_t[j], keys[i].value(j));
         }
     }
 

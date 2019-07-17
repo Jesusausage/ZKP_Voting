@@ -18,12 +18,12 @@ void TestKeyGeneration()
 
     KeyGen key_gen(ecg, gen, token_sums, id);
     key_gen.setIDKey(id_key);
-    Key keys = key_gen.getKeysAndProofs();
+    Key key = key_gen.getKeysAndProofs();
     
     for (int i = 0; i < 10; i++) {
         ElGamalProtocol prot(ecg, gen, 0);
-        prot.setParams(token_sums[i], id, keys.values[i]);
+        prot.setParams(token_sums[i], id, key.value(i));
 
-        assert(prot.verifyNIZKP(keys.proofs[i]) == true);
+        assert(prot.verifyNIZKP(key.proof(i)) == true);
     }
 }
