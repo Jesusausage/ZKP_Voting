@@ -33,10 +33,4 @@ private:
 };
 
 
-// CompressedOrNIZKP CompressOrNIZKP(const OrTranscript& or_nizkp);
-
-// OrTranscript DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
-//                           const CryptoPP::ECP& curve);
-
-
 #endif

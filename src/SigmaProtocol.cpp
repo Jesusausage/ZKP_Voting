@@ -21,33 +21,15 @@ void SigmaProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
 }
 
 
-CryptoPP::Integer SigmaProtocol::challengeSize() const
-{
-    return *_order;
-}
-
-
-CryptoPP::ECPPoint* SigmaProtocol::commitment() const
-{
-    return _transcript.commitment();
-}
-
-
-int SigmaProtocol::commitmentSize() const
-{
-    return _transcript.commitmentSize();
-}
-
-
 CryptoPP::Integer SigmaProtocol::challenge() const
 {
     return _transcript.challenge();
 }
 
 
-CryptoPP::Integer SigmaProtocol::response() const
+CryptoPP::Integer SigmaProtocol::challengeSize() const
 {
-    return _transcript.response();
+    return *_order;
 }
 
 
@@ -103,30 +85,3 @@ CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
     delete [] digest;
     return decoded_int % challenge_max;
 }
-
-
-// CompressedTranscript CompressTranscript(const Transcript& transcript)
-// {
-//     CompressedTranscript ret;
-//     for (auto com : transcript.commitment) {
-//         ret.commitment.push_back(CompressPoint(com));
-//     }
-//     ret.challenge = transcript.challenge;
-//     ret.response = transcript.response;
-
-//     return ret;
-// }
-
-
-// Transcript DecompressTranscript(const CompressedTranscript& compressed_transcript,
-//                                 const CryptoPP::ECP& curve)
-// {
-//     Transcript ret;
-//     for (auto com : compressed_transcript.commitment) {
-//         ret.commitment.push_back(DecompressPoint(com, curve));
-//     }
-//     ret.challenge = compressed_transcript.challenge;
-//     ret.response = compressed_transcript.response;
-
-//     return ret;
-// }

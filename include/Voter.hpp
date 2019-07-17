@@ -17,7 +17,6 @@ public:
     void setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys);
     void castVote(int option);
     Vote getVoteAndProofs();
-    // CompressedVote getCompressedVote();
 
 private:
     const ECGroup* _ecg;

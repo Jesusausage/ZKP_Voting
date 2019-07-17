@@ -20,13 +20,9 @@ public:
     virtual bool verify() = 0;
     virtual void generateSimulation() = 0;
     
+    CryptoPP::Integer challenge() const;
     CryptoPP::Integer challengeSize() const;
     virtual std::string getHashData() = 0;
-
-    CryptoPP::ECPPoint* commitment() const;
-    int commitmentSize() const;
-    CryptoPP::Integer challenge() const;
-    CryptoPP::Integer response() const;
 
     Transcript getTranscript() const;
     void setTranscript(const Transcript& transcript);

@@ -56,15 +56,3 @@ Vote Voter::getVoteAndProofs()
 {
     return _vote;
 }
-
-
-// CompressedVote Voter::getCompressedVote()
-// {
-//     CompressedVote ret;
-//     for (int i = 0; i < _num_options; i++) {
-//         ret.values.push_back(CompressPoint(_votes[i]));
-//         ret.proofs.push_back(CompressOrNIZKP(_proofs[i]));
-//     }
-
-//     return ret;
-// }

@@ -133,28 +133,3 @@ bool OrProtocol::verifyNIZKP(const OrTranscript& or_nizkp)
 
     return true;
 }
-
-
-// CompressedOrNIZKP CompressOrNIZKP(const OrTranscript& or_nizkp)
-// {
-//     CompressedOrNIZKP ret;
-//     for (auto transcript : or_nizkp.transcripts) {
-//         ret.transcripts.push_back(CompressTranscript(transcript));
-//     }
-//     ret.e = or_nizkp.e;
-
-//     return ret;
-// }
-
-
-// OrTranscript DecompressOrNIZKP(const CompressedOrNIZKP& compressed_or_nizkp,
-//                           const CryptoPP::ECP& curve)
-// {
-//     OrTranscript ret;
-//     for (auto transcript : compressed_or_nizkp.transcripts) {
-//         ret.transcripts.push_back(DecompressTranscript(transcript, curve));
-//     }
-//     ret.e = compressed_or_nizkp.e;
-
-//     return ret;
-// }

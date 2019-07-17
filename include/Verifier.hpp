@@ -15,12 +15,11 @@ public:
              const CryptoPP::ECPPoint& id_sum,
              const std::vector<CryptoPP::ECPPoint>& token_sums);
     ~Verifier();
+    
     void setVoterTokens(const std::vector<CryptoPP::ECPPoint>& tokens);
     bool verifyVoteProofs(const Vote& vote);
     void setID(const CryptoPP::ECPPoint& id);
     bool verifyKeyProofs(const Key& key);
-    // Vote decompressVote(const CompressedVote& compressed_vote);
-    // Key decompressKey(const CompressedKey& compressed_key);
 
 private:
     const ECGroup* _ecg;
@@ -38,6 +37,3 @@ private:
 
 
 #endif
-
-
-// CREATE VOTE AND KEY PORTION COMPRESSION AND DECOMPRESSION

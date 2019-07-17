@@ -13,9 +13,9 @@ public:
           const std::vector<CryptoPP::ECPPoint>& token_sums,
           const CryptoPP::ECPPoint& id);
     ~KeyGen();
+
     void setIDKey(const CryptoPP::Integer& id_key);
     Key getKeysAndProofs();
-    // CompressedKey getCompressedKey();
 
 private:
     const ECGroup* _ecg;
