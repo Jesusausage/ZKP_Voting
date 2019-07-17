@@ -41,6 +41,5 @@ int main() {
     // TestVoteCompression();
     std::cout << "Verification test success." << std::endl;
 
-	while (!std::cin.get())
     return 0;
 }

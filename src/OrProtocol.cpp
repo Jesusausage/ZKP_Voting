@@ -94,12 +94,10 @@ std::string OrProtocol::getHashData()
 OrTranscript OrProtocol::generateNIZKP()
 {
     generateCommitment();
-    std::string hash_data = getHashData();
-    auto hash_challenge = GenHashChallenge(hash_data, challengeSize());
+    auto hash_challenge = GenHashChallenge(getHashData(), challengeSize());
     hash_challenge += (_num_prots - 1) * challengeSize();
     generateChallenge(hash_challenge);
     generateResponse();
-    assert(verify() == true);
 
     auto* transcripts = new Transcript[_num_prots];
     for (int i = 0; i < _num_prots; i++) {
@@ -121,17 +119,16 @@ bool OrProtocol::verifyNIZKP(const OrTranscript& or_nizkp)
             return false;
     }
     
-    std::string hash_data = getHashData();
-    auto hash_challenge = GenHashChallenge(hash_data, challengeSize());
-    hash_challenge += (_num_prots - 1) * challengeSize();
+    auto hash_e = GenHashChallenge(getHashData(), challengeSize());
+    hash_e += (_num_prots - 1) * challengeSize();
 
     CryptoPP::Integer total_challenge = 0;
     for (SigmaProtocol* prot : _sigma_prots)
         total_challenge += prot->challenge();
         
-    if (hash_challenge != or_nizkp.e())
+    if (hash_e != or_nizkp.e())
         return false;
-    if (total_challenge != hash_challenge)
+    if (total_challenge != hash_e)
         return false;
 
     return true;

@@ -36,7 +36,7 @@ bool SchnorrProtocol::verify()
 {
     auto a = _curve->Multiply(_transcript.response(), *_gen);
     auto b = _curve->Multiply(_transcript.challenge(), 
-                                 _curve->Inverse(_pub_key));
+                              _curve->Inverse(_pub_key));
     auto result = _curve->Add(a, b);
     // r = g^s * x^-e
     auto r = _transcript.commitment();
