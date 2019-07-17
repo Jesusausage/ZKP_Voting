@@ -19,17 +19,15 @@ void TestVoting()
     Voter voter(ecg, gen, id_sum, tokens);
     voter.setTokenKeys(token_keys);
     voter.castVote(8);
-    Vote votes = voter.getVoteAndProofs();
-     
-    // votes.values[8].x += 1;
+    Vote vote = voter.getVoteAndProofs();
 
     for (int i = 0; i < 10; i++) {
         ElGamalProtocol prot0(ecg, gen, 0);
         ElGamalProtocol prot1(ecg, gen, 1);
-        prot0.setParams(id_sum, tokens[i], votes.values[i]);
-        prot1.setParams(id_sum, tokens[i], votes.values[i]);
+        prot0.setParams(id_sum, tokens[i], vote.value(i));
+        prot1.setParams(id_sum, tokens[i], vote.value(i));
 
         OrProtocol prot({&prot0, &prot1});
-        assert(prot.verifyNIZKP(votes.proofs[i]) == true);
+        assert(prot.verifyNIZKP(vote.proof(i)) == true);
     }
 }

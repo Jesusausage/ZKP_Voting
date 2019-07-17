@@ -1,15 +1,10 @@
-#ifndef VOTE_HPP
-#define VOTE_HPP
+#ifndef VOTER_HPP
+#define VOTER_HPP
 
 
 #include "OrProtocol.hpp"
 #include "ElGamalProtocol.hpp"
-
-
-struct Vote {
-    std::vector<CryptoPP::ECPPoint> values;
-    std::vector<OrTranscript> proofs;
-};
+#include "Vote.hpp"
 
 
 class Voter {
@@ -33,8 +28,7 @@ private:
     int _num_options;
     std::vector<CryptoPP::Integer> _token_keys;
 
-    std::vector<CryptoPP::ECPPoint> _votes;
-    std::vector<OrTranscript> _proofs;
+    Vote _vote;
 
     ElGamalProtocol* _prots[2];
     OrProtocol* _or_prot;

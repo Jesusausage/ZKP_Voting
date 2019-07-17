@@ -21,13 +21,11 @@ void TestVerification()
     Voter voter(ecg, gen, id_sum, tokens);
     voter.setTokenKeys(token_keys);
     voter.castVote(8);
-    Vote votes = voter.getVoteAndProofs();    
-    // votes.values[8].x += 1;
+    Vote votes = voter.getVoteAndProofs();
 
     KeyGen key_gen(ecg, gen, token_sums, id);
     key_gen.setIDKey(id_key);
     Key keys = key_gen.getKeysAndProofs();
-    // keys.values[8].x += 1;
 
     Verifier verifier(ecg, gen, id_sum, token_sums);
     verifier.setVoterTokens(tokens);
@@ -87,7 +85,7 @@ void TestVoteDecryption()
     CryptoPP::ECPPoint key_t[6];
     for (int j = 0; j < 6; j++) {
         for (int i = 0; i < no_voters; i++) {
-            vote_t[j] = ecg.curve.Add(vote_t[j], votes[i].values[j]);
+            vote_t[j] = ecg.curve.Add(vote_t[j], votes[i].value(j));
             key_t[j] = ecg.curve.Add(key_t[j], keys[i].values[j]);
         }
     }

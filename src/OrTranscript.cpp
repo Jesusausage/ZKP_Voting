@@ -48,6 +48,7 @@ OrTranscript& OrTranscript::operator=(const OrTranscript& transcript)
     _num_prots = transcript._num_prots;
     _e = transcript._e;
 
+    _transcripts = new Transcript[_num_prots];
     for (int i = 0; i < _num_prots; i++) {
         _transcripts[i] = transcript._transcripts[i];
     }

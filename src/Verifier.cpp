@@ -41,15 +41,15 @@ void Verifier::setID(const CryptoPP::ECPPoint& id)
 }
 
 
-bool Verifier::verifyVoteProofs(const Vote& votes)
+bool Verifier::verifyVoteProofs(const Vote& vote)
 {
-    int num_options = votes.values.size();
+    int num_options = vote.num_options();
 
     for (int i = 0; i < num_options; i++) {
-        _vote_prots[0]->setParams(_id_sum, _tokens[i], votes.values[i]);
-        _vote_prots[1]->setParams(_id_sum, _tokens[i], votes.values[i]);
+        _vote_prots[0]->setParams(_id_sum, _tokens[i], vote.value(i));
+        _vote_prots[1]->setParams(_id_sum, _tokens[i], vote.value(i));
 
-        if (_vote_prot->verifyNIZKP(votes.proofs[i]) == false)
+        if (_vote_prot->verifyNIZKP(vote.proof(i)) == false)
             return false;
     }
 

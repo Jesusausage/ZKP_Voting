@@ -19,8 +19,6 @@ void TestKeyGeneration()
     KeyGen key_gen(ecg, gen, token_sums, id);
     key_gen.setIDKey(id_key);
     Key keys = key_gen.getKeysAndProofs();
-
-    // keys.values[8].x += 1;
     
     for (int i = 0; i < 10; i++) {
         ElGamalProtocol prot(ecg, gen, 0);
