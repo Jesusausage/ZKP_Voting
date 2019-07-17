@@ -6,26 +6,26 @@ Transcript::Transcript(CryptoPP::ECPPoint* commitment,
                        const CryptoPP::Integer& challenge,
                        const CryptoPP::Integer& response)
                        :
-                       _r_size(commitment_size),
-                       _e(challenge), 
-                       _s(response) 
+                       r_size_(commitment_size),
+                       e_(challenge), 
+                       s_(response) 
 {
-    _r = new CryptoPP::ECPPoint[_r_size];
-    for (int i = 0; i < _r_size; i++) {
-        _r[i] = commitment[i];
+    r_ = new CryptoPP::ECPPoint[r_size_];
+    for (int i = 0; i < r_size_; i++) {
+        r_[i] = commitment[i];
     }
 }
 
 
 Transcript::Transcript(const Transcript& transcript)
                        :
-                       _r_size(transcript._r_size),
-                       _e(transcript._e), 
-                       _s(transcript._s)
+                       r_size_(transcript.r_size_),
+                       e_(transcript.e_), 
+                       s_(transcript.s_)
 {
-    _r = new CryptoPP::ECPPoint[_r_size];
-    for (int i = 0; i < _r_size; i++) {
-        _r[i] = transcript._r[i];
+    r_ = new CryptoPP::ECPPoint[r_size_];
+    for (int i = 0; i < r_size_; i++) {
+        r_[i] = transcript.r_[i];
     }
 }
 
@@ -42,8 +42,8 @@ Transcript::Transcript()
 
 Transcript::~Transcript()
 {
-    if (_r)
-        delete [] _r;
+    if (r_)
+        delete [] r_;
 }
 
 
@@ -56,23 +56,23 @@ Transcript& Transcript::operator=(Transcript transcript)
 
 void swap(Transcript& a, Transcript& b)
 {
-    std::swap(a._r, b._r);
-    std::swap(a._r_size, b._r_size);
-    std::swap(a._e, b._e);
-    std::swap(a._s, b._s);
+    std::swap(a.r_, b.r_);
+    std::swap(a.r_size_, b.r_size_);
+    std::swap(a.e_, b.e_);
+    std::swap(a.s_, b.s_);
 }
 
 
 void Transcript::setCommitment(CryptoPP::ECPPoint* commitment, 
                                int commitment_size)
 {
-    if (_r == commitment)
+    if (r_ == commitment)
         return;
-    if (_r)
-        delete [] _r;
-    _r_size = commitment_size;
-    _r = new CryptoPP::ECPPoint[_r_size];
-    for (int i = 0; i < _r_size; i++) {
-        _r[i] = commitment[i];
+    if (r_)
+        delete [] r_;
+    r_size_ = commitment_size;
+    r_ = new CryptoPP::ECPPoint[r_size_];
+    for (int i = 0; i < r_size_; i++) {
+        r_[i] = commitment[i];
     }
 }

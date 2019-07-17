@@ -31,12 +31,12 @@ public:
     bool verifyNIZKP(const Transcript& nizkp);
 
 protected:    
-    const CryptoPP::ECP* _curve;
-    const CryptoPP::Integer* _order;
-    const CryptoPP::ECPPoint* _gen;
+    const CryptoPP::ECP* curve_;
+    const CryptoPP::Integer* order_;
+    const CryptoPP::ECPPoint* gen_;
 
-    CryptoPP::Integer _commitment_seed;
-    Transcript _transcript;
+    CryptoPP::Integer commitment_seed_;
+    Transcript transcript_;
 };
 
 

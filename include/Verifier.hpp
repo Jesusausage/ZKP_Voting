@@ -22,17 +22,17 @@ public:
     bool verifyKeyProofs(const Key& key);
 
 private:
-    const ECGroup* _ecg;
-    const CryptoPP::ECPPoint _gen;
-    const CryptoPP::ECPPoint _id_sum;
-    const std::vector<CryptoPP::ECPPoint> _token_sums;
+    const ECGroup* ecg_;
+    const CryptoPP::ECPPoint gen_;
+    const CryptoPP::ECPPoint id_sum_;
+    const std::vector<CryptoPP::ECPPoint> token_sums_;
 
-    std::vector<CryptoPP::ECPPoint> _tokens;
-    CryptoPP::ECPPoint _id;
+    std::vector<CryptoPP::ECPPoint> tokens_;
+    CryptoPP::ECPPoint id_;
 
-    ElGamalProtocol* _vote_prots[2];
-    OrProtocol* _vote_prot;
-    ElGamalProtocol* _key_prot;
+    ElGamalProtocol* vote_prots_[2];
+    OrProtocol* vote_or_prot_;
+    ElGamalProtocol* key_prot_;
 };
 
 

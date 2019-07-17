@@ -6,42 +6,42 @@ KeyGen::KeyGen(const ECGroup& ecg,
                const std::vector<CryptoPP::ECPPoint>& token_sums,
                const CryptoPP::ECPPoint& id)
                :
-               _ecg(&ecg),
-               _gen(&generator),
-               _token_sums(token_sums),
-               _id(id),
-               _num_options(_token_sums.size()),
-               _key(_token_sums.size())
+               ecg_(&ecg),
+               gen_(&generator),
+               token_sums_(token_sums),
+               id_(id),
+               num_options_(token_sums_.size()),
+               key_(token_sums_.size())
 {
-    _prot = new ElGamalProtocol(*_ecg, *_gen, 0);
+    prot_ = new ElGamalProtocol(*ecg_, *gen_, 0);
 }
 
 
 KeyGen::~KeyGen()
 {
-    delete _prot;
+    delete prot_;
 }
 
 
 void KeyGen::setIDKey(const CryptoPP::Integer& id_key)
 {
-    _id_key = id_key;
+    id_key_ = id_key;
 }
 
 
 Key KeyGen::getKeysAndProofs()
 {   
-    _generateKeys();
-    return _key;
+    generateKeys();
+    return key_;
 }
 
 
-void KeyGen::_generateKeys()
+void KeyGen::generateKeys()
 {
-    for (int i = 0; i < _num_options; i++) {
-        _key.setValue(i, _ecg->curve.Multiply(_id_key, _token_sums[i]));
+    for (int i = 0; i < num_options_; i++) {
+        key_.setValue(i, ecg_->curve.Multiply(id_key_, token_sums_[i]));
 
-        _prot->setParams(_token_sums[i], _id, _key.value(i), _id_key);
-        _key.setProof(i, _prot->generateNIZKP());
+        prot_->setParams(token_sums_[i], id_, key_.value(i), id_key_);
+        key_.setProof(i, prot_->generateNIZKP());
     }
 }

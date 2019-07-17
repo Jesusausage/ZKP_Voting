@@ -28,12 +28,12 @@ public:
     std::string getHashData() override; 
 
 private:
-    const int _m;
+    const int m_;
 
-    CryptoPP::ECPPoint _gen2;
-    CryptoPP::ECPPoint _pub_key1;
-    CryptoPP::ECPPoint _pub_key2;
-    CryptoPP::Integer _w;
+    CryptoPP::ECPPoint gen2_;
+    CryptoPP::ECPPoint pub_key1_;
+    CryptoPP::ECPPoint pub_key2_;
+    CryptoPP::Integer w_;
 
     CryptoPP::ECPPoint computeCommitment1();
     CryptoPP::ECPPoint computeCommitment2();

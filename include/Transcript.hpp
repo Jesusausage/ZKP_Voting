@@ -23,20 +23,20 @@ public:
     void setCommitment(CryptoPP::ECPPoint* commitment, 
                        int commitment_size);
     inline void setChallenge(const CryptoPP::Integer& challenge) 
-        { _e = challenge; }
+        { e_ = challenge; }
     inline void setResponse(const CryptoPP::Integer& response) 
-        { _s = response; }
+        { s_ = response; }
 
-    inline CryptoPP::ECPPoint* commitment() const { return _r; }
-    inline int commitmentSize() const { return _r_size; }
-    inline CryptoPP::Integer challenge() const { return _e; }
-    inline CryptoPP::Integer response() const { return _s; }
+    inline CryptoPP::ECPPoint* commitment() const { return r_; }
+    inline int commitmentSize() const { return r_size_; }
+    inline CryptoPP::Integer challenge() const { return e_; }
+    inline CryptoPP::Integer response() const { return s_; }
 
 private:
-    CryptoPP::ECPPoint* _r = nullptr;
-    int _r_size = 0;
-    CryptoPP::Integer _e = 0;
-    CryptoPP::Integer _s = 0;
+    CryptoPP::ECPPoint* r_ = nullptr;
+    int r_size_ = 0;
+    CryptoPP::Integer e_ = 0;
+    CryptoPP::Integer s_ = 0;
 };
 
 

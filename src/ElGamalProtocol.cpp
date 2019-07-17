@@ -6,7 +6,7 @@ ElGamalProtocol::ElGamalProtocol(const ECGroup& ecg,
                                  int message)
                                  :
                                  SigmaProtocol(ecg, generator1),
-                                 _m(message)
+                                 m_(message)
 {}
 
 
@@ -15,37 +15,37 @@ void ElGamalProtocol::setParams(const CryptoPP::ECPPoint& generator2,
                                 const CryptoPP::ECPPoint& public_key2,
                                 const CryptoPP::Integer& witness /*= 0*/)
 {
-    _gen2 = generator2;
-    _pub_key1 = public_key1;
-    _pub_key2 = public_key2;
-    _w = witness;
+    gen2_ = generator2;
+    pub_key1_ = public_key1;
+    pub_key2_ = public_key2;
+    w_ = witness;
 }
 
 
 void ElGamalProtocol::generateCommitment()
 {
-    _commitment_seed = RandomInteger(2, *_order); 
+    commitment_seed_ = RandomInteger(2, *order_); 
     CryptoPP::ECPPoint r[2];   
-    r[0] = _curve->Multiply(_commitment_seed, *_gen);
-    r[1] = _curve->Multiply(_commitment_seed, _gen2);
+    r[0] = curve_->Multiply(commitment_seed_, *gen_);
+    r[1] = curve_->Multiply(commitment_seed_, gen2_);
     // r1 = g1^u, r2 = g2^u
-    _transcript.setCommitment(r, 2);
+    transcript_.setCommitment(r, 2);
 }
 
 
 void ElGamalProtocol::generateResponse()
 {
-    assert(_transcript.challenge() > 0);
+    assert(transcript_.challenge() > 0);
 
     // s = u + ew (mod q)
-    auto ew = a_times_b_mod_c(_w, _transcript.challenge(), *_order);
-    _transcript.setResponse((_commitment_seed + ew) % *_order);
+    auto ew = a_times_b_mod_c(w_, transcript_.challenge(), *order_);
+    transcript_.setResponse((commitment_seed_ + ew) % *order_);
 }
 
 
 bool ElGamalProtocol::verify()
 {
-    auto r = _transcript.commitment();
+    auto r = transcript_.commitment();
     if (!(computeCommitment1() == r[0]))
         return false;
     if (!(computeCommitment2() == r[1]))
@@ -57,48 +57,48 @@ bool ElGamalProtocol::verify()
 
 void ElGamalProtocol::generateSimulation()
 {
-    assert(_transcript.challenge() > 0);
+    assert(transcript_.challenge() > 0);
 
-    _transcript.setResponse(RandomInteger(1, *_order));
+    transcript_.setResponse(RandomInteger(1, *order_));
     CryptoPP::ECPPoint r[2];
     r[0] = computeCommitment1();    
     r[1] = computeCommitment2();
-    _transcript.setCommitment(r, 2);
+    transcript_.setCommitment(r, 2);
 }
 
 
 std::string ElGamalProtocol::getHashData()
 {
-    auto r = _transcript.commitment();
+    auto r = transcript_.commitment();
     std::string ret;
     ret += CryptoPP::IntToString<CryptoPP::Integer>(r[0].x);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(r[0].y);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key1.x);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key1.y);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key1_.x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key1_.y);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(r[1].x);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(r[1].y);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key2.x);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key2.y);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key2_.x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key2_.y);
     return ret;
 }
 
 
 CryptoPP::ECPPoint ElGamalProtocol::computeCommitment1()
 {
-    auto a = _curve->Multiply(_transcript.response(), *_gen);
-    auto b = _curve->Multiply(_transcript.challenge(), 
-                              _curve->Inverse(_pub_key1));
+    auto a = curve_->Multiply(transcript_.response(), *gen_);
+    auto b = curve_->Multiply(transcript_.challenge(), 
+                              curve_->Inverse(pub_key1_));
     // r1 = g1^s * x1^-e
-    return _curve->Add(a, b);
+    return curve_->Add(a, b);
 }
 
 
 CryptoPP::ECPPoint ElGamalProtocol::computeCommitment2()
 {
-    auto a = _curve->Multiply(_transcript.response(), _gen2);
-    auto b = _curve->Multiply(_transcript.challenge(), 
-                              _curve->Inverse(_pub_key2));
-    auto c = _curve->Multiply(_m*_transcript.challenge(), *_gen);
+    auto a = curve_->Multiply(transcript_.response(), gen2_);
+    auto b = curve_->Multiply(transcript_.challenge(), 
+                              curve_->Inverse(pub_key2_));
+    auto c = curve_->Multiply(m_*transcript_.challenge(), *gen_);
     // r2 = g2^s * x2^-e * g2^me
-    return _curve->Add(a, _curve->Add(b, c));
+    return curve_->Add(a, curve_->Add(b, c));
 }

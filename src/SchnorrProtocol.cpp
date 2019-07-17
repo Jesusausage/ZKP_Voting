@@ -7,66 +7,66 @@ SchnorrProtocol::SchnorrProtocol(const ECGroup& ecg,
                                  const CryptoPP::Integer& witness /*= 0*/)
                                  :
                                  SigmaProtocol(ecg, generator),
-                                 _pub_key(public_key), 
-                                 _w(witness) 
+                                 pub_key_(public_key), 
+                                 w_(witness) 
 {}
 
 
 void SchnorrProtocol::generateCommitment()
 {
-    _commitment_seed = RandomInteger(2, *_order);
+    commitment_seed_ = RandomInteger(2, *order_);
     CryptoPP::ECPPoint r[1];
-    r[0] = _curve->Multiply(_commitment_seed, *_gen);
+    r[0] = curve_->Multiply(commitment_seed_, *gen_);
     // r = g^u
-    _transcript.setCommitment(r, 1);
+    transcript_.setCommitment(r, 1);
 }
 
 
 void SchnorrProtocol::generateResponse()
 {
-    assert(_transcript.challenge() > 0);
+    assert(transcript_.challenge() > 0);
 
     // s = u + ew (mod q)
-    auto ew = a_times_b_mod_c(_w, _transcript.challenge(), *_order);
-    _transcript.setResponse((_commitment_seed + ew) % *_order);
+    auto ew = a_times_b_mod_c(w_, transcript_.challenge(), *order_);
+    transcript_.setResponse((commitment_seed_ + ew) % *order_);
 }
 
 
 bool SchnorrProtocol::verify()
 {
-    auto a = _curve->Multiply(_transcript.response(), *_gen);
-    auto b = _curve->Multiply(_transcript.challenge(), 
-                              _curve->Inverse(_pub_key));
-    auto result = _curve->Add(a, b);
+    auto a = curve_->Multiply(transcript_.response(), *gen_);
+    auto b = curve_->Multiply(transcript_.challenge(), 
+                              curve_->Inverse(pub_key_));
+    auto result = curve_->Add(a, b);
     // r = g^s * x^-e
-    auto r = _transcript.commitment();
+    auto r = transcript_.commitment();
     return (r[0] == result);
 }
 
 
 void SchnorrProtocol::generateSimulation()
 {
-    assert(_transcript.challenge() > 0);
+    assert(transcript_.challenge() > 0);
 
-    _transcript.setResponse(RandomInteger(1, *_order));
+    transcript_.setResponse(RandomInteger(1, *order_));
 
-    auto a = _curve->Multiply(_transcript.response(), *_gen);
-    auto b = _curve->Multiply(_transcript.challenge(), 
-                                 _curve->Inverse(_pub_key));
+    auto a = curve_->Multiply(transcript_.response(), *gen_);
+    auto b = curve_->Multiply(transcript_.challenge(), 
+                                 curve_->Inverse(pub_key_));
     CryptoPP::ECPPoint r[1];
-    r[0] = _curve->Add(a, b);
+    r[0] = curve_->Add(a, b);
     // r = g^s * x^-e
-    _transcript.setCommitment(r, 1);
+    transcript_.setCommitment(r, 1);
 }
 
 
 std::string SchnorrProtocol::getHashData() 
 {
-    auto r = _transcript.commitment();
+    auto r = transcript_.commitment();
     std::string ret;
     ret += CryptoPP::IntToString<CryptoPP::Integer>(r[0].x);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(r[0].y);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key.x);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(_pub_key.y);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key_.x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key_.y);
     return ret;
 }

@@ -25,11 +25,11 @@ public:
     bool verifyNIZKP(const OrTranscript& or_nizkp);
 
 private:
-    std::vector<SigmaProtocol*> _sigma_prots;
-    int _i_known;
-    int _num_prots;
-    CryptoPP::Integer _total_e = 0;
-    CryptoPP::Integer _e = 0;
+    std::vector<SigmaProtocol*> sigma_prots_;
+    int i_known_;
+    int num_prots_;
+    CryptoPP::Integer total_e_ = 0;
+    CryptoPP::Integer e_ = 0;
 };
 
 

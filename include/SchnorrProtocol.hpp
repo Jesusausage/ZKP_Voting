@@ -24,8 +24,8 @@ public:
     std::string getHashData() override;
 
 private:
-    CryptoPP::ECPPoint _pub_key;
-    CryptoPP::Integer _w;
+    CryptoPP::ECPPoint pub_key_;
+    CryptoPP::Integer w_;
 };
 
 

@@ -5,31 +5,31 @@ Vote::Vote(CryptoPP::ECPPoint* values,
            OrTranscript* proofs,
            int num_options)
            :
-           _num_options(num_options)
+           num_options_(num_options)
 {
-    _values = new CryptoPP::ECPPoint[_num_options];
-    _proofs = new OrTranscript[_num_options];
-    for (int i = 0; i < _num_options; i++) {
-        _values[i] = values[i];
-        _proofs[i] = proofs[i];
+    values_ = new CryptoPP::ECPPoint[num_options_];
+    proofs_ = new OrTranscript[num_options_];
+    for (int i = 0; i < num_options_; i++) {
+        values_[i] = values[i];
+        proofs_[i] = proofs[i];
     }
 }
 
 
-Vote::Vote(int num_options) : _num_options(num_options)
+Vote::Vote(int num_options) : num_options_(num_options)
 {
-    _values = new CryptoPP::ECPPoint[_num_options];
-    _proofs = new OrTranscript[_num_options];
+    values_ = new CryptoPP::ECPPoint[num_options_];
+    proofs_ = new OrTranscript[num_options_];
 }
 
 
-Vote::Vote(const Vote& vote) : _num_options(vote._num_options)
+Vote::Vote(const Vote& vote) : num_options_(vote.num_options_)
 {
-    _values = new CryptoPP::ECPPoint[_num_options];
-    _proofs = new OrTranscript[_num_options];
-    for (int i = 0; i < _num_options; i++) {
-        _values[i] = vote._values[i];
-        _proofs[i] = vote._proofs[i];
+    values_ = new CryptoPP::ECPPoint[num_options_];
+    proofs_ = new OrTranscript[num_options_];
+    for (int i = 0; i < num_options_; i++) {
+        values_[i] = vote.values_[i];
+        proofs_[i] = vote.proofs_[i];
     }
 }
 
@@ -46,10 +46,10 @@ Vote::Vote()
 
 Vote::~Vote()
 {
-    if (_values)
-        delete [] _values;
-    if (_proofs)
-        delete [] _proofs;
+    if (values_)
+        delete [] values_;
+    if (proofs_)
+        delete [] proofs_;
 }
 
 
@@ -62,7 +62,7 @@ Vote& Vote::operator=(Vote vote)
 
 void swap(Vote& a, Vote& b)
 {
-    std::swap(a._values, b._values);
-    std::swap(a._proofs, b._proofs);
-    std::swap(a._num_options, b._num_options);
+    std::swap(a.values_, b.values_);
+    std::swap(a.proofs_, b.proofs_);
+    std::swap(a.num_options_, b.num_options_);
 }

@@ -5,24 +5,24 @@ OrTranscript::OrTranscript(Transcript* transcripts,
                            int num_prots, 
                            const CryptoPP::Integer& e)
                            :
-                           _num_prots(num_prots),
-                           _e(e)
+                           num_prots_(num_prots),
+                           e_(e)
 {
-    _transcripts = new Transcript[_num_prots];
-    for (int i = 0; i < _num_prots; i++) {
-        _transcripts[i] = transcripts[i];
+    transcripts_ = new Transcript[num_prots_];
+    for (int i = 0; i < num_prots_; i++) {
+        transcripts_[i] = transcripts[i];
     }
 }
 
 
 OrTranscript::OrTranscript(const OrTranscript& or_transcript)
                            :
-                           _num_prots(or_transcript._num_prots),
-                           _e(or_transcript._e)
+                           num_prots_(or_transcript.num_prots_),
+                           e_(or_transcript.e_)
 {
-    _transcripts = new Transcript[_num_prots];
-    for (int i = 0; i < _num_prots; i++) {
-        _transcripts[i] = or_transcript._transcripts[i];
+    transcripts_ = new Transcript[num_prots_];
+    for (int i = 0; i < num_prots_; i++) {
+        transcripts_[i] = or_transcript.transcripts_[i];
     }
 }
 
@@ -39,8 +39,8 @@ OrTranscript::OrTranscript()
 
 OrTranscript::~OrTranscript()
 {
-    if (_transcripts)
-        delete [] _transcripts;
+    if (transcripts_)
+        delete [] transcripts_;
 }
 
 
@@ -53,7 +53,7 @@ OrTranscript& OrTranscript::operator=(OrTranscript or_transcript)
 
 void swap(OrTranscript& a, OrTranscript& b)
 {
-    std::swap(a._transcripts, b._transcripts);
-    std::swap(a._num_prots, b._num_prots);
-    std::swap(a._e, b._e);
+    std::swap(a.transcripts_, b.transcripts_);
+    std::swap(a.num_prots_, b.num_prots_);
+    std::swap(a.e_, b.e_);
 }

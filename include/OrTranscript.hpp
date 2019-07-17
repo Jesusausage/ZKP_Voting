@@ -18,14 +18,14 @@ public:
     OrTranscript& operator=(OrTranscript or_transcript);
     friend void swap(OrTranscript& a, OrTranscript& b);
 
-    inline Transcript transcript(int i) const { return _transcripts[i]; }
-    inline int num_prots() const { return _num_prots; }
-    inline CryptoPP::Integer e() const { return _e; }
+    inline Transcript transcript(int i) const { return transcripts_[i]; }
+    inline int numProts() const { return num_prots_; }
+    inline CryptoPP::Integer e() const { return e_; }
 
 private:
-    Transcript* _transcripts = nullptr;
-    int _num_prots = 0;
-    CryptoPP::Integer _e = 0;
+    Transcript* transcripts_ = nullptr;
+    int num_prots_ = 0;
+    CryptoPP::Integer e_ = 0;
 };
 
 

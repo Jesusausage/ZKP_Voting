@@ -18,19 +18,19 @@ public:
     Key getKeysAndProofs();
 
 private:
-    const ECGroup* _ecg;
-    const CryptoPP::ECPPoint* _gen;
-    const std::vector<CryptoPP::ECPPoint> _token_sums;
-    const CryptoPP::ECPPoint _id;
+    const ECGroup* ecg_;
+    const CryptoPP::ECPPoint* gen_;
+    const std::vector<CryptoPP::ECPPoint> token_sums_;
+    const CryptoPP::ECPPoint id_;
     
-    int _num_options;
-    CryptoPP::Integer _id_key;
+    int num_options_;
+    CryptoPP::Integer id_key_;
 
-    Key _key;
+    Key key_;
 
-    ElGamalProtocol* _prot = nullptr;
+    ElGamalProtocol* prot_ = nullptr;
 
-    void _generateKeys();
+    void generateKeys();
 };
 
 

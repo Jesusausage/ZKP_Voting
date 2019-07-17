@@ -6,53 +6,53 @@ Voter::Voter(const ECGroup& ecg,
              const CryptoPP::ECPPoint& id_sum,
              const std::vector<CryptoPP::ECPPoint>& tokens)
              :
-             _ecg(&ecg),
-             _gen(&generator),
-             _id_sum(id_sum),
-             _tokens(tokens),
-             _num_options(tokens.size()),
-             _vote(tokens.size())
+             ecg_(&ecg),
+             gen_(&generator),
+             id_sum_(id_sum),
+             tokens_(tokens),
+             num_options_(tokens.size()),
+             vote_(tokens.size())
 {
-    _prots[0] = new ElGamalProtocol(*_ecg, *_gen, 0);
-    _prots[1] = new ElGamalProtocol(*_ecg, *_gen, 1);
-    _or_prot = new OrProtocol({_prots[0], _prots[1]});
+    prots_[0] = new ElGamalProtocol(*ecg_, *gen_, 0);
+    prots_[1] = new ElGamalProtocol(*ecg_, *gen_, 1);
+    or_prot_ = new OrProtocol({prots_[0], prots_[1]});
 }
 
 
 Voter::~Voter()
 {
-    delete _prots[0];
-    delete _prots[1];
-    delete _or_prot;
+    delete prots_[0];
+    delete prots_[1];
+    delete or_prot_;
 }
 
 
 void Voter::setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys)
 {
-    assert(token_keys.size() == (unsigned int)_num_options);
-    _token_keys = token_keys;
+    assert(token_keys.size() == (unsigned int)num_options_);
+    token_keys_ = token_keys;
 }
 
 
 void Voter::castVote(int option)
 {
-    auto identity = _ecg->curve.Identity();
+    auto identity = ecg_->curve.Identity();
 
-    for (int i = 0; i < _num_options; i++) {
-        auto a = (i == option) ? *_gen : identity;
-        auto b = _ecg->curve.Multiply(_token_keys[i], _id_sum);
-        _vote.setValue(i, _ecg->curve.Add(a, b));
+    for (int i = 0; i < num_options_; i++) {
+        auto a = (i == option) ? *gen_ : identity;
+        auto b = ecg_->curve.Multiply(token_keys_[i], id_sum_);
+        vote_.setValue(i, ecg_->curve.Add(a, b));
 
         int known = (i == option) ? 1 : 0;
-        _prots[known]->setParams(_id_sum, _tokens[i], _vote.value(i), _token_keys[i]);
-        _prots[1 - known]->setParams(_id_sum, _tokens[i], _vote.value(i));
-        _or_prot->setKnown(known);
-        _vote.setProof(i, _or_prot->generateNIZKP());
+        prots_[known]->setParams(id_sum_, tokens_[i], vote_.value(i), token_keys_[i]);
+        prots_[1 - known]->setParams(id_sum_, tokens_[i], vote_.value(i));
+        or_prot_->setKnown(known);
+        vote_.setProof(i, or_prot_->generateNIZKP());
     }
 }
 
 
 Vote Voter::getVoteAndProofs()
 {
-    return _vote;
+    return vote_;
 }

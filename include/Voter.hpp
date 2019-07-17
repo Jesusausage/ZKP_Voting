@@ -19,18 +19,18 @@ public:
     Vote getVoteAndProofs();
 
 private:
-    const ECGroup* _ecg;
-    const CryptoPP::ECPPoint* _gen;
-    const CryptoPP::ECPPoint _id_sum;
-    const std::vector<CryptoPP::ECPPoint> _tokens;
+    const ECGroup* ecg_;
+    const CryptoPP::ECPPoint* gen_;
+    const CryptoPP::ECPPoint id_sum_;
+    const std::vector<CryptoPP::ECPPoint> tokens_;
     
-    int _num_options;
-    std::vector<CryptoPP::Integer> _token_keys;
+    int num_options_;
+    std::vector<CryptoPP::Integer> token_keys_;
 
-    Vote _vote;
+    Vote vote_;
 
-    ElGamalProtocol* _prots[2];
-    OrProtocol* _or_prot;
+    ElGamalProtocol* prots_[2];
+    OrProtocol* or_prot_;
 };
 
 

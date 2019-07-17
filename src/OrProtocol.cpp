@@ -4,34 +4,34 @@
 OrProtocol::OrProtocol(std::vector<SigmaProtocol*> sigma_protocols, 
                        int i_known /*= 0*/)
                        :
-                       _sigma_prots(sigma_protocols), 
-                       _i_known(i_known)
+                       sigma_prots_(sigma_protocols), 
+                       i_known_(i_known)
 {
-    _num_prots = sigma_protocols.size();
+    num_prots_ = sigma_protocols.size();
 
-    assert(_i_known >= 0 && _i_known < _num_prots);
+    assert(i_known_ >= 0 && i_known_ < num_prots_);
 
-    for (int i = 1; i < _num_prots; i++) {
-        assert(_sigma_prots[i]->challengeSize() == 
-               _sigma_prots[i - 1]->challengeSize());
+    for (int i = 1; i < num_prots_; i++) {
+        assert(sigma_prots_[i]->challengeSize() == 
+               sigma_prots_[i - 1]->challengeSize());
     }
 }
 
 
 void OrProtocol::setKnown(int i_known)
 {
-    _i_known = i_known;
+    i_known_ = i_known;
 }
 
 
 void OrProtocol::generateCommitment()
 {
-    for (int i = 0; i < _num_prots; i++) {
-        if (i == _i_known)
-            _sigma_prots[i]->generateCommitment();
+    for (int i = 0; i < num_prots_; i++) {
+        if (i == i_known_)
+            sigma_prots_[i]->generateCommitment();
         else {
-            _sigma_prots[i]->generateChallenge();
-            _sigma_prots[i]->generateSimulation();
+            sigma_prots_[i]->generateChallenge();
+            sigma_prots_[i]->generateSimulation();
         }
     }
 }
@@ -39,37 +39,37 @@ void OrProtocol::generateCommitment()
 
 void OrProtocol::generateChallenge(CryptoPP::Integer e)
 {
-    assert(_i_known >= 0);
+    assert(i_known_ >= 0);
 
-    _total_e = 0;
-    for (int i = 0; i < _num_prots; i++) {
-        if (i != _i_known)
-            _total_e += _sigma_prots[i]->challenge();
+    total_e_ = 0;
+    for (int i = 0; i < num_prots_; i++) {
+        if (i != i_known_)
+            total_e_ += sigma_prots_[i]->challenge();
     }
-    assert(e > _total_e);
-    _e = e;
+    assert(e > total_e_);
+    e_ = e;
 }
 
 
 void OrProtocol::generateResponse()
 {
-    assert(_e > 0);
+    assert(e_ > 0);
 
-    CryptoPP::Integer e_known = _e - _total_e;
-    _sigma_prots[_i_known]->generateChallenge(&e_known);
-    _sigma_prots[_i_known]->generateResponse();
+    CryptoPP::Integer e_known = e_ - total_e_;
+    sigma_prots_[i_known_]->generateChallenge(&e_known);
+    sigma_prots_[i_known_]->generateResponse();
 }
 
 
 bool OrProtocol::verify()
 {
-    assert(_e > 0);
+    assert(e_ > 0);
 
-    for (SigmaProtocol* prot : _sigma_prots) {
+    for (SigmaProtocol* prot : sigma_prots_) {
         if (prot->verify() == false)
             return false;
     }
-    if (_e != _total_e + _sigma_prots[_i_known]->challenge())
+    if (e_ != total_e_ + sigma_prots_[i_known_]->challenge())
         return false;
 
     return true;
@@ -78,15 +78,15 @@ bool OrProtocol::verify()
 
 CryptoPP::Integer OrProtocol::challengeSize()
 { 
-    return _sigma_prots[0]->challengeSize();
+    return sigma_prots_[0]->challengeSize();
 }
 
 
 std::string OrProtocol::getHashData() 
 {
     std::string ret;
-    for (int i = 0; i < _num_prots; i++)
-        ret += _sigma_prots[i]->getHashData();
+    for (int i = 0; i < num_prots_; i++)
+        ret += sigma_prots_[i]->getHashData();
     return ret;
 }
 
@@ -95,15 +95,15 @@ OrTranscript OrProtocol::generateNIZKP()
 {
     generateCommitment();
     auto hash_challenge = GenHashChallenge(getHashData(), challengeSize());
-    hash_challenge += (_num_prots - 1) * challengeSize();
+    hash_challenge += (num_prots_ - 1) * challengeSize();
     generateChallenge(hash_challenge);
     generateResponse();
 
-    auto* transcripts = new Transcript[_num_prots];
-    for (int i = 0; i < _num_prots; i++) {
-        transcripts[i] = _sigma_prots[i]->getTranscript();
+    auto* transcripts = new Transcript[num_prots_];
+    for (int i = 0; i < num_prots_; i++) {
+        transcripts[i] = sigma_prots_[i]->getTranscript();
     }
-    auto ret = OrTranscript(transcripts, _num_prots, _e);
+    auto ret = OrTranscript(transcripts, num_prots_, e_);
     delete [] transcripts;
     return ret;
 }
@@ -111,19 +111,19 @@ OrTranscript OrProtocol::generateNIZKP()
 
 bool OrProtocol::verifyNIZKP(const OrTranscript& or_nizkp)
 {
-    assert(_num_prots == or_nizkp.num_prots());
+    assert(num_prots_ == or_nizkp.numProts());
 
-    for (int i = 0; i < _num_prots; i++) {
-        _sigma_prots[i]->setTranscript(or_nizkp.transcript(i));
-        if (_sigma_prots[i]->verify() == false)
+    for (int i = 0; i < num_prots_; i++) {
+        sigma_prots_[i]->setTranscript(or_nizkp.transcript(i));
+        if (sigma_prots_[i]->verify() == false)
             return false;
     }
     
     auto hash_e = GenHashChallenge(getHashData(), challengeSize());
-    hash_e += (_num_prots - 1) * challengeSize();
+    hash_e += (num_prots_ - 1) * challengeSize();
 
     CryptoPP::Integer total_challenge = 0;
-    for (SigmaProtocol* prot : _sigma_prots)
+    for (SigmaProtocol* prot : sigma_prots_)
         total_challenge += prot->challenge();
         
     if (hash_e != or_nizkp.e())

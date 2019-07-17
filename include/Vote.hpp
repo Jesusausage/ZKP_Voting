@@ -20,18 +20,18 @@ public:
     friend void swap(Vote& a, Vote& b);
 
     inline void setValue(int i, const CryptoPP::ECPPoint& value) 
-        { _values[i] = value; }
+        { values_[i] = value; }
     inline void setProof(int i, const OrTranscript& proof) 
-        { _proofs[i] = proof; }
+        { proofs_[i] = proof; }
 
-    inline CryptoPP::ECPPoint value(int i) const { return _values[i]; }
-    inline OrTranscript proof(int i) const { return _proofs[i]; }
-    inline int num_options() const { return _num_options; }
+    inline CryptoPP::ECPPoint value(int i) const { return values_[i]; }
+    inline OrTranscript proof(int i) const { return proofs_[i]; }
+    inline int numOptions() const { return num_options_; }
 
 private:
-    CryptoPP::ECPPoint* _values = nullptr;
-    OrTranscript* _proofs = nullptr;
-    int _num_options = 0;
+    CryptoPP::ECPPoint* values_ = nullptr;
+    OrTranscript* proofs_ = nullptr;
+    int num_options_ = 0;
 };
 
 

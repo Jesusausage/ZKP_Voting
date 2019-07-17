@@ -4,55 +4,55 @@
 SigmaProtocol::SigmaProtocol(const ECGroup& ecg, 
                              const CryptoPP::ECPPoint& generator)
                              :
-                             _curve(&ecg.curve),
-                             _order(&ecg.order),
-                             _gen(&generator)
+                             curve_(&ecg.curve),
+                             order_(&ecg.order),
+                             gen_(&generator)
 {}
 
 
 void SigmaProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
 {
     if (e) {
-        _transcript.setChallenge(*e);
+        transcript_.setChallenge(*e);
     }
     else {
-        _transcript.setChallenge(RandomInteger(1, *_order));
+        transcript_.setChallenge(RandomInteger(1, *order_));
     }
 }
 
 
 CryptoPP::Integer SigmaProtocol::challenge() const
 {
-    return _transcript.challenge();
+    return transcript_.challenge();
 }
 
 
 CryptoPP::Integer SigmaProtocol::challengeSize() const
 {
-    return *_order;
+    return *order_;
 }
 
 
 Transcript SigmaProtocol::getTranscript() const
 {
-    return _transcript;
+    return transcript_;
 }
 
 
 void SigmaProtocol::setTranscript(const Transcript& transcript) 
 {
-    _transcript = transcript;
+    transcript_ = transcript;
 }
 
 
 Transcript SigmaProtocol::generateNIZKP()
 {
     generateCommitment();
-    auto hash_e = GenHashChallenge(getHashData(), *_order);
+    auto hash_e = GenHashChallenge(getHashData(), *order_);
     generateChallenge(&hash_e);
     generateResponse();
 
-    return _transcript;
+    return transcript_;
 }
 
 
@@ -63,8 +63,8 @@ bool SigmaProtocol::verifyNIZKP(const Transcript& nizkp)
     if (verify() == false)
         return false;
 
-    auto hash_e = GenHashChallenge(getHashData(), *_order);
-    if (hash_e != _transcript.challenge())
+    auto hash_e = GenHashChallenge(getHashData(), *order_);
+    if (hash_e != transcript_.challenge())
         return false;
 
     return true;
