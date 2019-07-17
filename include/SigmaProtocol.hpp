@@ -40,7 +40,7 @@ protected:
 };
 
 
-CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
+CryptoPP::Integer GenHashChallenge(std::string hash_data,
                                    const CryptoPP::Integer& challenge_max);
 
 

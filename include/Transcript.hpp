@@ -13,20 +13,24 @@ public:
                const CryptoPP::Integer& challenge,
                const CryptoPP::Integer& response);
     Transcript(const Transcript& transcript);
+    Transcript(Transcript&& transcript);
     Transcript();
     ~Transcript();
 
-    Transcript& operator=(const Transcript& transcript);
+    Transcript& operator=(Transcript transcript);
+    friend void swap(Transcript& a, Transcript& b);
 
     void setCommitment(CryptoPP::ECPPoint* commitment, 
                        int commitment_size);
-    void setChallenge(const CryptoPP::Integer& challenge);
-    void setResponse(const CryptoPP::Integer& response);
+    inline void setChallenge(const CryptoPP::Integer& challenge) 
+        { _e = challenge; }
+    inline void setResponse(const CryptoPP::Integer& response) 
+        { _s = response; }
 
-    CryptoPP::ECPPoint* commitment() const;
-    int commitmentSize() const;
-    CryptoPP::Integer challenge() const;
-    CryptoPP::Integer response() const;
+    inline CryptoPP::ECPPoint* commitment() const { return _r; }
+    inline int commitmentSize() const { return _r_size; }
+    inline CryptoPP::Integer challenge() const { return _e; }
+    inline CryptoPP::Integer response() const { return _s; }
 
 private:
     CryptoPP::ECPPoint* _r = nullptr;

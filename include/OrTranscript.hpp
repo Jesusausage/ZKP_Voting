@@ -11,14 +11,16 @@ public:
                  int num_prots, 
                  const CryptoPP::Integer& e);
     OrTranscript(const OrTranscript& or_transcript);
+    OrTranscript(OrTranscript&& or_transcript);
     OrTranscript();
     ~OrTranscript();
 
-    OrTranscript& operator=(const OrTranscript& transcript);
+    OrTranscript& operator=(OrTranscript or_transcript);
+    friend void swap(OrTranscript& a, OrTranscript& b);
 
-    Transcript transcript(int i) const;
-    int num_prots() const;
-    CryptoPP::Integer e() const;
+    inline Transcript transcript(int i) const { return _transcripts[i]; }
+    inline int num_prots() const { return _num_prots; }
+    inline CryptoPP::Integer e() const { return _e; }
 
 private:
     Transcript* _transcripts = nullptr;

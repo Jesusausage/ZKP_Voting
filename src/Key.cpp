@@ -32,6 +32,12 @@ Key::Key(const Key& key) : _num_options(key._num_options)
 }
 
 
+Key::Key(Key&& key)
+{
+    swap(*this, key);
+}
+
+
 Key::Key()
 {}
 
@@ -45,53 +51,16 @@ Key::~Key()
 }
 
 
-Key& Key::operator=(const Key& key)
+Key& Key::operator=(Key key)
 {
-    if (this == &key)
-        return *this;
-
-    _num_options = key._num_options;
-
-    if (_values)
-        delete [] _values;
-    if (_proofs)
-        delete [] _proofs;
-    _proofs = new Transcript[_num_options];
-    _values = new CryptoPP::ECPPoint[_num_options];
-    for (int i = 0; i < _num_options; i++) {
-        _values[i] = key._values[i];
-        _proofs[i] = key._proofs[i];
-    }
-
+    swap(*this, key);
     return *this;
 }
 
 
-void Key::setValue(int i, CryptoPP::ECPPoint value)
+void swap(Key& a, Key& b)
 {
-    _values[i] = value;
-}
-
-
-void Key::setProof(int i, Transcript proof)
-{
-    _proofs[i] = proof;
-}
-
-
-CryptoPP::ECPPoint Key::value(int i) const
-{
-    return _values[i];
-}
-
-
-Transcript Key::proof(int i) const
-{
-    return _proofs[i];
-}
-
-
-int Key::num_options() const
-{
-    return _num_options;
+    std::swap(a._values, b._values);
+    std::swap(a._proofs, b._proofs);
+    std::swap(a._num_options, b._num_options);
 }

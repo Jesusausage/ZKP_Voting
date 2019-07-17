@@ -46,7 +46,7 @@ CryptoPP::Integer TonelliShanks(const CryptoPP::Integer& a,
 CryptoPP::Integer RandomInteger(const CryptoPP::Integer& min, 
                                 const CryptoPP::Integer& max,
                                 CryptoPP::byte* seed = nullptr,
-                                const size_t size = 32);
+                                size_t size = 32);
 
 
 #endif

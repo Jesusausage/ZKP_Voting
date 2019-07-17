@@ -27,6 +27,12 @@ OrTranscript::OrTranscript(const OrTranscript& or_transcript)
 }
 
 
+OrTranscript::OrTranscript(OrTranscript&& or_transcript)
+{
+    swap(*this, or_transcript);
+}
+
+
 OrTranscript::OrTranscript()
 {}
 
@@ -38,37 +44,16 @@ OrTranscript::~OrTranscript()
 }
 
 
-OrTranscript& OrTranscript::operator=(const OrTranscript& transcript)
+OrTranscript& OrTranscript::operator=(OrTranscript or_transcript)
 {
-    if (this == &transcript)
-        return *this;
-        
-    _num_prots = transcript._num_prots;
-    _e = transcript._e;
-    if (_transcripts)
-        delete [] _transcripts;
-    _transcripts = new Transcript[_num_prots];
-    for (int i = 0; i < _num_prots; i++) {
-        _transcripts[i] = transcript._transcripts[i];
-    }
-
+    swap(*this, or_transcript);
     return *this;
 }
 
 
-Transcript OrTranscript::transcript(int i) const
+void swap(OrTranscript& a, OrTranscript& b)
 {
-    return _transcripts[i];
-}
-
-
-int OrTranscript::num_prots() const
-{
-    return _num_prots;
-}
-
-
-CryptoPP::Integer OrTranscript::e() const
-{
-    return _e;
+    std::swap(a._transcripts, b._transcripts);
+    std::swap(a._num_prots, b._num_prots);
+    std::swap(a._e, b._e);
 }

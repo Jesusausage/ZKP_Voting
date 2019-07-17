@@ -71,7 +71,7 @@ bool SigmaProtocol::verifyNIZKP(const Transcript& nizkp)
 }
 
 
-CryptoPP::Integer GenHashChallenge(const std::string& hash_data,
+CryptoPP::Integer GenHashChallenge(std::string hash_data,
                                    const CryptoPP::Integer& challenge_max)
 {
     const auto challenge_size = challenge_max.ByteCount();

@@ -30,6 +30,12 @@ Transcript::Transcript(const Transcript& transcript)
 }
 
 
+Transcript::Transcript(Transcript&& transcript)
+{
+    swap(*this, transcript);
+}
+
+
 Transcript::Transcript()
 {}
 
@@ -41,22 +47,19 @@ Transcript::~Transcript()
 }
 
 
-Transcript& Transcript::operator=(const Transcript& transcript)
+Transcript& Transcript::operator=(Transcript transcript)
 {
-    if (this == &transcript)
-        return *this;
-
-    _r_size = transcript._r_size;
-    _e = transcript._e;
-    _s = transcript._s;
-    if (_r)
-        delete [] _r;
-    _r = new CryptoPP::ECPPoint[_r_size];
-    for (int i = 0; i < _r_size; i++) {
-        _r[i] = transcript._r[i];
-    }
-
+    swap(*this, transcript);
     return *this;
+}
+
+
+void swap(Transcript& a, Transcript& b)
+{
+    std::swap(a._r, b._r);
+    std::swap(a._r_size, b._r_size);
+    std::swap(a._e, b._e);
+    std::swap(a._s, b._s);
 }
 
 
@@ -72,40 +75,4 @@ void Transcript::setCommitment(CryptoPP::ECPPoint* commitment,
     for (int i = 0; i < _r_size; i++) {
         _r[i] = commitment[i];
     }
-}
-
-
-void Transcript::setChallenge(const CryptoPP::Integer& challenge)
-{
-    _e = challenge;
-}
-
-
-void Transcript::setResponse(const CryptoPP::Integer& response)
-{
-    _s = response;
-}
-
-
-CryptoPP::ECPPoint* Transcript::commitment() const
-{
-    return _r;
-}
-
-
-int Transcript::commitmentSize() const
-{
-    return _r_size;
-}
-
-
-CryptoPP::Integer Transcript::challenge() const
-{
-    return _e;
-}
-
-
-CryptoPP::Integer Transcript::response() const
-{
-    return _s;
 }

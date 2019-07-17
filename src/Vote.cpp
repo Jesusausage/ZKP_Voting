@@ -34,6 +34,12 @@ Vote::Vote(const Vote& vote) : _num_options(vote._num_options)
 }
 
 
+Vote::Vote(Vote&& vote)
+{
+    swap(*this, vote);
+}
+
+
 Vote::Vote()
 {}
 
@@ -47,52 +53,16 @@ Vote::~Vote()
 }
 
 
-Vote& Vote::operator=(const Vote& vote)
+Vote& Vote::operator=(Vote vote)
 {
-    if (this == &vote)
-        return *this;
-
-    _num_options = vote._num_options;
-    if (_values)
-        delete [] _values;
-    if (_proofs)
-        delete [] _proofs;
-    _proofs = new OrTranscript[_num_options];
-    _values = new CryptoPP::ECPPoint[_num_options];
-    for (int i = 0; i < _num_options; i++) {
-        _values[i] = vote._values[i];
-        _proofs[i] = vote._proofs[i];
-    }
-
+    swap(*this, vote);
     return *this;
 }
 
 
-void Vote::setValue(int i, CryptoPP::ECPPoint value)
+void swap(Vote& a, Vote& b)
 {
-    _values[i] = value;
-}
-
-
-void Vote::setProof(int i, OrTranscript proof)
-{
-    _proofs[i] = proof;
-}
-
-
-CryptoPP::ECPPoint Vote::value(int i) const
-{
-    return _values[i];
-}
-
-
-OrTranscript Vote::proof(int i) const
-{
-    return _proofs[i];
-}
-
-
-int Vote::num_options() const
-{
-    return _num_options;
+    std::swap(a._values, b._values);
+    std::swap(a._proofs, b._proofs);
+    std::swap(a._num_options, b._num_options);
 }

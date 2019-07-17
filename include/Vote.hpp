@@ -12,17 +12,21 @@ public:
          int num_options);
     Vote(int num_options);
     Vote(const Vote& vote);
+    Vote(Vote&& vote);
     Vote();
     ~Vote();
 
-    Vote& operator=(const Vote& vote);
+    Vote& operator=(Vote vote);
+    friend void swap(Vote& a, Vote& b);
 
-    void setValue(int i, CryptoPP::ECPPoint value);
-    void setProof(int i, OrTranscript proof);
+    inline void setValue(int i, const CryptoPP::ECPPoint& value) 
+        { _values[i] = value; }
+    inline void setProof(int i, const OrTranscript& proof) 
+        { _proofs[i] = proof; }
 
-    CryptoPP::ECPPoint value(int i) const;
-    OrTranscript proof(int i) const;
-    int num_options() const;
+    inline CryptoPP::ECPPoint value(int i) const { return _values[i]; }
+    inline OrTranscript proof(int i) const { return _proofs[i]; }
+    inline int num_options() const { return _num_options; }
 
 private:
     CryptoPP::ECPPoint* _values = nullptr;
