@@ -32,8 +32,8 @@ public:
     inline CryptoPP::Integer challenge() const { return e_; }
     inline CryptoPP::Integer response() const { return s_; }
 
-private:
     CryptoPP::ECPPoint* r_ = nullptr;
+private:
     int r_size_ = 0;
     CryptoPP::Integer e_ = 0;
     CryptoPP::Integer s_ = 0;

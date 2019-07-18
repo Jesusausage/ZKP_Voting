@@ -10,23 +10,25 @@ int main()
     boost::asio::ip::tcp::resolver resolver(io_context);
 
     boost::asio::ip::tcp::resolver::results_type endpoints =
-        resolver.resolve("146.169.221.213", "1300");
+        resolver.resolve("146.169.218.129", "1300");
 
     boost::asio::ip::tcp::socket socket(io_context);
     boost::asio::connect(socket, endpoints);
 
-    while(true) {
-        CryptoPP::Integer potatoes[24];
+    size_t size[1];
+    boost::system::error_code error;
+    boost::asio::read(socket, boost::asio::buffer(size), 
+                      boost::asio::transfer_exactly(4));
+
+    for (int i = 0; ; i++) {
+        char msg[32];
         boost::system::error_code error;
 
-        size_t len = socket.read_some(boost::asio::buffer(potatoes), error);
-
+        boost::asio::read(socket, boost::asio::buffer(msg), error);
         if (error == boost::asio::error::eof)
             break;
-        else if (error)
-            std::cerr << "everything broken\nwell done" << std::endl;
 
-        std::cout << potatoes[4] << std::endl;
+        std::cout << msg << std::endl;
     }
 
     return 0;

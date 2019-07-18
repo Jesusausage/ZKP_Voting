@@ -41,12 +41,5 @@ int main() {
     // TestVoteCompression();
     std::cout << "Verification test success." << std::endl;
 
-    auto ecg = GenerateECGroup();
-    std::cout << ecg.order << std::endl;
-    unsigned char enc[32];
-    ecg.order.Encode(enc, 32);
-    auto o = CryptoPP::Integer(enc, 32);    
-    std::cout << o << std::endl;
-
     return 0;
 }

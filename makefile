@@ -1,4 +1,4 @@
-SRC = src/ECGroup.cpp src/SigmaProtocol.cpp src/Transcript.cpp src/ElGamalProtocol.cpp src/SchnorrProtocol.cpp src/OrProtocol.cpp src/OrTranscript.cpp src/Voter.cpp src/KeyGen.cpp src/Verifier.cpp
+SRC = src/ECGroup.cpp src/SigmaProtocol.cpp src/Transcript.cpp src/ElGamalProtocol.cpp src/SchnorrProtocol.cpp src/OrProtocol.cpp src/OrTranscript.cpp src/Voter.cpp src/Vote.cpp src/KeyGen.cpp src/Key.cpp src/Verifier.cpp
 TEST = test/ECGroupTest.cpp test/ElGamalProtocolTest.cpp test/Main.cpp test/SchnorrProtocolTest.cpp test/OrProtocolTest.cpp test/VoterTest.cpp test/KeyGenTest.cpp test/VerifierTest.cpp
 OBJ = $(SRC:src/%.cpp=build/%.o)
 TESTOBJ = $(TEST:test/%.cpp=build/test/%.o)

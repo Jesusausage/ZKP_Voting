@@ -66,8 +66,6 @@ void swap(Transcript& a, Transcript& b)
 void Transcript::setCommitment(CryptoPP::ECPPoint* commitment, 
                                int commitment_size)
 {
-    if (r_ == commitment)
-        return;
     if (r_)
         delete [] r_;
     r_size_ = commitment_size;
