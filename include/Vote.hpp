@@ -2,6 +2,7 @@
 #define VOTE_HPP
 
 
+#include "ECGroup.hpp"
 #include "OrTranscript.hpp"
 
 
@@ -36,8 +37,8 @@ private:
     OrTranscript* proofs_ = nullptr;
     int num_options_ = 0;
 
-    void serialiseSingle(CryptoPP::byte output[325], int option);
-    void deserialiseSingle(CryptoPP::byte input[325], int option, 
+    void serialiseSingle(CryptoPP::byte output[335], int option);
+    void deserialiseSingle(CryptoPP::byte input[335], int option, 
                            const CryptoPP::ECP& ec);
 };
 
