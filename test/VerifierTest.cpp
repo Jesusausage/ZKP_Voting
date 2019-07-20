@@ -21,17 +21,17 @@ void TestVerification()
     Voter voter(ecg, gen, id_sum, tokens);
     voter.setTokenKeys(token_keys);
     voter.castVote(8);
-    Vote votes = voter.getVoteAndProofs();
+    Vote vote = voter.getVoteAndProofs();
 
     KeyGen key_gen(ecg, gen, token_sums, id);
     key_gen.setIDKey(id_key);
-    Key keys = key_gen.getKeysAndProofs();
+    Key key = key_gen.getKeysAndProofs();
 
     Verifier verifier(ecg, gen, id_sum, token_sums);
     verifier.setVoterTokens(tokens);
-    assert(verifier.verifyVoteProofs(votes) == true);
+    assert(verifier.verifyVoteProofs(vote) == true);
     verifier.setID(id);
-    assert(verifier.verifyKeyProofs(keys) == true);
+    assert(verifier.verifyKeyProofs(key) == true);
 }
 
 
@@ -67,14 +67,14 @@ void TestVoteDecryption()
         }
     } 
 
-    Vote votes[no_voters];
+    Vote vote[no_voters];
     Key keys[no_voters];
 
     for (int i = 0; i < no_voters; i++) {
         Voter voter(ecg, gen, id_sum, tokens[i]);
         voter.setTokenKeys(token_keys[i]);
         voter.castVote(2 + i%2);
-        votes[i] = voter.getVoteAndProofs();
+        vote[i] = voter.getVoteAndProofs();
         
         KeyGen key_gen(ecg, gen, token_sums, id[i]);
         key_gen.setIDKey(id_key[i]);
@@ -85,7 +85,7 @@ void TestVoteDecryption()
     CryptoPP::ECPPoint key_t[6];
     for (int j = 0; j < 6; j++) {
         for (int i = 0; i < no_voters; i++) {
-            vote_t[j] = ecg.curve.Add(vote_t[j], votes[i].value(j));
+            vote_t[j] = ecg.curve.Add(vote_t[j], vote[i].value(j));
             key_t[j] = ecg.curve.Add(key_t[j], keys[i].value(j));
         }
     }

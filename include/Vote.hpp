@@ -37,8 +37,8 @@ private:
     OrTranscript* proofs_ = nullptr;
     int num_options_ = 0;
 
-    void serialiseSingle(CryptoPP::byte output[335], int option);
-    void deserialiseSingle(CryptoPP::byte input[335], int option, 
+    void serialiseSingle(CryptoPP::byte output[326], int option);
+    void deserialiseSingle(CryptoPP::byte input[326], int option, 
                            const CryptoPP::ECP& ec);
 };
 

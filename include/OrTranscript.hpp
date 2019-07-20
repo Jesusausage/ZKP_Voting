@@ -22,6 +22,14 @@ public:
     inline int numProts() const { return num_prots_; }
     inline CryptoPP::Integer e() const { return e_; }
 
+    void serialise(CryptoPP::byte* output, 
+                   int* num_prots = nullptr,
+                   int* commitment_sizes = nullptr);
+    OrTranscript(CryptoPP::byte* input, 
+                 int num_prots, 
+                 int* commitment_sizes, 
+                 const CryptoPP::ECP& ec);
+
 private:
     Transcript* transcripts_ = nullptr;
     int num_prots_ = 0;

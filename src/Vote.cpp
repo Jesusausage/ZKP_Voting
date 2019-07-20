@@ -74,18 +74,18 @@ void Vote::serialise(CryptoPP::byte*& output, int& num_options)
     /*
     ECPPoint: 1xInteger, 1xbool
     Transcript: 4xInteger, 2xbool
-    OrTranscript: 1xInteger, 2xTranscript
+    OrTranscript: 1xInteger(33byte), 2xTranscript
     
-    Total: 10xInteger, 5xbool
+    Total: 1xInteger(33byte), 9xInteger, 5xbool
 
-    = 10*33 + 5
-    = 335 bytes PER OPTION
+    = 33 + 9*32 + 5
+    = 326 bytes PER OPTION
     */
-    size_t length = 335 * num_options_;
+    size_t length = 326 * num_options_;
     output = new CryptoPP::byte[length];
 
     for (int i = 0; i < num_options_; i++)
-        serialiseSingle((output + 335*i), i);
+        serialiseSingle((output + 326*i), i);
 }
 
 
@@ -96,76 +96,36 @@ Vote::Vote(CryptoPP::byte* input, int num_options,
     proofs_ = new OrTranscript[num_options_];
 
     for (int i = 0; i < num_options_; i++) {
-        deserialiseSingle((input + 335*i), i, ec);
+        deserialiseSingle((input + 326*i), i, ec);
     }
 }
 
 
-void Vote::serialiseSingle(CryptoPP::byte output[335], int option)
+void Vote::serialiseSingle(CryptoPP::byte output[326], int option)
 {
-    CompressedPoint p = CompressPoint(values_[option]);
-    p.x.Encode(output, 33);
-    output[33] = (p.y == true) ? 1 : 0;
+    int offset = 0;
+    CompressedPoint p;
 
-    Transcript ts = proofs_[option].transcript(0);
-    CryptoPP::ECPPoint* com = ts.commitment();
-    p = CompressPoint(com[0]);
-    p.x.Encode(output+34, 33);
-    output[67] = (p.y == true) ? 1 : 0;
-    p = CompressPoint(com[1]);
-    p.x.Encode(output+68, 33);
-    output[101] = (p.y == true) ? 1 : 0;
+    p = CompressPoint(values_[option]);
+    p.x.Encode(output+offset, FIELD_SIZE);
+    offset += FIELD_SIZE;
+    output[offset++] = (p.y == true) ? 1 : 0;
 
-    ts.challenge().Encode(output+102, 33);
-    ts.response().Encode(output+135, 33);
-
-    ts = proofs_[option].transcript(1);
-    com = ts.commitment();
-    p = CompressPoint(com[0]);
-    p.x.Encode(output+168, 33);
-    output[201] = (p.y == true) ? 1 : 0;
-    p = CompressPoint(com[1]);
-    p.x.Encode(output+202, 33);
-    output[235] = (p.y == true) ? 1 : 0;
-
-    ts.challenge().Encode(output+236, 33);
-    ts.response().Encode(output+269, 33);
-
-    proofs_[option].e().Encode(output+302, 33);
+    proofs_[option].serialise(output+offset);
 }
 
 
-void Vote::deserialiseSingle(CryptoPP::byte input[335], int option, 
+void Vote::deserialiseSingle(CryptoPP::byte input[326], int option, 
                              const CryptoPP::ECP& ec)
 {
+    int offset = 0;
     CompressedPoint p;
-    p.x = CryptoPP::Integer(input, 33);
-    p.y = (input[33] == 1) ? true : false;
+
+    p.x = CryptoPP::Integer(input+offset, FIELD_SIZE);
+    offset += FIELD_SIZE;
+    p.y = (input[offset++] == 1) ? true : false;
     values_[option] = DecompressPoint(p, ec);
 
-    Transcript ts[2];
-    CryptoPP::ECPPoint com[2];
-    p.x = CryptoPP::Integer(input+34, 33);
-    p.y = (input[67] == 1) ? true : false;
-    com[0] = DecompressPoint(p, ec);
-    p.x = CryptoPP::Integer(input+68, 33);
-    p.y = (input[101] == 1) ? true : false;
-    com[1] = DecompressPoint(p, ec);
-    ts[0].setCommitment(com, 2);
-    ts[0].setChallenge(CryptoPP::Integer(input+102, 33));
-    ts[0].setResponse(CryptoPP::Integer(input+135, 33));
-
-    p.x = CryptoPP::Integer(input+168, 33);
-    p.y = (input[201] == 1) ? true : false;
-    com[0] = DecompressPoint(p, ec);
-    p.x = CryptoPP::Integer(input+202, 33);
-    p.y = (input[235] == 1) ? true : false;
-    com[1] = DecompressPoint(p, ec);
-    ts[1].setCommitment(com, 2);
-    ts[1].setChallenge(CryptoPP::Integer(input+236, 33));
-    ts[1].setResponse(CryptoPP::Integer(input+269, 33));
-
-    auto e = CryptoPP::Integer(input+302, 33);
-
-    proofs_[option] = OrTranscript(ts, 2, e);
+    int r_sizes[2] = {2, 2};
+    proofs_[option] = OrTranscript(input+offset, 2, r_sizes, ec);
 }

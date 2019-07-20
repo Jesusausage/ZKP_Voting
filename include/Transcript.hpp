@@ -2,6 +2,7 @@
 #define TRANSCRIPT_HPP
 
 
+#include "ECGroup.hpp"
 #include <cryptopp/ecp.h>
 #include <iostream>
 
@@ -32,8 +33,14 @@ public:
     inline CryptoPP::Integer challenge() const { return e_; }
     inline CryptoPP::Integer response() const { return s_; }
 
-    CryptoPP::ECPPoint* r_ = nullptr;
+    void serialise(CryptoPP::byte* output, 
+                   int* commitment_size = nullptr);
+    Transcript(CryptoPP::byte* input, 
+               int commitment_size,
+               const CryptoPP::ECP& ec);
+
 private:
+    CryptoPP::ECPPoint* r_ = nullptr;
     int r_size_ = 0;
     CryptoPP::Integer e_ = 0;
     CryptoPP::Integer s_ = 0;

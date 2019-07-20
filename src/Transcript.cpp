@@ -74,3 +74,50 @@ void Transcript::setCommitment(CryptoPP::ECPPoint* commitment,
         r_[i] = commitment[i];
     }
 }
+
+
+void Transcript::serialise(CryptoPP::byte* output, 
+                           int* commitment_size /*= nullptr*/)
+{
+    if (commitment_size)
+        *commitment_size = r_size_;
+
+    CompressedPoint p;
+    int offset = 0;
+
+    for (int i = 0; i < r_size_; i++) {
+        p = CompressPoint(r_[i]);
+        p.x.Encode(output+offset, FIELD_SIZE);
+        offset += FIELD_SIZE;
+        output[offset++] = (p.y == true) ? 1 : 0;
+    }
+
+    e_.Encode(output+offset, FIELD_SIZE);
+    offset += FIELD_SIZE;
+
+    s_.Encode(output+offset, FIELD_SIZE);
+}
+
+
+Transcript::Transcript(CryptoPP::byte* input, 
+                       int commitment_size,
+                       const CryptoPP::ECP& ec) 
+                       : 
+                       r_size_(commitment_size)
+{
+    r_ = new CryptoPP::ECPPoint[r_size_];
+    CompressedPoint p;
+    int offset = 0;
+
+    for (int i = 0; i < r_size_; i++) {
+        p.x = CryptoPP::Integer(input+offset, FIELD_SIZE);
+        offset += FIELD_SIZE;
+        p.y = (input[offset++] == 1) ? true : false;
+        r_[i] = DecompressPoint(p, ec);
+    }
+
+    e_ = CryptoPP::Integer(input+offset, FIELD_SIZE);
+    offset += FIELD_SIZE;
+
+    s_ = CryptoPP::Integer(input+offset, FIELD_SIZE);
+}
