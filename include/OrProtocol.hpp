@@ -14,11 +14,10 @@ public:
     OrProtocol(std::vector<SigmaProtocol*> sigma_protocols, int i_known = 0);
     void setKnown(int i_known);
     void generateCommitment();
-    void generateChallenge(CryptoPP::Integer e);
+    void generateChallenge(const CryptoPP::Integer& e);
     void generateResponse();
     bool verify();
 
-    CryptoPP::Integer challengeSize();
     std::string getHashData();
 
     OrTranscript generateNIZKP();
@@ -28,8 +27,10 @@ private:
     std::vector<SigmaProtocol*> sigma_prots_;
     int i_known_;
     int num_prots_;
-    CryptoPP::Integer total_e_ = 0;
+
     CryptoPP::Integer e_ = 0;
+    CryptoPP::Integer total_e_ = 0;
+    CryptoPP::Integer e_size_ = 0;
 };
 
 

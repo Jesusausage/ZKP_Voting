@@ -11,10 +11,9 @@ OrProtocol::OrProtocol(std::vector<SigmaProtocol*> sigma_protocols,
 
     assert(i_known_ >= 0 && i_known_ < num_prots_);
 
-    for (int i = 1; i < num_prots_; i++) {
-        assert(sigma_prots_[i]->challengeSize() == 
-               sigma_prots_[i - 1]->challengeSize());
-    }
+    e_size_ = sigma_prots_[0]->challengeSize();
+    for (auto prot : sigma_prots_)
+        assert(prot->challengeSize() == e_size_);
 }
 
 
@@ -37,17 +36,17 @@ void OrProtocol::generateCommitment()
 }
 
 
-void OrProtocol::generateChallenge(CryptoPP::Integer e)
+void OrProtocol::generateChallenge(const CryptoPP::Integer& e)
 {
-    assert(i_known_ >= 0);
-
     total_e_ = 0;
     for (int i = 0; i < num_prots_; i++) {
         if (i != i_known_)
             total_e_ += sigma_prots_[i]->challenge();
     }
-    assert(e > total_e_);
+    
     e_ = e;
+    while (e_ < total_e_)
+        e_ += e_size_;
 }
 
 
@@ -69,16 +68,14 @@ bool OrProtocol::verify()
         if (prot->verify() == false)
             return false;
     }
-    if (e_ != total_e_ + sigma_prots_[i_known_]->challenge())
+
+    CryptoPP::Integer total_challenge = 0;
+    for (auto prot : sigma_prots_)
+        total_challenge += prot->challenge();
+    if (e_ != total_challenge)
         return false;
 
     return true;
-}
-
-
-CryptoPP::Integer OrProtocol::challengeSize()
-{ 
-    return sigma_prots_[0]->challengeSize();
 }
 
 
@@ -94,8 +91,7 @@ std::string OrProtocol::getHashData()
 OrTranscript OrProtocol::generateNIZKP()
 {
     generateCommitment();
-    auto hash_challenge = GenHashChallenge(getHashData(), challengeSize());
-    hash_challenge += (num_prots_ - 1) * challengeSize();
+    auto hash_challenge = GenHashChallenge(getHashData(), e_size_);
     generateChallenge(hash_challenge);
     generateResponse();
 
@@ -119,16 +115,15 @@ bool OrProtocol::verifyNIZKP(const OrTranscript& or_nizkp)
             return false;
     }
     
-    auto hash_e = GenHashChallenge(getHashData(), challengeSize());
-    hash_e += (num_prots_ - 1) * challengeSize();
+    auto hash_e = GenHashChallenge(getHashData(), e_size_);
 
     CryptoPP::Integer total_challenge = 0;
-    for (SigmaProtocol* prot : sigma_prots_)
+    for (auto prot : sigma_prots_)
         total_challenge += prot->challenge();
         
-    if (hash_e != or_nizkp.e())
+    if (hash_e != or_nizkp.e() % e_size_)
         return false;
-    if (total_challenge != hash_e)
+    if (hash_e != total_challenge % e_size_)
         return false;
 
     return true;

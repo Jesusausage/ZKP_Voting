@@ -34,6 +34,8 @@ void TestVoting()
 
     //     auto a = vote.proof(i);
     //     auto b = ote.proof(i);
+    //     std::cout << a.transcript(0).challenge().MinEncodedSize() << std::endl;
+    //     std::cout << a.transcript(1).challenge().MinEncodedSize() << std::endl;
     //     assert(a.e() == b.e());
     //     assert(a.transcript(0).challenge() == b.transcript(0).challenge());
     //     assert(a.transcript(0).response() == b.transcript(0).response());
