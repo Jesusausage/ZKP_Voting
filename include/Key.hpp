@@ -29,7 +29,7 @@ public:
     inline Transcript proof(int i) const { return proofs_[i]; }
     inline int numOptions() const { return num_options_; }
 
-    void serialise(CryptoPP::byte*& output, int& num_options);
+    void serialise(CryptoPP::byte* output, int& num_options);
     Key(CryptoPP::byte* input, int num_options, const CryptoPP::ECP& ec);
 
 private:

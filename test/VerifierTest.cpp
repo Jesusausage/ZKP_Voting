@@ -40,7 +40,7 @@ void TestVoteDecryption()
     auto ecg = GenerateECGroup();
     auto gen = ecg.base;
 
-    const int no_voters = 10;
+    const int no_voters = 4;
 
     CryptoPP::Integer id_key[no_voters];
     CryptoPP::ECPPoint id[no_voters];
@@ -102,8 +102,8 @@ void TestVoteDecryption()
 
     assert(results[0] == 0);
     assert(results[1] == 0);
-    assert(results[2] == 5);
-    assert(results[3] == 5);
+    assert(results[2] == 2);
+    assert(results[3] == 2);
     assert(results[4] == 0);
     assert(results[5] == 0);
 }

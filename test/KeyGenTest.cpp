@@ -20,11 +20,10 @@ void TestKeyGeneration()
     key_gen.setIDKey(id_key);
     Key key = key_gen.getKeysAndProofs();
 
-    CryptoPP::byte* o;
+    CryptoPP::byte o[1630];
     int n;
     key.serialise(o, n);
     Key ey(o, n, ecg.curve);
-    delete [] o;
 
     // for (int i = 0; i < 10; i++) {
     //     std::cout << i << std::endl;

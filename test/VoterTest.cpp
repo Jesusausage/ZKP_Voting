@@ -12,7 +12,7 @@ void TestVoting()
     std::vector<CryptoPP::Integer> token_keys;
     std::vector<CryptoPP::ECPPoint> tokens;
     for (int i = 0; i < 10; i++) {
-        token_keys.push_back(RandomInteger(2, ecg.order));
+        token_keys.push_back(RandomInteger(1, ecg.order));
         tokens.push_back(ecg.curve.Multiply(token_keys[i], gen));
     }
 
@@ -21,11 +21,10 @@ void TestVoting()
     voter.castVote(8);
     Vote vote = voter.getVoteAndProofs();
 
-    CryptoPP::byte* o;
+    CryptoPP::byte o[3260];
     int n;
     vote.serialise(o, n);
     Vote ote(o, n, ecg.curve);
-    delete [] o;
 
     // for (int i = 0; i < 10; i++) {
     //     std::cout << i << std::endl;

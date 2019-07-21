@@ -68,7 +68,7 @@ void swap(Vote& a, Vote& b)
 }
 
 
-void Vote::serialise(CryptoPP::byte*& output, int& num_options)
+void Vote::serialise(CryptoPP::byte* output, int& num_options)
 {
     num_options = num_options_;
     /*
@@ -81,8 +81,6 @@ void Vote::serialise(CryptoPP::byte*& output, int& num_options)
     = 33 + 9*32 + 5
     = 326 bytes PER OPTION
     */
-    size_t length = 326 * num_options_;
-    output = new CryptoPP::byte[length];
 
     for (int i = 0; i < num_options_; i++)
         serialiseSingle((output + 326*i), i);

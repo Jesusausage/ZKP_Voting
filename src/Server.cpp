@@ -1,6 +1,7 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include <cryptopp/integer.h>
+#include "KeyGen.hpp"
 
 
 int main()
@@ -14,18 +15,26 @@ int main()
         ip::tcp::socket socket(io_context);
         acceptor.accept(socket);
 
-        int size[1] = {4};
-        char msg[128];
-        for (int i = 0; i < 128; i++)
-            msg[i] = 'A' + (i % 26);
+        auto ecg = GenerateECGroup();
+        auto gen = ecg.base;
+        auto id_key = CryptoPP::Integer(27);
+        auto id = ecg.curve.Multiply(id_key, gen);
+        std::vector<CryptoPP::ECPPoint> token_sums;
+        for (int i = 0; i < 10; i++) {
+            token_sums.push_back(ecg.curve.Multiply(42 + i, gen));
+        }
 
-        msg[31] = '\0';
-        msg[63] = '\0';
-        msg[95] = '\0';
-        msg[127] = '\0';
+        KeyGen key_gen(ecg, gen, token_sums, id);
+        key_gen.setIDKey(id_key);
+        Key key = key_gen.getKeysAndProofs();
+        CryptoPP::byte msg[1630];
+        int opts[1];
+        key.serialise(msg, opts[0]);        
+
+        std::cout << "running" << std::endl;
 
         boost::system::error_code ignored_error;
-        boost::asio::write(socket, buffer(size), ignored_error);
+        boost::asio::write(socket, buffer(opts), ignored_error);
         boost::asio::write(socket, buffer(msg), ignored_error);
     }
 
