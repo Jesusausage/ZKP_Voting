@@ -9,13 +9,42 @@ Voter::Voter(const ECGroup& ecg,
              ecg_(&ecg),
              gen_(&generator),
              id_sum_(id_sum),
-             tokens_(tokens),
              num_options_(tokens.size()),
              vote_(tokens.size())
 {
     prots_[0] = new ElGamalProtocol(*ecg_, *gen_, 0);
     prots_[1] = new ElGamalProtocol(*ecg_, *gen_, 1);
     or_prot_ = new OrProtocol({prots_[0], prots_[1]});
+
+    tokens_ = new CryptoPP::ECPPoint[num_options_];
+    for (int i = 0; i < num_options_; i++)
+        tokens_[i] = tokens[i];
+
+    token_keys_ = new CryptoPP::Integer[num_options_];
+}
+
+
+Voter::Voter(const ECGroup& ecg,
+             const CryptoPP::ECPPoint& generator,
+             const CryptoPP::ECPPoint& id_sum,
+             const CryptoPP::ECPPoint tokens[],
+             const int num_options)
+             :
+             ecg_(&ecg),
+             gen_(&generator),
+             id_sum_(id_sum),
+             num_options_(num_options),
+             vote_(num_options)
+{
+    prots_[0] = new ElGamalProtocol(*ecg_, *gen_, 0);
+    prots_[1] = new ElGamalProtocol(*ecg_, *gen_, 1);
+    or_prot_ = new OrProtocol({prots_[0], prots_[1]});
+
+    tokens_ = new CryptoPP::ECPPoint[num_options_];
+    for (int i = 0; i < num_options_; i++)
+        tokens_[i] = tokens[i];
+
+    token_keys_ = new CryptoPP::Integer[num_options_];
 }
 
 
@@ -24,13 +53,23 @@ Voter::~Voter()
     delete prots_[0];
     delete prots_[1];
     delete or_prot_;
+
+    delete [] tokens_;
+    delete [] token_keys_;
 }
 
 
 void Voter::setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys)
 {
-    assert(token_keys.size() == (unsigned int)num_options_);
-    token_keys_ = token_keys;
+    for (int i = 0; i < num_options_; i++)
+        token_keys_[i] = token_keys[i];
+}
+
+
+void Voter::setTokenKeys(const CryptoPP::Integer token_keys[])
+{
+    for (int i = 0; i < num_options_; i++)
+        token_keys_[i] = token_keys[i];
 }
 
 

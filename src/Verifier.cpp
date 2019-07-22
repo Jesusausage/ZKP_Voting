@@ -8,14 +8,45 @@ Verifier::Verifier(const ECGroup& ecg,
                    :
                    ecg_(&ecg),
                    gen_(generator),
-                   id_sum_(id_sum),
-                   token_sums_(token_sums)
+                   num_options_(token_sums.size()),
+                   id_sum_(id_sum)
 {
     vote_prots_[0] = new ElGamalProtocol(*ecg_, gen_, 0);
     vote_prots_[1] = new ElGamalProtocol(*ecg_, gen_, 1);
     vote_or_prot_ = new OrProtocol({vote_prots_[0], vote_prots_[1]});
 
     key_prot_ = new ElGamalProtocol(*ecg_, gen_, 0);
+
+    token_sums_ = new CryptoPP::ECPPoint[num_options_];
+    for (int i = 0; i < num_options_; i++)
+        token_sums_[i] = token_sums[i];
+        
+    tokens_ = new CryptoPP::ECPPoint[num_options_];
+}
+
+
+Verifier::Verifier(const ECGroup& ecg,
+                   const CryptoPP::ECPPoint& generator,
+                   const CryptoPP::ECPPoint& id_sum,
+                   const CryptoPP::ECPPoint token_sums[],
+                   const int num_options)
+                   :
+                   ecg_(&ecg),
+                   gen_(generator),
+                   num_options_(num_options),
+                   id_sum_(id_sum)
+{
+    vote_prots_[0] = new ElGamalProtocol(*ecg_, gen_, 0);
+    vote_prots_[1] = new ElGamalProtocol(*ecg_, gen_, 1);
+    vote_or_prot_ = new OrProtocol({vote_prots_[0], vote_prots_[1]});
+
+    key_prot_ = new ElGamalProtocol(*ecg_, gen_, 0);
+
+    token_sums_ = new CryptoPP::ECPPoint[num_options_];
+    for (int i = 0; i < num_options_; i++)
+        token_sums_[i] = token_sums[i];
+        
+    tokens_ = new CryptoPP::ECPPoint[num_options_];
 }
 
 
@@ -26,12 +57,23 @@ Verifier::~Verifier()
     delete vote_or_prot_;
 
     delete key_prot_;
+
+    delete [] token_sums_;
+    delete [] tokens_;
 }
 
 
-void Verifier::setVoterTokens(const std::vector<CryptoPP::ECPPoint>& tokens)
+void Verifier::setTokens(const std::vector<CryptoPP::ECPPoint>& tokens)
 {
-    tokens_ = tokens;
+    for (int i = 0; i < num_options_; i++)
+        tokens_[i] = tokens[i];
+}
+
+
+void Verifier::setTokens(const CryptoPP::ECPPoint tokens[])
+{
+    for (int i = 0; i < num_options_; i++)
+        tokens_[i] = tokens[i];
 }
 
 
@@ -41,14 +83,11 @@ void Verifier::setID(const CryptoPP::ECPPoint& id)
 }
 
 
-bool Verifier::verifyVoteProofs(const Vote& vote)
+bool Verifier::verifyVote(const Vote& vote)
 {
-    int num_options = vote.numOptions();
-
-    for (int i = 0; i < num_options; i++) {
+    for (int i = 0; i < num_options_; i++) {
         vote_prots_[0]->setParams(id_sum_, tokens_[i], vote.value(i));
         vote_prots_[1]->setParams(id_sum_, tokens_[i], vote.value(i));
-
         if (vote_or_prot_->verifyNIZKP(vote.proof(i)) == false)
             return false;
     }
@@ -57,11 +96,9 @@ bool Verifier::verifyVoteProofs(const Vote& vote)
 }
 
 
-bool Verifier::verifyKeyProofs(const Key& key)
+bool Verifier::verifyKey(const Key& key)
 {
-    int num_options = key.numOptions();
-
-    for (int i = 0; i < num_options; i++) {
+    for (int i = 0; i < num_options_; i++) {
         key_prot_->setParams(token_sums_[i], id_, key.value(i));
         if (key_prot_->verifyNIZKP(key.proof(i)) == false)
             return false;

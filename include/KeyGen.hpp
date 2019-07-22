@@ -9,9 +9,14 @@
 class KeyGen {
 public:
     KeyGen(const ECGroup& ecg,
-          const CryptoPP::ECPPoint& generator,
-          const std::vector<CryptoPP::ECPPoint>& token_sums,
-          const CryptoPP::ECPPoint& id);
+           const CryptoPP::ECPPoint& generator,
+           const std::vector<CryptoPP::ECPPoint>& token_sums,
+           const CryptoPP::ECPPoint& id);
+    KeyGen(const ECGroup& ecg,
+           const CryptoPP::ECPPoint& generator,
+           const CryptoPP::ECPPoint token_sums[],
+           const CryptoPP::ECPPoint& id,
+           const int num_options);
     ~KeyGen();
 
     void setIDKey(const CryptoPP::Integer& id_key);
@@ -20,15 +25,14 @@ public:
 private:
     const ECGroup* ecg_;
     const CryptoPP::ECPPoint* gen_;
-    const std::vector<CryptoPP::ECPPoint> token_sums_;
     const CryptoPP::ECPPoint id_;
-    
-    int num_options_;
+    CryptoPP::ECPPoint* token_sums_;
+    const int num_options_;
+
+    ElGamalProtocol* prot_ = nullptr;
     CryptoPP::Integer id_key_;
 
     Key key_;
-
-    ElGamalProtocol* prot_ = nullptr;
 
     void generateKeys();
 };

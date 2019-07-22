@@ -14,20 +14,29 @@ public:
              const CryptoPP::ECPPoint& generator,
              const CryptoPP::ECPPoint& id_sum,
              const std::vector<CryptoPP::ECPPoint>& token_sums);
+    Verifier(const ECGroup& ecg,
+             const CryptoPP::ECPPoint& generator,
+             const CryptoPP::ECPPoint& id_sum,
+             const CryptoPP::ECPPoint token_sums[],
+             const int num_options);
     ~Verifier();
     
-    void setVoterTokens(const std::vector<CryptoPP::ECPPoint>& tokens);
-    bool verifyVoteProofs(const Vote& vote);
+    void setTokens(const std::vector<CryptoPP::ECPPoint>& tokens);
+    void setTokens(const CryptoPP::ECPPoint tokens[]);
+    bool verifyVote(const Vote& vote);
+
     void setID(const CryptoPP::ECPPoint& id);
-    bool verifyKeyProofs(const Key& key);
+    bool verifyKey(const Key& key);
 
 private:
     const ECGroup* ecg_;
     const CryptoPP::ECPPoint gen_;
-    const CryptoPP::ECPPoint id_sum_;
-    const std::vector<CryptoPP::ECPPoint> token_sums_;
+    const int num_options_;
+    
+    CryptoPP::ECPPoint id_sum_;
+    CryptoPP::ECPPoint* tokens_;
 
-    std::vector<CryptoPP::ECPPoint> tokens_;
+    CryptoPP::ECPPoint* token_sums_;
     CryptoPP::ECPPoint id_;
 
     ElGamalProtocol* vote_prots_[2];

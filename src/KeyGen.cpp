@@ -8,18 +8,42 @@ KeyGen::KeyGen(const ECGroup& ecg,
                :
                ecg_(&ecg),
                gen_(&generator),
-               token_sums_(token_sums),
                id_(id),
-               num_options_(token_sums_.size()),
-               key_(token_sums_.size())
+               num_options_(token_sums.size()),
+               key_(token_sums.size())
 {
     prot_ = new ElGamalProtocol(*ecg_, *gen_, 0);
+
+    token_sums_ = new CryptoPP::ECPPoint[num_options_];
+    for (int i = 0; i < num_options_; i++)
+        token_sums_[i] = token_sums[i];
+}
+
+
+KeyGen::KeyGen(const ECGroup& ecg,
+               const CryptoPP::ECPPoint& generator,
+               const CryptoPP::ECPPoint token_sums[],
+               const CryptoPP::ECPPoint& id,
+               const int num_options)
+               :
+               ecg_(&ecg),
+               gen_(&generator),
+               id_(id),
+               num_options_(num_options),
+               key_(num_options)
+{
+    prot_ = new ElGamalProtocol(*ecg_, *gen_, 0);
+
+    token_sums_ = new CryptoPP::ECPPoint[num_options_];
+    for (int i = 0; i < num_options_; i++)
+        token_sums_[i] = token_sums[i];
 }
 
 
 KeyGen::~KeyGen()
 {
     delete prot_;
+    delete [] token_sums_;
 }
 
 

@@ -28,10 +28,10 @@ void TestVerification()
     Key key = key_gen.getKeysAndProofs();
 
     Verifier verifier(ecg, gen, id_sum, token_sums);
-    verifier.setVoterTokens(tokens);
-    assert(verifier.verifyVoteProofs(vote) == true);
+    verifier.setTokens(tokens);
+    assert(verifier.verifyVote(vote) == true);
     verifier.setID(id);
-    assert(verifier.verifyKeyProofs(key) == true);
+    assert(verifier.verifyKey(key) == true);
 }
 
 
@@ -51,15 +51,10 @@ void TestVoteDecryption()
         id_sum = ecg.curve.Add(id[i], id_sum);
     }
 
-    std::vector<std::vector<CryptoPP::Integer>> token_keys;
-    std::vector<std::vector<CryptoPP::ECPPoint>> tokens;
-    std::vector<CryptoPP::ECPPoint> token_sums;
-    token_keys.resize(no_voters);
-    tokens.resize(no_voters);
-    token_sums.resize(6);
+    CryptoPP::Integer token_keys[no_voters][6];
+    CryptoPP::ECPPoint tokens[no_voters][6];
+    CryptoPP::ECPPoint token_sums[6];
     for (int i = 0; i < no_voters; i++) {
-        token_keys[i].resize(6);
-        tokens[i].resize(6);
         for (int j = 0; j < 6; j++) {
             token_keys[i][j] = RandomInteger(2, ecg.order);
             tokens[i][j] = ecg.curve.Multiply(token_keys[i][j], gen);
@@ -71,12 +66,12 @@ void TestVoteDecryption()
     Key keys[no_voters];
 
     for (int i = 0; i < no_voters; i++) {
-        Voter voter(ecg, gen, id_sum, tokens[i]);
+        Voter voter(ecg, gen, id_sum, tokens[i], 6);
         voter.setTokenKeys(token_keys[i]);
         voter.castVote(2 + i%2);
         vote[i] = voter.getVoteAndProofs();
         
-        KeyGen key_gen(ecg, gen, token_sums, id[i]);
+        KeyGen key_gen(ecg, gen, token_sums, id[i], 6);
         key_gen.setIDKey(id_key[i]);
         keys[i] = key_gen.getKeysAndProofs();
     }
