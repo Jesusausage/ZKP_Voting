@@ -60,3 +60,47 @@ void TestPointCompression()
         assert(P == P_decomp);
     }
 }
+
+
+void TestWrite()
+{
+    auto ecg = GenerateECGroup();
+
+    std::ofstream id_out("IDs.txt");
+    CryptoPP::ECPPoint ids[10];
+    for (int i = 0; i < 10; i++) {
+        ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), ecg.base);
+        WriteID(ids[i], id_out);
+    }
+    id_out.close();
+
+    std::ofstream token_out("tokens.txt");
+    CryptoPP::ECPPoint tokens[10][5];
+    for (int i = 0; i < 10; i++) {
+        for (int option = 0; option < 5; option++) {
+            tokens[i][option] = ecg.curve.Multiply(RandomInteger(1, ecg.order), ecg.base);
+        }
+        WriteTokens(tokens[i], 5, token_out);
+    }
+    token_out.close();
+
+    std::ifstream id_in("IDs.txt");
+    CryptoPP::ECPPoint read_ids[10];
+    ReadIDs(id_in, read_ids);
+    for (int i = 0; i < 10; i++) {
+        assert(read_ids[i] == ids[i]);
+    }
+    id_in.close();
+
+    std::ifstream token_in("tokens.txt");
+    CryptoPP::ECPPoint* read_tokens[10]; 
+    for (int i = 0; i < 10; i++)
+        read_tokens[i] = new CryptoPP::ECPPoint[5];
+    ReadTokens(token_in, read_tokens, 5);
+    for (int i = 0; i < 10; i++) {
+        for (int option = 0; option < 5; option++) {
+            assert(read_tokens[i][option] == tokens[i][option]);
+        }
+    }
+    token_in.close();
+}

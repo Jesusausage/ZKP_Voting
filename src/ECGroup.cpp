@@ -125,3 +125,64 @@ CryptoPP::Integer RandomInteger(const CryptoPP::Integer& min,
 
     return rand_integer;
 }
+
+
+void WriteID(const CryptoPP::ECPPoint& id,
+             std::ostream& o)
+{
+    o << id.x << " " << id.y << std::endl;
+}
+
+
+void WriteTokens(const CryptoPP::ECPPoint* tokens,
+                 const int num_options,
+                 std::ostream& o)
+{
+    for (int i = 0; i < num_options; i++)
+        o << tokens[i].x  << " " << tokens[i].y << std::endl;
+}
+
+
+void WriteTokens(const std::vector<CryptoPP::ECPPoint> tokens,
+                 std::ostream& o)
+{
+    for (auto token : tokens)
+        o << token.x  << " " << token.y << std::endl;
+}
+
+
+void ReadIDs(std::istream& in,
+             CryptoPP::ECPPoint* ids)
+{
+    CryptoPP::Integer x, y;
+    int i = 0;
+
+    in >> x >> std::ws >> y >> std::ws;
+    ids[i] = CryptoPP::ECPPoint(x, y);
+    while (!in.eof()) {
+        i++;
+        in >> x >> std::ws >> y >> std::ws;
+        ids[i] = CryptoPP::ECPPoint(x, y);
+    }
+}
+
+
+void ReadTokens(std::istream& in,
+                CryptoPP::ECPPoint** tokens,
+                const int num_options)
+{
+    CryptoPP::Integer x, y;
+    int i = 0;
+    int option = 0;
+
+    in >> x >> std::ws >> y >> std::ws;
+    tokens[i][option] = CryptoPP::ECPPoint(x, y);
+    while (!in.eof()) {
+        if (++option == num_options) {
+            option = 0;
+            i++;
+        }
+        in >> x >> std::ws >> y >> std::ws;
+        tokens[i][option] = CryptoPP::ECPPoint(x, y);
+    }
+}

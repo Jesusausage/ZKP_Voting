@@ -12,6 +12,7 @@ int main() {
     TestDecodePoint();
     TestPointCompression();
     TestRandomPoint();
+    TestWrite();
     std::cout << "ECGroup test success." << std::endl;
     
     TestNormalSchnorrRun();

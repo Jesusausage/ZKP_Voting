@@ -7,6 +7,7 @@
 #include <cryptopp/hex.h>
 #include <cryptopp/randpool.h>
 #include <cryptopp/osrng.h>
+#include <fstream>
 
 #include <iostream>
 
@@ -48,6 +49,22 @@ CryptoPP::Integer RandomInteger(const CryptoPP::Integer& min,
                                 const CryptoPP::Integer& max,
                                 CryptoPP::byte* seed = nullptr,
                                 size_t size = 32);
+
+void WriteID(const CryptoPP::ECPPoint& id,
+             std::ostream& o);
+
+void WriteTokens(const CryptoPP::ECPPoint* tokens,
+                 const int num_options,
+                 std::ostream& o);
+void WriteTokens(const std::vector<CryptoPP::ECPPoint> tokens,
+                 std::ostream& o);
+
+void ReadIDs(std::istream& i,
+             CryptoPP::ECPPoint* ids);
+
+void ReadTokens(std::istream& i,
+                CryptoPP::ECPPoint** tokens,
+                const int num_options);
 
 
 #endif
