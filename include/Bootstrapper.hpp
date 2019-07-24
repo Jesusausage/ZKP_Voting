@@ -10,6 +10,9 @@ public:
     Bootstrapper(int num_voters, int num_options);
     ~Bootstrapper();
 
+    void readTokensFromFile(const std::string filename);
+    void readIDsFromFile(const std::string filename);
+
 private:
     CryptoPP::ECPPoint* voter_ids_;
     int num_voters_;

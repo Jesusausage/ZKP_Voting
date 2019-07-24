@@ -59,10 +59,10 @@ void WriteTokens(const CryptoPP::ECPPoint* tokens,
 void WriteTokens(const std::vector<CryptoPP::ECPPoint> tokens,
                  std::ostream& o);
 
-void ReadIDs(std::istream& i,
+void ReadIDs(std::istream& in,
              CryptoPP::ECPPoint* ids);
 
-void ReadTokens(std::istream& i,
+void ReadTokens(std::istream& in,
                 CryptoPP::ECPPoint** tokens,
                 const int num_options);
 

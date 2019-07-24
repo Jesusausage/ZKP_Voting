@@ -27,3 +27,19 @@ Bootstrapper::~Bootstrapper()
     delete [] options_;
     delete [] ip_addrs_;
 }
+
+
+void Bootstrapper::readTokensFromFile(const std::string filename)
+{
+    std::ifstream id_in(filename);
+    ReadIDs(id_in, voter_ids_);
+    id_in.close();
+}
+
+
+void Bootstrapper::readIDsFromFile(const std::string filename)
+{
+    std::ifstream token_in(filename);
+    ReadTokens(token_in, tokens_, num_options_);
+    token_in.close();
+}
