@@ -65,8 +65,10 @@ void TestPointCompression()
 void TestWrite()
 {
     auto ecg = GenerateECGroup();
+    std::string id_file("IDs.txt");
+    std::string token_file("tokens.txt");
 
-    std::ofstream id_out("IDs.txt");
+    std::ofstream id_out(id_file);
     CryptoPP::ECPPoint ids[10];
     for (int i = 0; i < 10; i++) {
         ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), ecg.base);
@@ -74,7 +76,7 @@ void TestWrite()
     }
     id_out.close();
 
-    std::ofstream token_out("tokens.txt");
+    std::ofstream token_out(token_file);
     CryptoPP::ECPPoint tokens[10][5];
     for (int i = 0; i < 10; i++) {
         for (int option = 0; option < 5; option++) {
@@ -84,7 +86,7 @@ void TestWrite()
     }
     token_out.close();
 
-    std::ifstream id_in("IDs.txt");
+    std::ifstream id_in(id_file);
     CryptoPP::ECPPoint read_ids[10];
     ReadIDs(id_in, read_ids);
     for (int i = 0; i < 10; i++) {
@@ -92,7 +94,7 @@ void TestWrite()
     }
     id_in.close();
 
-    std::ifstream token_in("tokens.txt");
+    std::ifstream token_in(token_file);
     CryptoPP::ECPPoint* read_tokens[10]; 
     for (int i = 0; i < 10; i++)
         read_tokens[i] = new CryptoPP::ECPPoint[5];
@@ -103,4 +105,6 @@ void TestWrite()
         }
     }
     token_in.close();
+    for (int i = 0; i < 10; i++)
+        delete [] read_tokens[i];
 }
