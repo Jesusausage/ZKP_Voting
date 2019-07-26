@@ -13,10 +13,12 @@ public:
     void readTokensFromFile(const std::string filename);
     void readIDsFromFile(const std::string filename);
     void readOptionsFromFile(const std::string filename);
+    void readIPsFromFile(const std::string filename);
 
     inline std::string option(int i) { return options_[i]; }
     inline CryptoPP::ECPPoint voterID(int i) { return voter_ids_[i]; }
     inline CryptoPP::ECPPoint token(int i, int option) { return tokens_[i][option]; }
+    inline std::string ip(int i) { return ip_addrs_[i]; }
 
 private:
     int num_voters_;

@@ -45,6 +45,7 @@ int main() {
     TestReadOptions();
     TestReadTokens();
     TestReadIDs();
+    TestReadIPs();
     std::cout << "Bootstrapper test success." << std::endl;
 
     return 0;

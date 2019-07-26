@@ -64,3 +64,21 @@ void TestReadIDs()
         }
     }
 }
+
+
+void TestReadIPs()
+{    
+    std::string filename = "IPs.txt";
+
+    std::ofstream opts(filename);
+    opts << "192.168.27.1" << std::endl 
+         << "192.168.26.1" << std::endl 
+         << "192.168.27.193" << std::endl;
+    opts.close();
+
+    VoteData data(3, 3);
+    data.readIPsFromFile(filename);
+    assert(data.ip(0) == "192.168.27.1");
+    assert(data.ip(1) == "192.168.26.1");
+    assert(data.ip(2) == "192.168.27.193");
+}

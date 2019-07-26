@@ -10,6 +10,7 @@
 void TestReadOptions();
 void TestReadTokens();
 void TestReadIDs();
+void TestReadIPs();
 
 
 #endif

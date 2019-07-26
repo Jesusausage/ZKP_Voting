@@ -55,3 +55,14 @@ void VoteData::readOptionsFromFile(const std::string filename)
         options_in >> options_[i++];
     while (!options_in.eof());
 }
+
+
+void VoteData::readIPsFromFile(const std::string filename)
+{
+    std::ifstream ips_in(filename);
+    int i = 0;
+
+    do
+        ips_in >> ip_addrs_[i++];
+    while (!ips_in.eof());    
+}
