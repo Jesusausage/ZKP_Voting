@@ -27,6 +27,9 @@ private:
     CryptoPP::ECPPoint* voter_ids_;
     CryptoPP::ECPPoint** tokens_;
 
+    char** key_hashes_;
+    char** vote_hashes_;
+
     std::string* options_;
 
     std::string* ip_addrs_;

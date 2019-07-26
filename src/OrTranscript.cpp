@@ -97,3 +97,14 @@ OrTranscript::OrTranscript(CryptoPP::byte* input,
 
     e_ = CryptoPP::Integer(input+offset, FIELD_SIZE+1);
 }
+
+
+std::string OrTranscript::getHashData()
+{
+    std::string ret;
+
+    for (int i = 0; i < num_prots_; i++)
+        ret += transcripts_[i].getHashData();
+
+    return ret;
+}

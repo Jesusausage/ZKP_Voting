@@ -127,3 +127,18 @@ void Vote::deserialiseSingle(CryptoPP::byte input[326], int option,
     int r_sizes[2] = {2, 2};
     proofs_[option] = OrTranscript(input+offset, 2, r_sizes, ec);
 }
+
+
+void Vote::hash(char output[32])
+{
+    std::string hash_data;
+    for (int i = 0; i < num_options_; i++) {
+        hash_data += CryptoPP::IntToString<CryptoPP::Integer>(values_[i].x);
+        hash_data += CryptoPP::IntToString<CryptoPP::Integer>(values_[i].y);
+        hash_data += proofs_[i].getHashData();
+    }
+
+    CryptoPP::SHA3_256 hash;
+    hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
+    hash.TruncatedFinal((CryptoPP::byte*)output, 32);
+}

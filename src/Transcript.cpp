@@ -121,3 +121,18 @@ Transcript::Transcript(CryptoPP::byte* input,
 
     s_ = CryptoPP::Integer(input+offset, FIELD_SIZE);
 }
+
+
+std::string Transcript::getHashData()
+{
+    std::string ret;
+
+    for (int i = 0; i < r_size_; i++) {
+        ret += CryptoPP::IntToString<CryptoPP::Integer>(r_[i].x);
+        ret += CryptoPP::IntToString<CryptoPP::Integer>(r_[i].y);
+    }
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(e_);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(s_);
+
+    return ret;
+}

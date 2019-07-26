@@ -7,23 +7,33 @@ VoteData::VoteData(int num_voters, int num_options)
                            num_options_(num_options)
 {
     voter_ids_ = new CryptoPP::ECPPoint[num_voters_];
-
     tokens_ = new CryptoPP::ECPPoint*[num_voters_];
-    for (int i = 0; i < num_voters_; i++)
+    key_hashes_ = new char*[num_voters_];
+    vote_hashes_ = new char*[num_voters_];
+
+    for (int i = 0; i < num_voters_; i++) {
         tokens_[i] = new CryptoPP::ECPPoint[num_options_];
+        key_hashes_[i] = new char[32];
+        vote_hashes_[i] = new char[32];
+    }
 
     options_ = new std::string[num_options_];
-
     ip_addrs_ = new std::string[num_voters_];
 }
 
 
 VoteData::~VoteData()
 {
-    delete [] voter_ids_;
-    for (int i = 0; i < num_voters_; i++)
+    for (int i = 0; i < num_voters_; i++) {
         delete [] tokens_[i];
+        delete [] key_hashes_[i];
+        delete [] vote_hashes_[i];
+    }
+
+    delete [] voter_ids_;
     delete [] tokens_;
+    delete [] key_hashes_;
+    delete [] vote_hashes_;
 
     delete [] options_;
     delete [] ip_addrs_;
