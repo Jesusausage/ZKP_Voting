@@ -5,7 +5,7 @@
 #include "VoterTest.hpp"
 #include "KeyGenTest.hpp"
 #include "VerifierTest.hpp"
-#include "BootstrapperTest.hpp"
+#include "VoteDataTest.hpp"
 
 
 int main() {
@@ -40,7 +40,7 @@ int main() {
 
     TestVerification();
     TestVoteDecryption();
-    std::cout << "Verification test success." << std::endl;
+    std::cout << "Verification test success." << std::endl; 
 
     TestReadOptions();
     TestReadTokens();

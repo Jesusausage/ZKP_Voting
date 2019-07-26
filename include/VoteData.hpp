@@ -1,21 +1,18 @@
-#ifndef BOOTSTRAPPER_HPP
-#define BOOTSTRAPPER_HPP
+#ifndef VOTE_DATA_HPP
+#define VOTE_DATA_HPP
 
 
 #include "ECGroup.hpp"
-#include <boost/asio.hpp>
 
 
-class Bootstrapper {
+class VoteData {
 public:
-    Bootstrapper(int num_voters, int num_options);
-    ~Bootstrapper();
+    VoteData(int num_voters, int num_options);
+    ~VoteData();
 
     void readTokensFromFile(const std::string filename);
     void readIDsFromFile(const std::string filename);
     void readOptionsFromFile(const std::string filename);
-
-    void run();
 
     inline std::string option(int i) { return options_[i]; }
     inline CryptoPP::ECPPoint voterID(int i) { return voter_ids_[i]; }

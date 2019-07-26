@@ -2,7 +2,7 @@
 #define BOOTSTRAPPER_TEST_HPP
 
 
-#include "Bootstrapper.hpp"
+#include "VoteData.hpp"
 #include <assert.h>
 #include <iostream>
 

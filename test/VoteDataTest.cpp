@@ -1,4 +1,4 @@
-#include "BootstrapperTest.hpp"
+#include "VoteDataTest.hpp"
 
 
 void TestReadOptions()
@@ -11,11 +11,11 @@ void TestReadOptions()
          << "Onion" << std::endl;
     opts.close();
 
-    Bootstrapper bs(10, 3);
-    bs.readOptionsFromFile(filename);
-    assert(bs.option(0) == "Celery");
-    assert(bs.option(1) == "Carrot");
-    assert(bs.option(2) == "Onion");
+    VoteData data(10, 3);
+    data.readOptionsFromFile(filename);
+    assert(data.option(0) == "Celery");
+    assert(data.option(1) == "Carrot");
+    assert(data.option(2) == "Onion");
 }
 
 
@@ -32,10 +32,10 @@ void TestReadTokens()
     }
     id_out.close();
 
-    Bootstrapper bs(10, 3);
-    bs.readIDsFromFile(id_file);
+    VoteData data(10, 3);
+    data.readIDsFromFile(id_file);
     for (int i = 0; i < 10; i++) {
-        assert(bs.voterID(i) == ids[i]);
+        assert(data.voterID(i) == ids[i]);
     }
 }
 
@@ -55,12 +55,12 @@ void TestReadIDs()
     }
     token_out.close();
 
-    Bootstrapper bs(10, 5);
-    bs.readTokensFromFile(token_file);
+    VoteData data(10, 5);
+    data.readTokensFromFile(token_file);
 
     for (int i = 0; i < 10; i++) {
         for (int option = 0; option < 5; option++) {
-            assert(bs.token(i, option) == tokens[i][option]);
+            assert(data.token(i, option) == tokens[i][option]);
         }
     }
 }
