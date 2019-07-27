@@ -116,7 +116,7 @@ void VoteData::setVerifier(const ECGroup& ecg,
                            const CryptoPP::ECPPoint& generator)
 {
     CryptoPP::ECPPoint id_sum;
-    CryptoPP::ECPPoint token_sums[num_options_];
+    auto* token_sums = new CryptoPP::ECPPoint[num_options_];
     for (int i = 0; i < num_voters_; i++) {
         id_sum = ecg.curve.Add(id_sum, voter_ids_[i]);
         for (int option = 0; option < num_options_; option++) {
@@ -126,6 +126,7 @@ void VoteData::setVerifier(const ECGroup& ecg,
     }
 
     verifier_ = new Verifier(ecg, generator, id_sum, token_sums, num_options_);
+    delete [] token_sums;
 }
 
 
