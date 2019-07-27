@@ -37,6 +37,9 @@ VoteData::~VoteData()
 
     delete [] options_;
     delete [] ip_addrs_;
+
+    if (verifier_)
+        delete verifier_;
 }
 
 
@@ -93,13 +96,62 @@ void VoteData::validateHashes(char** key_hashes, char** vote_hashes,
 }
 
 
-void VoteData::requestVote(const std::string ip, int i)
+void VoteData::setVerifier(const ECGroup& ecg, 
+                           const CryptoPP::ECPPoint& generator)
 {
-    Vote vote; // ask "ip" for vote[i]    
+    CryptoPP::ECPPoint id_sum;
+    CryptoPP::ECPPoint token_sums[num_options_];
+    for (int i = 0; i < num_voters_; i++) {
+        id_sum = ecg.curve.Add(id_sum, voter_ids_[i]);
+        for (int option = 0; option < num_options_; option++) {
+            token_sums[option] = ecg.curve.Add(token_sums[option],
+                                               tokens_[i][option]);
+        }
+    }
+
+    verifier_ = new Verifier(ecg, generator, id_sum, token_sums, num_options_);
 }
 
 
-void VoteData::requestKey(const std::string ip, int i)
+void VoteData::requestVote(const std::string ip, int index)
 {
-    Key key; // ask "ip" for key[i]
+    Vote vote; // ask "ip" for vote[index]
+
+    if (verifyVote(vote, index))
+        writeVote(vote, index);
+}
+
+
+void VoteData::requestKey(const std::string ip, int index)
+{
+    Key key; // ask "ip" for key[index]
+
+    if (verifyKey(key, index))
+        writeKey(key, index);
+}
+
+
+bool VoteData::verifyVote(const Vote& vote, int index)
+{
+    verifier_->setTokens(tokens_[index]); 
+    verifier_->verifyVote(vote);
+}
+
+
+bool VoteData::verifyKey(const Key& key, int index)
+{
+    verifier_->setID(voter_ids_[index]);
+    verifier_->verifyKey(key);
+}
+
+
+void VoteData::writeVote(const Vote& vote, int index)
+{
+
+}
+
+
+void VoteData::writeKey(const Key& key, int index)
+{
+    
 }

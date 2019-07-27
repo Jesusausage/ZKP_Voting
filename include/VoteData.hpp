@@ -30,13 +30,15 @@ public:
     void validateHashes(char** key_hashes, char** vote_hashes,
                         const std::string ip);
 
+    void setVerifier(const ECGroup& ecg,
+                     const CryptoPP::ECPPoint& generator);
+
 private:
     const int num_voters_;
     const int num_options_;
 
     CryptoPP::ECPPoint* voter_ids_;
     CryptoPP::ECPPoint** tokens_;
-    Verifier* verifier;
 
     char** key_hashes_;
     char** vote_hashes_;
@@ -45,8 +47,16 @@ private:
 
     std::string* ip_addrs_;
 
-    void requestVote(const std::string ip, int i);
-    void requestKey(const std::string ip, int i);
+    Verifier* verifier_;
+
+    void requestVote(const std::string ip, int index);
+    void requestKey(const std::string ip, int index);
+
+    bool verifyVote(const Vote& vote, int index);
+    bool verifyKey(const Key& key, int index);
+
+    void writeVote(const Vote& vote, int index);
+    void writeKey(const Key& key, int index);
 };
 
 
