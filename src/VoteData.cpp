@@ -81,18 +81,34 @@ void VoteData::readIPsFromFile(const std::string filename)
 }
 
 
-void VoteData::validateHashes(char** key_hashes, char** vote_hashes,
-                              const std::string ip)
+bool VoteData::processHashes(char** key_hashes, char** vote_hashes,
+                             const std::string ip)
 {
     for (int i = 0; i < num_voters_; i++) {
-        for (int ch = 0; ch < 32; ch++) {
-            if (key_hashes[i][ch] != key_hashes_[i][ch] ||
-                vote_hashes[i][ch] != vote_hashes_[i][ch]) {
-                requestVote(ip, i);  
-                requestKey(ip, i);
-            }
-        }         
+        if (!validateHash(key_hashes[i], vote_hashes[i], i, ip)) {
+            auto vote = requestVote(ip, i);
+            if (verifyVote(vote, i))
+                writeVote(vote, i);
+
+            auto key = requestKey(ip, i);
+            if (verifyKey(key, i))
+                writeKey(key, i);
+        }
     }
+}
+
+
+bool VoteData::validateHash(char key_hash[32], char vote_hash[32],
+                            int i, const std::string ip)
+{
+    for (int ch = 0; ch < 32; ch++) {
+        if (key_hash[ch] != key_hashes_[i][ch] ||
+            vote_hash[ch] != vote_hashes_[i][ch]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 
@@ -113,21 +129,17 @@ void VoteData::setVerifier(const ECGroup& ecg,
 }
 
 
-void VoteData::requestVote(const std::string ip, int index)
+Vote VoteData::requestVote(const std::string ip, int index)
 {
     Vote vote; // ask "ip" for vote[index]
-
-    if (verifyVote(vote, index))
-        writeVote(vote, index);
+    return vote;
 }
 
 
-void VoteData::requestKey(const std::string ip, int index)
+Key VoteData::requestKey(const std::string ip, int index)
 {
     Key key; // ask "ip" for key[index]
-
-    if (verifyKey(key, index))
-        writeKey(key, index);
+    return key;
 }
 
 
@@ -147,11 +159,13 @@ bool VoteData::verifyKey(const Key& key, int index)
 
 void VoteData::writeVote(const Vote& vote, int index)
 {
-
+    // write new hash
+    // write new vote
 }
 
 
 void VoteData::writeKey(const Key& key, int index)
 {
-    
+    // write new hash
+    // write new key
 }

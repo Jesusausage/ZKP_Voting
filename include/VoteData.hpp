@@ -27,8 +27,8 @@ public:
     inline std::string ip(int i) const 
         { return ip_addrs_[i]; }
 
-    void validateHashes(char** key_hashes, char** vote_hashes,
-                        const std::string ip);
+    bool processHashes(char** key_hashes, char** vote_hashes,
+                       const std::string ip);
 
     void setVerifier(const ECGroup& ecg,
                      const CryptoPP::ECPPoint& generator);
@@ -49,8 +49,11 @@ private:
 
     Verifier* verifier_;
 
-    void requestVote(const std::string ip, int index);
-    void requestKey(const std::string ip, int index);
+    bool validateHash(char key_hashes[32], char vote_hashes[32],
+                      int i, const std::string ip);
+
+    Vote requestVote(const std::string ip, int index);
+    Key requestKey(const std::string ip, int index);
 
     bool verifyVote(const Vote& vote, int index);
     bool verifyKey(const Key& key, int index);
