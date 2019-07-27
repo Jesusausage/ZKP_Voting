@@ -76,3 +76,22 @@ void VoteData::readIPsFromFile(const std::string filename)
         ips_in >> ip_addrs_[i++];
     while (!ips_in.eof());    
 }
+
+
+void VoteData::validateHashes(char** key_hashes, char** vote_hashes,
+                              const std::string ip)
+{
+    for (int i = 0; i < num_voters_; i++) {
+        for (int ch = 0; ch < 32; ch++) {
+            if (key_hashes[i][ch] != key_hashes_[i][ch] ||
+                vote_hashes[i][ch] != vote_hashes_[i][ch])
+                requestData(ip, i);  
+        }         
+    }
+}
+
+
+void VoteData::requestData(const std::string ip, int i)
+{
+    // ask "ip" for data[i]
+}

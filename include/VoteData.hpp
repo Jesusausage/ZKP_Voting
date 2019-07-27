@@ -3,6 +3,8 @@
 
 
 #include "ECGroup.hpp"
+#define VOTE_FILE "votes.txt"
+#define KEY_FILE "keys.txt"
 
 
 class VoteData {
@@ -15,14 +17,21 @@ public:
     void readOptionsFromFile(const std::string filename);
     void readIPsFromFile(const std::string filename);
 
-    inline std::string option(int i) { return options_[i]; }
-    inline CryptoPP::ECPPoint voterID(int i) { return voter_ids_[i]; }
-    inline CryptoPP::ECPPoint token(int i, int option) { return tokens_[i][option]; }
-    inline std::string ip(int i) { return ip_addrs_[i]; }
+    inline std::string option(int i) const 
+        { return options_[i]; }
+    inline CryptoPP::ECPPoint voterID(int i) const 
+        { return voter_ids_[i]; }
+    inline CryptoPP::ECPPoint token(int i, int option) const
+        { return tokens_[i][option]; }
+    inline std::string ip(int i) const 
+        { return ip_addrs_[i]; }
+
+    void validateHashes(char** key_hashes, char** vote_hashes,
+                        const std::string ip);
 
 private:
-    int num_voters_;
-    int num_options_;
+    const int num_voters_;
+    const int num_options_;
 
     CryptoPP::ECPPoint* voter_ids_;
     CryptoPP::ECPPoint** tokens_;
@@ -33,6 +42,8 @@ private:
     std::string* options_;
 
     std::string* ip_addrs_;
+
+    void requestData(const std::string ip, int i);
 };
 
 
