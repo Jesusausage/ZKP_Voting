@@ -2,9 +2,9 @@
 
 
 VoteData::VoteData(int num_voters, int num_options)
-                           :
-                           num_voters_(num_voters), 
-                           num_options_(num_options)
+                   :
+                   num_voters_(num_voters), 
+                   num_options_(num_options)
 {
     voter_ids_ = new CryptoPP::ECPPoint[num_voters_];
     tokens_ = new CryptoPP::ECPPoint*[num_voters_];
@@ -84,14 +84,22 @@ void VoteData::validateHashes(char** key_hashes, char** vote_hashes,
     for (int i = 0; i < num_voters_; i++) {
         for (int ch = 0; ch < 32; ch++) {
             if (key_hashes[i][ch] != key_hashes_[i][ch] ||
-                vote_hashes[i][ch] != vote_hashes_[i][ch])
-                requestData(ip, i);  
+                vote_hashes[i][ch] != vote_hashes_[i][ch]) {
+                requestVote(ip, i);  
+                requestKey(ip, i);
+            }
         }         
     }
 }
 
 
-void VoteData::requestData(const std::string ip, int i)
+void VoteData::requestVote(const std::string ip, int i)
 {
-    // ask "ip" for data[i]
+    Vote vote; // ask "ip" for vote[i]    
+}
+
+
+void VoteData::requestKey(const std::string ip, int i)
+{
+    Key key; // ask "ip" for key[i]
 }

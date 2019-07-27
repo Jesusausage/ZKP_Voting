@@ -2,7 +2,8 @@
 #define VOTE_DATA_HPP
 
 
-#include "ECGroup.hpp"
+#include "Verifier.hpp"
+
 #define VOTE_FILE "votes.txt"
 #define KEY_FILE "keys.txt"
 
@@ -35,6 +36,7 @@ private:
 
     CryptoPP::ECPPoint* voter_ids_;
     CryptoPP::ECPPoint** tokens_;
+    Verifier* verifier;
 
     char** key_hashes_;
     char** vote_hashes_;
@@ -43,7 +45,8 @@ private:
 
     std::string* ip_addrs_;
 
-    void requestData(const std::string ip, int i);
+    void requestVote(const std::string ip, int i);
+    void requestKey(const std::string ip, int i);
 };
 
 
