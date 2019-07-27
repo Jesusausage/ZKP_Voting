@@ -5,14 +5,15 @@
 #include "Verifier.hpp"
 
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc != 2)
+        return 1;
+
     boost::asio::io_context io_context;
-
     boost::asio::ip::tcp::resolver resolver(io_context);
-
     boost::asio::ip::tcp::resolver::results_type endpoints =
-        resolver.resolve("192.168.1.29", "1300");
+        resolver.resolve(argv[1], "1300");
 
     boost::asio::ip::tcp::socket socket(io_context);
     boost::asio::connect(socket, endpoints);

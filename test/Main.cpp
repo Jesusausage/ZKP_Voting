@@ -46,7 +46,7 @@ int main() {
     TestReadTokens();
     TestReadIDs();
     TestReadIPs();
-    std::cout << "Bootstrapper test success." << std::endl;
+    std::cout << "VoteData test success." << std::endl;
 
     return 0;
 }
