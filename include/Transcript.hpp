@@ -39,6 +39,8 @@ public:
                int commitment_size,
                const CryptoPP::ECP& ec);
 
+    std::string getHashData();
+
 private:
     CryptoPP::ECPPoint* r_ = nullptr;
     int r_size_ = 0;

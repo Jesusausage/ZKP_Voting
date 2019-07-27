@@ -2,6 +2,7 @@
 #define KEY_HPP
 
 
+#include <cryptopp/sha3.h>
 #include "ECGroup.hpp"
 #include "Transcript.hpp"
 
@@ -31,6 +32,8 @@ public:
 
     void serialise(CryptoPP::byte* output, int& num_options);
     Key(CryptoPP::byte* input, int num_options, const CryptoPP::ECP& ec);
+
+    void hash(char output[32]);
 
 private:
     CryptoPP::ECPPoint* values_ = nullptr;

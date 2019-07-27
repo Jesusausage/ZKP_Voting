@@ -30,6 +30,8 @@ public:
                  int* commitment_sizes, 
                  const CryptoPP::ECP& ec);
 
+    std::string getHashData();
+
 private:
     Transcript* transcripts_ = nullptr;
     int num_prots_ = 0;
