@@ -81,7 +81,7 @@ void VoteData::readIPsFromFile(const std::string filename)
 }
 
 
-bool VoteData::processHashes(char** key_hashes, char** vote_hashes,
+void VoteData::processHashes(char** key_hashes, char** vote_hashes,
                              const std::string ip)
 {
     for (int i = 0; i < num_voters_; i++) {
@@ -146,14 +146,14 @@ Key VoteData::requestKey(const std::string ip, int index)
 bool VoteData::verifyVote(const Vote& vote, int index)
 {
     verifier_->setTokens(tokens_[index]); 
-    verifier_->verifyVote(vote);
+    return verifier_->verifyVote(vote);
 }
 
 
 bool VoteData::verifyKey(const Key& key, int index)
 {
     verifier_->setID(voter_ids_[index]);
-    verifier_->verifyKey(key);
+    return verifier_->verifyKey(key);
 }
 
 

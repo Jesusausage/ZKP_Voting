@@ -27,7 +27,7 @@ public:
     inline std::string ip(int i) const 
         { return ip_addrs_[i]; }
 
-    bool processHashes(char** key_hashes, char** vote_hashes,
+    void processHashes(char** key_hashes, char** vote_hashes,
                        const std::string ip);
 
     void setVerifier(const ECGroup& ecg,
@@ -47,7 +47,7 @@ private:
 
     std::string* ip_addrs_;
 
-    Verifier* verifier_;
+    Verifier* verifier_ = nullptr;
 
     bool validateHash(char key_hashes[32], char vote_hashes[32],
                       int i, const std::string ip);
