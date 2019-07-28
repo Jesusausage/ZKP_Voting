@@ -167,15 +167,9 @@ void VoteData::writeVote(const Vote& vote, int index)
     vote.hash(vote_hashes_[index]);
 
     std::ofstream vote_out(filename);
-    int out_size = 326 * num_options_;
-    CryptoPP::byte* output = new CryptoPP::byte[out_size];
-    int n;
-    vote.serialise(output, n);
-
-    for (int i = 0; i < out_size; i++)
-        vote_out.put(output[i]);
-
-    delete [] output;
+    for (int i = 0; i < num_options_; i++) {
+        vote_out << vote.value(i).x << " " << vote.value(i).y << std::endl;
+    }
     vote_out.close();
 }
 
@@ -189,14 +183,8 @@ void VoteData::writeKey(const Key& key, int index)
     key.hash(key_hashes_[index]);
 
     std::ofstream key_out(filename);
-    int out_size = 163 * num_options_;
-    CryptoPP::byte* output = new CryptoPP::byte[out_size];
-    int n;
-    key.serialise(output, n);
-
-    for (int i = 0; i < out_size; i++)
-        key_out.put(output[i]);
-
-    delete [] output;
+    for (int i = 0; i < num_options_; i++) {
+        key_out << key.value(i).x << " " << key.value(i).y << std::endl;
+    }
     key_out.close();
 }
