@@ -68,7 +68,7 @@ void swap(Vote& a, Vote& b)
 }
 
 
-void Vote::serialise(CryptoPP::byte* output, int& num_options)
+void Vote::serialise(CryptoPP::byte* output, int& num_options) const
 {
     num_options = num_options_;
     /*
@@ -99,7 +99,7 @@ Vote::Vote(CryptoPP::byte* input, int num_options,
 }
 
 
-void Vote::serialiseSingle(CryptoPP::byte output[326], int option)
+void Vote::serialiseSingle(CryptoPP::byte output[326], int option) const
 {
     int offset = 0;
     CompressedPoint p;
@@ -129,7 +129,7 @@ void Vote::deserialiseSingle(CryptoPP::byte input[326], int option,
 }
 
 
-void Vote::hash(char output[32])
+void Vote::hash(char output[32]) const
 {
     std::string hash_data;
     for (int i = 0; i < num_options_; i++) {

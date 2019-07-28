@@ -66,7 +66,7 @@ void swap(Key& a, Key& b)
 }
 
 
-void Key::serialise(CryptoPP::byte* output, int& num_options)
+void Key::serialise(CryptoPP::byte* output, int& num_options) const
 {
     num_options = num_options_;
     /*
@@ -82,7 +82,7 @@ void Key::serialise(CryptoPP::byte* output, int& num_options)
 }
 
 
-void Key::serialiseSingle(CryptoPP::byte output[163], int option)
+void Key::serialiseSingle(CryptoPP::byte output[163], int option) const
 {
     int offset = 0;
     CompressedPoint p;
@@ -123,7 +123,7 @@ void Key::deserialiseSingle(CryptoPP::byte input[163], int option,
 }
 
 
-void Key::hash(char output[32])
+void Key::hash(char output[32]) const
 {    
     std::string hash_data;
     for (int i = 0; i < num_options_; i++) {

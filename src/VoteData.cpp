@@ -160,13 +160,43 @@ bool VoteData::verifyKey(const Key& key, int index)
 
 void VoteData::writeVote(const Vote& vote, int index)
 {
-    // write new hash
-    // write new vote
+    std::string filename = VOTE_FILE;
+    filename += std::to_string(index);
+    filename += ".txt";
+
+    vote.hash(vote_hashes_[index]);
+
+    std::ofstream vote_out(filename);
+    int out_size = 326 * num_options_;
+    CryptoPP::byte* output = new CryptoPP::byte[out_size];
+    int n;
+    vote.serialise(output, n);
+
+    for (int i = 0; i < out_size; i++)
+        vote_out.put(output[i]);
+
+    delete [] output;
+    vote_out.close();
 }
 
 
 void VoteData::writeKey(const Key& key, int index)
 {
-    // write new hash
-    // write new key
+    std::string filename = KEY_FILE;
+    filename += std::to_string(index);
+    filename += ".txt";
+
+    key.hash(key_hashes_[index]);
+
+    std::ofstream key_out(filename);
+    int out_size = 163 * num_options_;
+    CryptoPP::byte* output = new CryptoPP::byte[out_size];
+    int n;
+    key.serialise(output, n);
+
+    for (int i = 0; i < out_size; i++)
+        key_out.put(output[i]);
+
+    delete [] output;
+    key_out.close();
 }

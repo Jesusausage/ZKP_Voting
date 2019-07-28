@@ -82,3 +82,46 @@ void TestReadIPs()
     assert(data.ip(1) == "192.168.26.1");
     assert(data.ip(2) == "192.168.27.193");
 }
+
+
+void TestWriteVote()
+{
+    auto ecg = GenerateECGroup();
+    auto gen = ecg.base;
+    auto id_sum = ecg.curve.Multiply(27, gen);
+    std::vector<CryptoPP::Integer> token_keys;
+    std::vector<CryptoPP::ECPPoint> tokens;
+    for (int i = 0; i < 10; i++) {
+        token_keys.push_back(RandomInteger(1, ecg.order));
+        tokens.push_back(ecg.curve.Multiply(token_keys[i], gen));
+    }
+
+    Voter voter(ecg, gen, id_sum, tokens);
+    voter.setTokenKeys(token_keys);
+    voter.castVote(8);
+    Vote vote = voter.getVoteAndProofs();
+
+    VoteData data(3, 10);
+    data.writeVote(vote, 0);
+}
+
+
+void TestWriteKey()
+{
+    auto ecg = GenerateECGroup();
+    auto gen = ecg.base;
+    auto id_key = RandomInteger(2, ecg.order);
+    auto id = ecg.curve.Multiply(id_key, gen);
+    std::vector<CryptoPP::ECPPoint> token_sums;
+    for (int i = 0; i < 10; i++) {
+        auto x = RandomInteger(2, ecg.order);
+        token_sums.push_back(ecg.curve.Multiply(x, gen));
+    }
+
+    KeyGen key_gen(ecg, gen, token_sums, id);
+    key_gen.setIDKey(id_key);
+    Key key = key_gen.getKeysAndProofs();
+
+    VoteData data(3, 10);
+    data.writeKey(key, 0);
+}

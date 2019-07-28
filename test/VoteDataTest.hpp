@@ -11,6 +11,8 @@ void TestReadOptions();
 void TestReadTokens();
 void TestReadIDs();
 void TestReadIPs();
+void TestWriteVote();
+void TestWriteKey();
 
 
 #endif

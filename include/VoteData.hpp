@@ -4,8 +4,8 @@
 
 #include "Verifier.hpp"
 
-#define VOTE_FILE "votes.txt"
-#define KEY_FILE "keys.txt"
+#define VOTE_FILE "output/votes"
+#define KEY_FILE "output/keys"
 
 
 class VoteData {
@@ -33,6 +33,9 @@ public:
     void setVerifier(const ECGroup& ecg,
                      const CryptoPP::ECPPoint& generator);
 
+    void writeVote(const Vote& vote, int index);
+    void writeKey(const Key& key, int index);
+
 private:
     const int num_voters_;
     const int num_options_;
@@ -44,10 +47,10 @@ private:
     char** vote_hashes_;
 
     std::string* options_;
-
     std::string* ip_addrs_;
 
     Verifier* verifier_ = nullptr;
+
 
     bool validateHash(char key_hashes[32], char vote_hashes[32],
                       int i, const std::string ip);
@@ -57,9 +60,6 @@ private:
 
     bool verifyVote(const Vote& vote, int index);
     bool verifyKey(const Key& key, int index);
-
-    void writeVote(const Vote& vote, int index);
-    void writeKey(const Key& key, int index);
 };
 
 

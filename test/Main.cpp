@@ -46,6 +46,8 @@ int main() {
     TestReadTokens();
     TestReadIDs();
     TestReadIPs();
+    TestWriteVote();
+    TestWriteKey();
     std::cout << "VoteData test success." << std::endl;
 
     return 0;

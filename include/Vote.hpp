@@ -30,17 +30,17 @@ public:
     inline OrTranscript proof(int i) const { return proofs_[i]; }
     inline int numOptions() const { return num_options_; }
 
-    void serialise(CryptoPP::byte* output, int& num_options);
+    void serialise(CryptoPP::byte* output, int& num_options) const;
     Vote(CryptoPP::byte* input, int num_options, const CryptoPP::ECP& ec);
 
-    void hash(char output[32]);
+    void hash(char output[32]) const;
 
 private:
     CryptoPP::ECPPoint* values_ = nullptr;
     OrTranscript* proofs_ = nullptr;
     int num_options_ = 0;
 
-    void serialiseSingle(CryptoPP::byte output[326], int option);
+    void serialiseSingle(CryptoPP::byte output[326], int option) const;
     void deserialiseSingle(CryptoPP::byte input[326], int option, 
                            const CryptoPP::ECP& ec);
 };
