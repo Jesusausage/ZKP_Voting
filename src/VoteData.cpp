@@ -43,7 +43,7 @@ VoteData::~VoteData()
 }
 
 
-void VoteData::readTokensFromFile(const std::string filename)
+void VoteData::readTokensFromFile(const std::string& filename /*= TOKEN_FILE*/)
 {
     std::ifstream token_in(filename);
     ReadTokens(token_in, tokens_, num_options_);
@@ -51,7 +51,7 @@ void VoteData::readTokensFromFile(const std::string filename)
 }
 
 
-void VoteData::readIDsFromFile(const std::string filename)
+void VoteData::readIDsFromFile(const std::string& filename /*= ID_FILE*/)
 {
     std::ifstream id_in(filename);
     ReadIDs(id_in, voter_ids_);
@@ -59,7 +59,7 @@ void VoteData::readIDsFromFile(const std::string filename)
 }
 
 
-void VoteData::readOptionsFromFile(const std::string filename)
+void VoteData::readOptionsFromFile(const std::string& filename /*= OPTION_FILE*/)
 {
     std::ifstream options_in(filename);
     int i = 0;
@@ -67,10 +67,11 @@ void VoteData::readOptionsFromFile(const std::string filename)
     do
         options_in >> options_[i++];
     while (!options_in.eof());
+    options_in.close();
 }
 
 
-void VoteData::readIPsFromFile(const std::string filename)
+void VoteData::readIPsFromFile(const std::string& filename /*= IP_FILE*/)
 {
     std::ifstream ips_in(filename);
     int i = 0;
@@ -78,11 +79,12 @@ void VoteData::readIPsFromFile(const std::string filename)
     do
         ips_in >> ip_addrs_[i++];
     while (!ips_in.eof());    
+    ips_in.close();
 }
 
 
 void VoteData::processHashes(char** key_hashes, char** vote_hashes,
-                             const std::string ip)
+                             const std::string& ip)
 {
     for (int i = 0; i < num_voters_; i++) {
         if (!validateHash(key_hashes[i], vote_hashes[i], i, ip)) {
@@ -98,8 +100,7 @@ void VoteData::processHashes(char** key_hashes, char** vote_hashes,
 }
 
 
-bool VoteData::validateHash(char key_hash[32], char vote_hash[32],
-                            int i, const std::string ip)
+bool VoteData::validateHash(char key_hash[32], char vote_hash[32], int i)
 {
     for (int ch = 0; ch < 32; ch++) {
         if (key_hash[ch] != key_hashes_[i][ch] ||
@@ -130,14 +131,14 @@ void VoteData::setVerifier(const ECGroup& ecg,
 }
 
 
-Vote VoteData::requestVote(const std::string ip, int index)
+Vote VoteData::requestVote(const std::string& ip, int index)
 {
     Vote vote; // ask "ip" for vote[index]
     return vote;
 }
 
 
-Key VoteData::requestKey(const std::string ip, int index)
+Key VoteData::requestKey(const std::string& ip, int index)
 {
     Key key; // ask "ip" for key[index]
     return key;

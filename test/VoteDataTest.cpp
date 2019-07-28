@@ -102,7 +102,7 @@ void TestWriteVote()
     Vote vote = voter.getVoteAndProofs();
 
     VoteData data(3, 10);
-    data.writeVote(vote, 0);
+    // data.writeVote(vote, 0);
 }
 
 
@@ -123,5 +123,5 @@ void TestWriteKey()
     Key key = key_gen.getKeysAndProofs();
 
     VoteData data(3, 10);
-    data.writeKey(key, 0);
+    // data.writeKey(key, 0);
 }

@@ -7,16 +7,16 @@
 #define VOTE_FILE "output/votes"
 #define KEY_FILE "output/keys"
 
+#define TOKEN_FILE "tokens.txt"
+#define ID_FILE "IDs.txt"
+#define OPTION_FILE "options.txt"
+#define IP_FILE "IPs.txt"
+
 
 class VoteData {
 public:
     VoteData(int num_voters, int num_options);
     ~VoteData();
-
-    void readTokensFromFile(const std::string filename);
-    void readIDsFromFile(const std::string filename);
-    void readOptionsFromFile(const std::string filename);
-    void readIPsFromFile(const std::string filename);
 
     inline std::string option(int i) const 
         { return options_[i]; }
@@ -27,14 +27,16 @@ public:
     inline std::string ip(int i) const 
         { return ip_addrs_[i]; }
 
+    void readTokensFromFile(const std::string& filename = TOKEN_FILE);
+    void readIDsFromFile(const std::string& filename = ID_FILE);
+    void readOptionsFromFile(const std::string& filename = OPTION_FILE);
+    void readIPsFromFile(const std::string& filename = IP_FILE);
+
     void processHashes(char** key_hashes, char** vote_hashes,
-                       const std::string ip);
+                       const std::string& ip);
 
     void setVerifier(const ECGroup& ecg,
                      const CryptoPP::ECPPoint& generator);
-
-    void writeVote(const Vote& vote, int index);
-    void writeKey(const Key& key, int index);
 
 private:
     const int num_voters_;
@@ -52,14 +54,16 @@ private:
     Verifier* verifier_ = nullptr;
 
 
-    bool validateHash(char key_hashes[32], char vote_hashes[32],
-                      int i, const std::string ip);
+    bool validateHash(char key_hashes[32], char vote_hashes[32], int i);
 
-    Vote requestVote(const std::string ip, int index);
-    Key requestKey(const std::string ip, int index);
+    Vote requestVote(const std::string& ip, int index);
+    Key requestKey(const std::string& ip, int index);
 
     bool verifyVote(const Vote& vote, int index);
     bool verifyKey(const Key& key, int index);
+
+    void writeVote(const Vote& vote, int index);
+    void writeKey(const Key& key, int index);
 };
 
 
