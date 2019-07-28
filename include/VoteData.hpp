@@ -3,6 +3,8 @@
 
 
 #include "Verifier.hpp"
+#include <set>
+
 
 #define VOTE_FILE "output/votes"
 #define KEY_FILE "output/keys"
@@ -33,7 +35,7 @@ public:
     void readIPsFromFile(const std::string& filename = IP_FILE);
 
     void processHashes(char** key_hashes, char** vote_hashes,
-                       const std::string& ip);
+                       int sender_index);
 
     void setVerifier(const ECGroup& ecg,
                      const CryptoPP::ECPPoint& generator);
@@ -50,14 +52,15 @@ private:
 
     std::string* options_;
     std::string* ip_addrs_;
+    std::set<int> bad_senders_;
 
     Verifier* verifier_ = nullptr;
 
 
     bool validateHash(char key_hashes[32], char vote_hashes[32], int i);
 
-    Vote requestVote(const std::string& ip, int index);
-    Key requestKey(const std::string& ip, int index);
+    Vote requestVote(int sender_index, int vote_index);
+    Key requestKey(int sender_index, int key_index);
 
     bool verifyVote(const Vote& vote, int index);
     bool verifyKey(const Key& key, int index);

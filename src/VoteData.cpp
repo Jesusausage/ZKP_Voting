@@ -84,17 +84,18 @@ void VoteData::readIPsFromFile(const std::string& filename /*= IP_FILE*/)
 
 
 void VoteData::processHashes(char** key_hashes, char** vote_hashes,
-                             const std::string& ip)
+                             int sender_index)
 {
     for (int i = 0; i < num_voters_; i++) {
-        if (!validateHash(key_hashes[i], vote_hashes[i], i, ip)) {
-            auto vote = requestVote(ip, i);
-            if (verifyVote(vote, i))
+        if (!validateHash(key_hashes[i], vote_hashes[i], i)) {
+            auto vote = requestVote(sender_index, i);
+            auto key = requestKey(sender_index, i);
+            if (verifyVote(vote, i) && verifyKey(key, i)) {
                 writeVote(vote, i);
-
-            auto key = requestKey(ip, i);
-            if (verifyKey(key, i))
                 writeKey(key, i);
+            }
+            else
+                bad_senders_.insert(sender_index);            
         }
     }
 }
@@ -131,16 +132,16 @@ void VoteData::setVerifier(const ECGroup& ecg,
 }
 
 
-Vote VoteData::requestVote(const std::string& ip, int index)
+Vote VoteData::requestVote(int sender_index, int vote_index)
 {
-    Vote vote; // ask "ip" for vote[index]
+    Vote vote; // ask ip_addrs[sender_index] for vote[vote_index]
     return vote;
 }
 
 
-Key VoteData::requestKey(const std::string& ip, int index)
+Key VoteData::requestKey(int sender_index, int key_index)
 {
-    Key key; // ask "ip" for key[index]
+    Key key; // ask ip_addrs[sender_index] for key[key_index]
     return key;
 }
 
