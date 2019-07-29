@@ -21,12 +21,10 @@ void TestSchnorrOrRun()
     auto public_key2 = ecg.curve.Multiply(witness2, gen2);
     SchnorrProtocol prot2(ecg, gen2, public_key2);
 
-    std::vector<SigmaProtocol*> prots = {&prot0, &prot1, &prot2};
-    OrProtocol prot(prots, 0);
+    SigmaProtocol* prots[3] = {&prot0, &prot1, &prot2};
+    OrProtocol prot(prots, 3, 0);
     prot.generateCommitment();
-    auto challenge = RandomInteger(2 * prot0.challengeSize(), 
-                                   3 * prot0.challengeSize());
-    prot.generateChallenge(challenge);
+    prot.generateChallenge(RandomInteger(1, prot0.challengeSize()));
     prot.generateResponse();
     assert(prot.verify() == true);
 }
@@ -48,12 +46,10 @@ void TestElGamalOrRun()
     ElGamalProtocol prot1(ecg, gen1, 1);
     prot1.setParams(gen2, public_key1, public_key2);
 
-    std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
-    OrProtocol prot(prots, 0);
+    SigmaProtocol* prots[2] = {&prot0, &prot1};
+    OrProtocol prot(prots, 2, 0);
     prot.generateCommitment();
-    auto challenge = RandomInteger(1 * prot0.challengeSize(), 
-                                   2 * prot0.challengeSize());
-    prot.generateChallenge(challenge);
+    prot.generateChallenge(RandomInteger(1, prot0.challengeSize()));
     prot.generateResponse();
     assert(prot.verify() == true);
 }
@@ -74,8 +70,8 @@ void TestSchnorrOrNIZKP()
     auto public_key1 = ecg.curve.Multiply(witness1, gen1);
     SchnorrProtocol prot1(ecg, gen1, public_key1);
 
-    std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
-    OrProtocol prot(prots, 0);
+    SigmaProtocol* prots[2] = {&prot0, &prot1};
+    OrProtocol prot(prots, 2, 0);
 
     auto nizkp = prot.generateNIZKP();
     assert(prot.verifyNIZKP(nizkp) == true);
@@ -98,8 +94,8 @@ void TestElGamalOrNIZKP()
     ElGamalProtocol prot1(ecg, gen1, 1);
     prot1.setParams(gen2, public_key1, public_key2, witness);
 
-    std::vector<SigmaProtocol*> prots = {&prot0, &prot1};
-    OrProtocol prot(prots, 1);
+    SigmaProtocol* prots[2] = {&prot0, &prot1};
+    OrProtocol prot(prots, 2, 1);
 
     auto nizkp = prot.generateNIZKP();
     assert(prot.verifyNIZKP(nizkp) == true);

@@ -11,8 +11,10 @@
 
 class OrProtocol {
 public:
-    OrProtocol(std::vector<SigmaProtocol*> sigma_protocols, int i_known = 0);
+    OrProtocol(SigmaProtocol** sigma_protocols, int num_prots, int i_known = 0);
+    ~OrProtocol();
     void setKnown(int i_known);
+
     void generateCommitment();
     void generateChallenge(const CryptoPP::Integer& e);
     void generateResponse();
@@ -24,9 +26,9 @@ public:
     bool verifyNIZKP(const OrTranscript& or_nizkp);
 
 private:
-    std::vector<SigmaProtocol*> sigma_prots_;
-    int i_known_;
+    SigmaProtocol** sigma_prots_;
     int num_prots_;
+    int i_known_;
 
     CryptoPP::Integer e_ = 0;
     CryptoPP::Integer total_e_ = 0;

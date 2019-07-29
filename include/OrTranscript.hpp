@@ -18,9 +18,12 @@ public:
     OrTranscript& operator=(OrTranscript or_transcript);
     friend void swap(OrTranscript& a, OrTranscript& b);
 
-    inline Transcript transcript(int i) const { return transcripts_[i]; }
-    inline int numProts() const { return num_prots_; }
-    inline CryptoPP::Integer e() const { return e_; }
+    const inline Transcript& transcript(int i) const 
+        { return transcripts_[i]; }
+    const inline int& numProts() const 
+        { return num_prots_; }
+    const inline CryptoPP::Integer& e() const 
+        { return e_; }
 
     void serialise(CryptoPP::byte* output, 
                    int* num_prots = nullptr,

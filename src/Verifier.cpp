@@ -13,7 +13,7 @@ Verifier::Verifier(const ECGroup& ecg,
 {
     vote_prots_[0] = new ElGamalProtocol(*ecg_, gen_, 0);
     vote_prots_[1] = new ElGamalProtocol(*ecg_, gen_, 1);
-    vote_or_prot_ = new OrProtocol({vote_prots_[0], vote_prots_[1]});
+    vote_or_prot_ = new OrProtocol((SigmaProtocol**)vote_prots_, 2);
 
     key_prot_ = new ElGamalProtocol(*ecg_, gen_, 0);
 
@@ -38,7 +38,7 @@ Verifier::Verifier(const ECGroup& ecg,
 {
     vote_prots_[0] = new ElGamalProtocol(*ecg_, gen_, 0);
     vote_prots_[1] = new ElGamalProtocol(*ecg_, gen_, 1);
-    vote_or_prot_ = new OrProtocol({vote_prots_[0], vote_prots_[1]});
+    vote_or_prot_ = new OrProtocol((SigmaProtocol**)vote_prots_, 2);
 
     key_prot_ = new ElGamalProtocol(*ecg_, gen_, 0);
 

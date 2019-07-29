@@ -47,7 +47,8 @@ void TestVoting()
         prot0.setParams(id_sum, tokens[i], ote.value(i));
         prot1.setParams(id_sum, tokens[i], ote.value(i));
 
-        OrProtocol prot({&prot0, &prot1});
+        SigmaProtocol* prots[2] = {&prot0, &prot1};
+        OrProtocol prot(prots, 2);
         assert(prot.verifyNIZKP(ote.proof(i)) == true);
     }
 }

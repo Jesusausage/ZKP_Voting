@@ -14,7 +14,7 @@ Voter::Voter(const ECGroup& ecg,
 {
     prots_[0] = new ElGamalProtocol(*ecg_, *gen_, 0);
     prots_[1] = new ElGamalProtocol(*ecg_, *gen_, 1);
-    or_prot_ = new OrProtocol({prots_[0], prots_[1]});
+    or_prot_ = new OrProtocol((SigmaProtocol**)prots_, 2);
 
     tokens_ = new CryptoPP::ECPPoint[num_options_];
     for (int i = 0; i < num_options_; i++)
@@ -38,7 +38,7 @@ Voter::Voter(const ECGroup& ecg,
 {
     prots_[0] = new ElGamalProtocol(*ecg_, *gen_, 0);
     prots_[1] = new ElGamalProtocol(*ecg_, *gen_, 1);
-    or_prot_ = new OrProtocol({prots_[0], prots_[1]});
+    or_prot_ = new OrProtocol((SigmaProtocol**)prots_, 2);
 
     tokens_ = new CryptoPP::ECPPoint[num_options_];
     for (int i = 0; i < num_options_; i++)

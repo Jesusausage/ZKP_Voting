@@ -1,24 +1,31 @@
 #include "OrProtocol.hpp"
 
 
-OrProtocol::OrProtocol(std::vector<SigmaProtocol*> sigma_protocols, 
+OrProtocol::OrProtocol(SigmaProtocol** sigma_protocols, 
+                       int num_prots,
                        int i_known /*= 0*/)
-                       :
-                       sigma_prots_(sigma_protocols), 
-                       i_known_(i_known)
+                       : 
+                       num_prots_(num_prots)
 {
-    num_prots_ = sigma_protocols.size();
+    setKnown(i_known);
 
-    assert(i_known_ >= 0 && i_known_ < num_prots_);
+    sigma_prots_ = new SigmaProtocol*[num_prots];
+    for (int i = 0; i < num_prots_; i++)
+        sigma_prots_[i] = sigma_protocols[i];
 
     e_size_ = sigma_prots_[0]->challengeSize();
-    for (auto prot : sigma_prots_)
-        assert(prot->challengeSize() == e_size_);
+}
+
+
+OrProtocol::~OrProtocol()
+{
+    delete [] sigma_prots_;
 }
 
 
 void OrProtocol::setKnown(int i_known)
 {
+    assert(i_known >= 0 && i_known < num_prots_);
     i_known_ = i_known;
 }
 
@@ -64,14 +71,14 @@ bool OrProtocol::verify()
 {
     assert(e_ > 0);
 
-    for (SigmaProtocol* prot : sigma_prots_) {
-        if (prot->verify() == false)
+    for (int i = 0; i < num_prots_; i++) {
+        if (sigma_prots_[i]->verify() == false)
             return false;
     }
 
     CryptoPP::Integer total_challenge = 0;
-    for (auto prot : sigma_prots_)
-        total_challenge += prot->challenge();
+    for (int i = 0; i < num_prots_; i++)
+        total_challenge += sigma_prots_[i]->challenge();
     if (e_ != total_challenge)
         return false;
 
@@ -118,8 +125,8 @@ bool OrProtocol::verifyNIZKP(const OrTranscript& or_nizkp)
     auto hash_e = GenHashChallenge(getHashData(), e_size_);
 
     CryptoPP::Integer total_challenge = 0;
-    for (auto prot : sigma_prots_)
-        total_challenge += prot->challenge();
+    for (int i = 0; i < num_prots_; i++)
+        total_challenge += sigma_prots_[i]->challenge();
         
     if (hash_e != or_nizkp.e() % e_size_)
         return false;
