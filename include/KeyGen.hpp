@@ -23,13 +23,13 @@ public:
     Key getKeysAndProofs();
 
 private:
-    const ECGroup* ecg_;
-    const CryptoPP::ECPPoint* gen_;
-    const CryptoPP::ECPPoint id_;
+    const ECGroup& ecg_;
+    const CryptoPP::ECPPoint& gen_;
+    const CryptoPP::ECPPoint& id_;
     CryptoPP::ECPPoint* token_sums_;
     const int num_options_;
 
-    ElGamalProtocol* prot_ = nullptr;
+    ElGamalProtocol prot_;
     CryptoPP::Integer id_key_;
 
     Key key_;

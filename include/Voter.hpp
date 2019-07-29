@@ -26,9 +26,9 @@ public:
     Vote getVoteAndProofs();
 
 private:
-    const ECGroup* ecg_;
-    const CryptoPP::ECPPoint* gen_;
-    const CryptoPP::ECPPoint id_sum_;
+    const ECGroup& ecg_;
+    const CryptoPP::ECPPoint& gen_;
+    const CryptoPP::ECPPoint& id_sum_;
     CryptoPP::ECPPoint* tokens_;    
     const int num_options_;
 

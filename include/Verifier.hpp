@@ -29,11 +29,11 @@ public:
     bool verifyKey(const Key& key);
 
 private:
-    const ECGroup* ecg_;
-    const CryptoPP::ECPPoint gen_;
+    const ECGroup& ecg_;
+    const CryptoPP::ECPPoint& gen_;
     const int num_options_;
     
-    CryptoPP::ECPPoint id_sum_;
+    const CryptoPP::ECPPoint& id_sum_;
     CryptoPP::ECPPoint* tokens_;
 
     CryptoPP::ECPPoint* token_sums_;
@@ -41,7 +41,7 @@ private:
 
     ElGamalProtocol* vote_prots_[2];
     OrProtocol* vote_or_prot_;
-    ElGamalProtocol* key_prot_;
+    ElGamalProtocol key_prot_;
 };
 
 

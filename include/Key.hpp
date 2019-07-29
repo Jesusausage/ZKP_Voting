@@ -26,9 +26,12 @@ public:
     inline void setProof(int i, const Transcript& proof) 
         { proofs_[i] = proof; }
 
-    inline CryptoPP::ECPPoint value(int i) const { return values_[i]; }
-    inline Transcript proof(int i) const { return proofs_[i]; }
-    inline int numOptions() const { return num_options_; }
+    inline const CryptoPP::ECPPoint& value(int i) const 
+        { return values_[i]; }
+    inline const Transcript& proof(int i) const 
+        { return proofs_[i]; }
+    inline const int numOptions() const 
+        { return num_options_; }
 
     void serialise(CryptoPP::byte* output, int& num_options) const;
     Key(CryptoPP::byte* input, int num_options, const CryptoPP::ECP& ec);
