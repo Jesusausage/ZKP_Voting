@@ -50,15 +50,17 @@ private:
 
     std::vector< std::array<char, 32> > key_hashes_;
     std::vector< std::array<char, 32> > vote_hashes_;
+    std::set< std::array<char, 32> > bad_hashes_;
 
     std::vector<std::string> options_;
     std::vector<std::string> ip_addrs_;
-    std::set<int> bad_senders_;
 
     Verifier* verifier_ = nullptr;
 
 
     bool validateHash(char key_hashes[32], char vote_hashes[32], int i);
+    void addBadHash(char bad_hash[32]);
+    bool badHash(char hash[32]);
 
     Vote requestVote(int sender_index, int vote_index);
     Key requestKey(int sender_index, int key_index);

@@ -9,11 +9,11 @@ VoteData::VoteData(int num_voters, int num_options)
     voter_ids_.reserve(num_voters_);
     tokens_.reserve(num_voters_);
 
-    key_hashes_.resize(num_voters_);
-    vote_hashes_.resize(num_voters_);
-
     options_.resize(num_voters_);
     ip_addrs_.resize(num_voters_);
+
+    key_hashes_.resize(num_voters_);
+    vote_hashes_.resize(num_voters_);
 }
 
 
@@ -68,13 +68,16 @@ void VoteData::processHashes(char** key_hashes, char** vote_hashes,
     for (int i = 0; i < num_voters_; i++) {
         if (!validateHash(key_hashes[i], vote_hashes[i], i)) {
             auto vote = requestVote(sender_index, i);
-            auto key = requestKey(sender_index, i);
-            if (verifyVote(vote, i) && verifyKey(key, i)) {
+            if (verifyVote(vote, i))
                 writeVote(vote, i);
-                writeKey(key, i);
-            }
             else
-                bad_senders_.insert(sender_index);            
+                addBadHash(vote_hashes[i]); 
+
+            auto key = requestKey(sender_index, i);
+            if (verifyKey(key, i))
+                writeKey(key, i);
+            else
+                addBadHash(key_hashes[i]);                     
         }
     }
 }
@@ -82,6 +85,9 @@ void VoteData::processHashes(char** key_hashes, char** vote_hashes,
 
 bool VoteData::validateHash(char key_hash[32], char vote_hash[32], int i)
 {
+    if (badHash(key_hash) || badHash(vote_hash))
+        return false;
+
     for (int ch = 0; ch < 32; ch++) {
         if (key_hash[ch] != key_hashes_[i][ch] ||
             vote_hash[ch] != vote_hashes_[i][ch]) {
@@ -90,6 +96,26 @@ bool VoteData::validateHash(char key_hash[32], char vote_hash[32], int i)
     }
 
     return true;
+}
+
+
+void VoteData::addBadHash(char bad_hash[32])
+{
+    std::array<char, 32> hash;
+    for (int i = 0; i < 32; i++)
+        hash[i] = bad_hash[i];
+
+    bad_hashes_.insert(hash);
+}
+
+
+bool VoteData::badHash(char hash[32])
+{
+    std::array<char, 32> h;
+    for (int i = 0; i < 32; i++)
+        h[i] = hash[i];
+
+    return (bad_hashes_.count(h) > 0);
 }
 
 
