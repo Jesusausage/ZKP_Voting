@@ -20,12 +20,16 @@ public:
     virtual bool verify() = 0;
     virtual void generateSimulation() = 0;
     
-    CryptoPP::Integer challenge() const;
-    CryptoPP::Integer challengeSize() const;
+    inline const CryptoPP::Integer& challenge() const 
+        { return transcript_.challenge(); }
+    inline const CryptoPP::Integer& challengeSize() const
+        { return order_; }
     virtual std::string getHashData() = 0;
 
-    Transcript getTranscript() const;
-    void setTranscript(const Transcript& transcript);
+    inline const Transcript& getTranscript() const
+        { return transcript_; }
+    inline void setTranscript(const Transcript& transcript)
+        { transcript_ = transcript; }
 
     Transcript generateNIZKP();
     bool verifyNIZKP(const Transcript& nizkp);

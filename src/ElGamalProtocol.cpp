@@ -45,10 +45,9 @@ void ElGamalProtocol::generateResponse()
 
 bool ElGamalProtocol::verify()
 {
-    auto r = transcript_.commitment();
-    if (!(computeCommitment1() == r[0]))
+    if (!(computeCommitment1() == transcript_.commitment(0)))
         return false;
-    if (!(computeCommitment2() == r[1]))
+    if (!(computeCommitment2() == transcript_.commitment(1)))
         return false;
 
     return true;
@@ -69,14 +68,13 @@ void ElGamalProtocol::generateSimulation()
 
 std::string ElGamalProtocol::getHashData()
 {
-    auto r = transcript_.commitment();
     std::string ret;
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(r[0].x);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(r[0].y);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(transcript_.commitment(0).x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(transcript_.commitment(0).y);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key1_.x);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key1_.y);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(r[1].x);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(r[1].y);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(transcript_.commitment(1).x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(transcript_.commitment(1).y);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key2_.x);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key2_.y);
     return ret;

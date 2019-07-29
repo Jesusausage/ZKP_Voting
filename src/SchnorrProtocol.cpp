@@ -39,8 +39,7 @@ bool SchnorrProtocol::verify()
                               curve_.Inverse(pub_key_));
     auto result = curve_.Add(a, b);
     // r = g^s * x^-e
-    auto r = transcript_.commitment();
-    return (r[0] == result);
+    return (transcript_.commitment(0) == result);
 }
 
 
@@ -62,10 +61,9 @@ void SchnorrProtocol::generateSimulation()
 
 std::string SchnorrProtocol::getHashData() 
 {
-    auto r = transcript_.commitment();
     std::string ret;
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(r[0].x);
-    ret += CryptoPP::IntToString<CryptoPP::Integer>(r[0].y);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(transcript_.commitment(0).x);
+    ret += CryptoPP::IntToString<CryptoPP::Integer>(transcript_.commitment(0).y);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key_.x);
     ret += CryptoPP::IntToString<CryptoPP::Integer>(pub_key_.y);
     return ret;

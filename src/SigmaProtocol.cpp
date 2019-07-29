@@ -21,30 +21,6 @@ void SigmaProtocol::generateChallenge(CryptoPP::Integer* e /*= nullptr*/)
 }
 
 
-CryptoPP::Integer SigmaProtocol::challenge() const
-{
-    return transcript_.challenge();
-}
-
-
-CryptoPP::Integer SigmaProtocol::challengeSize() const
-{
-    return order_;
-}
-
-
-Transcript SigmaProtocol::getTranscript() const
-{
-    return transcript_;
-}
-
-
-void SigmaProtocol::setTranscript(const Transcript& transcript) 
-{
-    transcript_ = transcript;
-}
-
-
 Transcript SigmaProtocol::generateNIZKP()
 {
     generateCommitment();

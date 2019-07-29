@@ -28,10 +28,10 @@ public:
     inline void setResponse(const CryptoPP::Integer& response) 
         { s_ = response; }
 
-    inline CryptoPP::ECPPoint* commitment() const { return r_; }
-    inline int commitmentSize() const { return r_size_; }
-    inline CryptoPP::Integer challenge() const { return e_; }
-    inline CryptoPP::Integer response() const { return s_; }
+    inline const CryptoPP::ECPPoint& commitment(int i) const { return r_[i]; }
+    inline const int& commitmentSize() const { return r_size_; }
+    inline const CryptoPP::Integer& challenge() const { return e_; }
+    inline const CryptoPP::Integer& response() const { return s_; }
 
     void serialise(CryptoPP::byte* output, 
                    int* commitment_size = nullptr);
