@@ -9,12 +9,16 @@ ECGroup GenerateECGroup()
     CryptoPP::Integer p = power1 - power2 - 977;
     ecg.curve = CryptoPP::ECP(p, CURVE_A, CURVE_B);
 
-    CryptoPP::Integer base_x(BASE_X);
-    CryptoPP::Integer base_y(BASE_Y);
-    ecg.base = CryptoPP::ECPPoint(base_x, base_y);
     ecg.order = CryptoPP::Integer(ORDER);
 
     return ecg;
+}
+
+
+CryptoPP::ECPPoint GenerateECBase()
+{    
+    return CryptoPP::ECPPoint(CryptoPP::Integer(BASE_X), 
+                              CryptoPP::Integer(BASE_Y));
 }
 
 
@@ -55,9 +59,10 @@ CryptoPP::ECPPoint DecompressPoint(const CompressedPoint& compressed,
     CryptoPP::Integer x = compressed.x;
 
     auto p = ec.FieldSize();
-    auto alpha1 = a_exp_b_mod_c(x, 3, p);
-    auto alpha2 = a_times_b_mod_c(x, ec.GetA(), p);
-    auto alpha = (alpha1 + alpha2 + ec.GetB()) % p;
+    auto alpha = a_exp_b_mod_c(x, 3, p);
+    alpha += a_times_b_mod_c(x, ec.GetA(), p);
+    alpha += ec.GetB(); 
+    alpha %= p;
 
     auto beta = TonelliShanks(alpha, p);
 

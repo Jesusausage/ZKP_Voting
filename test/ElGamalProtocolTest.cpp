@@ -4,9 +4,10 @@
 void TestNormalElGamalRun() 
 {   
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
-    auto gen1 = ecg.base;
-    auto gen2 = ecg.curve.Multiply(27, ecg.base);
+    auto gen1 = base;
+    auto gen2 = ecg.curve.Multiply(27, base);
     ElGamalProtocol prot(ecg, gen1, 1);
 
     auto witness = RandomInteger(2, ecg.order);
@@ -24,9 +25,10 @@ void TestNormalElGamalRun()
 void TestSimulatedElGamalRun()
 {
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
-    auto gen1 = ecg.base;
-    auto gen2 = ecg.curve.Multiply(27, ecg.base);
+    auto gen1 = base;
+    auto gen2 = ecg.curve.Multiply(27, base);
     ElGamalProtocol prot(ecg, gen1, 0);
 
     auto witness = RandomInteger(2, ecg.order);
@@ -43,9 +45,10 @@ void TestSimulatedElGamalRun()
 void TestElGamalNIZKP()
 {
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
-    auto gen1 = ecg.base;
-    auto gen2 = ecg.curve.Multiply(27, ecg.base);
+    auto gen1 = base;
+    auto gen2 = ecg.curve.Multiply(27, base);
     ElGamalProtocol prot(ecg, gen1, 0);
 
     auto witness = RandomInteger(2, ecg.order);

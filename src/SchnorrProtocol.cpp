@@ -14,9 +14,9 @@ SchnorrProtocol::SchnorrProtocol(const ECGroup& ecg,
 
 void SchnorrProtocol::generateCommitment()
 {
-    commitment_seed_ = RandomInteger(2, *order_);
+    commitment_seed_ = RandomInteger(2, order_);
     CryptoPP::ECPPoint r[1];
-    r[0] = curve_->Multiply(commitment_seed_, *gen_);
+    r[0] = curve_.Multiply(commitment_seed_, gen_);
     // r = g^u
     transcript_.setCommitment(r, 1);
 }
@@ -27,17 +27,17 @@ void SchnorrProtocol::generateResponse()
     assert(transcript_.challenge() > 0);
 
     // s = u + ew (mod q)
-    auto ew = a_times_b_mod_c(w_, transcript_.challenge(), *order_);
-    transcript_.setResponse((commitment_seed_ + ew) % *order_);
+    auto ew = a_times_b_mod_c(w_, transcript_.challenge(), order_);
+    transcript_.setResponse((commitment_seed_ + ew) % order_);
 }
 
 
 bool SchnorrProtocol::verify()
 {
-    auto a = curve_->Multiply(transcript_.response(), *gen_);
-    auto b = curve_->Multiply(transcript_.challenge(), 
-                              curve_->Inverse(pub_key_));
-    auto result = curve_->Add(a, b);
+    auto a = curve_.Multiply(transcript_.response(), gen_);
+    auto b = curve_.Multiply(transcript_.challenge(), 
+                              curve_.Inverse(pub_key_));
+    auto result = curve_.Add(a, b);
     // r = g^s * x^-e
     auto r = transcript_.commitment();
     return (r[0] == result);
@@ -48,13 +48,13 @@ void SchnorrProtocol::generateSimulation()
 {
     assert(transcript_.challenge() > 0);
 
-    transcript_.setResponse(RandomInteger(1, *order_));
+    transcript_.setResponse(RandomInteger(1, order_));
 
-    auto a = curve_->Multiply(transcript_.response(), *gen_);
-    auto b = curve_->Multiply(transcript_.challenge(), 
-                                 curve_->Inverse(pub_key_));
+    auto a = curve_.Multiply(transcript_.response(), gen_);
+    auto b = curve_.Multiply(transcript_.challenge(), 
+                                 curve_.Inverse(pub_key_));
     CryptoPP::ECPPoint r[1];
-    r[0] = curve_->Add(a, b);
+    r[0] = curve_.Add(a, b);
     // r = g^s * x^-e
     transcript_.setCommitment(r, 1);
 }

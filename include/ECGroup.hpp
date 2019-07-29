@@ -8,7 +8,6 @@
 #include <cryptopp/randpool.h>
 #include <cryptopp/osrng.h>
 #include <fstream>
-
 #include <iostream>
 
 
@@ -22,7 +21,6 @@ const int FIELD_SIZE = 32;
 
 struct ECGroup {
     CryptoPP::ECP curve;
-    CryptoPP::ECPPoint base;
     CryptoPP::Integer order;
 };
 
@@ -33,6 +31,7 @@ struct CompressedPoint {
 
 
 ECGroup GenerateECGroup();
+CryptoPP::ECPPoint GenerateECBase();
 
 CryptoPP::ECPPoint DecodeHexString(const std::string& hex_string, 
                                    const CryptoPP::ECP& ec);

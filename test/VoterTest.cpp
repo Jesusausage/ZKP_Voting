@@ -4,8 +4,7 @@
 void TestVoting()
 {
     auto ecg = GenerateECGroup();
-
-    auto gen = ecg.base;
+    auto gen = GenerateECBase();
 
     auto id_sum = ecg.curve.Multiply(27, gen);
 

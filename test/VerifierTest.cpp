@@ -4,7 +4,7 @@
 void TestVerification()
 {
     auto ecg = GenerateECGroup();
-    auto gen = ecg.base;
+    auto gen = GenerateECBase();
 
     auto id_key = RandomInteger(2, ecg.order);
     auto id = ecg.curve.Multiply(id_key, gen);
@@ -38,7 +38,7 @@ void TestVerification()
 void TestVoteDecryption()
 {
     auto ecg = GenerateECGroup();
-    auto gen = ecg.base;
+    auto gen = GenerateECBase();
 
     const int no_voters = 4;
 

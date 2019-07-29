@@ -24,10 +24,10 @@ void ElGamalProtocol::setParams(const CryptoPP::ECPPoint& generator2,
 
 void ElGamalProtocol::generateCommitment()
 {
-    commitment_seed_ = RandomInteger(2, *order_); 
+    commitment_seed_ = RandomInteger(2, order_); 
     CryptoPP::ECPPoint r[2];   
-    r[0] = curve_->Multiply(commitment_seed_, *gen_);
-    r[1] = curve_->Multiply(commitment_seed_, gen2_);
+    r[0] = curve_.Multiply(commitment_seed_, gen_);
+    r[1] = curve_.Multiply(commitment_seed_, gen2_);
     // r1 = g1^u, r2 = g2^u
     transcript_.setCommitment(r, 2);
 }
@@ -38,8 +38,8 @@ void ElGamalProtocol::generateResponse()
     assert(transcript_.challenge() > 0);
 
     // s = u + ew (mod q)
-    auto ew = a_times_b_mod_c(w_, transcript_.challenge(), *order_);
-    transcript_.setResponse((commitment_seed_ + ew) % *order_);
+    auto ew = a_times_b_mod_c(w_, transcript_.challenge(), order_);
+    transcript_.setResponse((commitment_seed_ + ew) % order_);
 }
 
 
@@ -59,7 +59,7 @@ void ElGamalProtocol::generateSimulation()
 {
     assert(transcript_.challenge() > 0);
 
-    transcript_.setResponse(RandomInteger(1, *order_));
+    transcript_.setResponse(RandomInteger(1, order_));
     CryptoPP::ECPPoint r[2];
     r[0] = computeCommitment1();    
     r[1] = computeCommitment2();
@@ -85,20 +85,20 @@ std::string ElGamalProtocol::getHashData()
 
 CryptoPP::ECPPoint ElGamalProtocol::computeCommitment1()
 {
-    auto a = curve_->Multiply(transcript_.response(), *gen_);
-    auto b = curve_->Multiply(transcript_.challenge(), 
-                              curve_->Inverse(pub_key1_));
+    auto a = curve_.Multiply(transcript_.response(), gen_);
+    auto b = curve_.Multiply(transcript_.challenge(), 
+                              curve_.Inverse(pub_key1_));
     // r1 = g1^s * x1^-e
-    return curve_->Add(a, b);
+    return curve_.Add(a, b);
 }
 
 
 CryptoPP::ECPPoint ElGamalProtocol::computeCommitment2()
 {
-    auto a = curve_->Multiply(transcript_.response(), gen2_);
-    auto b = curve_->Multiply(transcript_.challenge(), 
-                              curve_->Inverse(pub_key2_));
-    auto c = curve_->Multiply(m_*transcript_.challenge(), *gen_);
+    auto a = curve_.Multiply(transcript_.response(), gen2_);
+    auto b = curve_.Multiply(transcript_.challenge(), 
+                              curve_.Inverse(pub_key2_));
+    auto c = curve_.Multiply(m_*transcript_.challenge(), gen_);
     // r2 = g2^s * x2^-e * g2^me
-    return curve_->Add(a, curve_->Add(b, c));
+    return curve_.Add(a, curve_.Add(b, c));
 }

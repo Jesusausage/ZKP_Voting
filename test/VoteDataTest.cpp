@@ -22,12 +22,13 @@ void TestReadOptions()
 void TestReadTokens()
 {
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
     std::string id_file("IDs.txt");
 
     std::ofstream id_out(id_file);
     CryptoPP::ECPPoint ids[10];
     for (int i = 0; i < 10; i++) {
-        ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), ecg.base);
+        ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), base);
         WriteID(ids[i], id_out);
     }
     id_out.close();
@@ -43,13 +44,14 @@ void TestReadTokens()
 void TestReadIDs()
 {
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
     std::string token_file("tokens.txt");
 
     std::ofstream token_out(token_file);
     CryptoPP::ECPPoint tokens[10][5];
     for (int i = 0; i < 10; i++) {
         for (int option = 0; option < 5; option++) {
-            tokens[i][option] = ecg.curve.Multiply(RandomInteger(1, ecg.order), ecg.base);
+            tokens[i][option] = ecg.curve.Multiply(RandomInteger(1, ecg.order), base);
         }
         WriteTokens(tokens[i], 5, token_out);
     }
@@ -87,7 +89,7 @@ void TestReadIPs()
 void TestWriteVote()
 {
     auto ecg = GenerateECGroup();
-    auto gen = ecg.base;
+    auto gen = GenerateECBase();
     auto id_sum = ecg.curve.Multiply(27, gen);
     std::vector<CryptoPP::Integer> token_keys;
     std::vector<CryptoPP::ECPPoint> tokens;
@@ -109,7 +111,7 @@ void TestWriteVote()
 void TestWriteKey()
 {
     auto ecg = GenerateECGroup();
-    auto gen = ecg.base;
+    auto gen = GenerateECBase();
     auto id_key = RandomInteger(2, ecg.order);
     auto id = ecg.curve.Multiply(id_key, gen);
     std::vector<CryptoPP::ECPPoint> token_sums;

@@ -4,18 +4,19 @@
 void TestSchnorrOrRun()
 {    
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
-    auto gen0 = ecg.base;
+    auto gen0 = base;
     auto witness0 = RandomInteger(2, ecg.order);
     auto public_key0 = ecg.curve.Multiply(witness0, gen0);
     SchnorrProtocol prot0(ecg, gen0, public_key0, witness0);
 
-    auto gen1 = ecg.curve.Multiply(27, ecg.base);
+    auto gen1 = ecg.curve.Multiply(27, base);
     auto witness1 = RandomInteger(2, ecg.order);
     auto public_key1 = ecg.curve.Multiply(witness1, gen1);
     SchnorrProtocol prot1(ecg, gen1, public_key1);
 
-    auto gen2 = ecg.curve.Multiply(42, ecg.base);
+    auto gen2 = ecg.curve.Multiply(42, base);
     auto witness2 = RandomInteger(2, ecg.order);
     auto public_key2 = ecg.curve.Multiply(witness2, gen2);
     SchnorrProtocol prot2(ecg, gen2, public_key2);
@@ -34,9 +35,10 @@ void TestSchnorrOrRun()
 void TestElGamalOrRun()
 { 
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
-    auto gen1 = ecg.base;
-    auto gen2 = ecg.curve.Multiply(27, ecg.base);
+    auto gen1 = base;
+    auto gen2 = ecg.curve.Multiply(27, base);
     auto witness = RandomInteger(2, ecg.order);
     auto public_key1 = ecg.curve.Multiply(witness, gen1);
     auto public_key2 = ecg.curve.Multiply(witness, gen2);
@@ -60,13 +62,14 @@ void TestElGamalOrRun()
 void TestSchnorrOrNIZKP()
 {
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
-    auto gen0 = ecg.base;
+    auto gen0 = base;
     auto witness0 = RandomInteger(2, ecg.order);
     auto public_key0 = ecg.curve.Multiply(witness0, gen0);
     SchnorrProtocol prot0(ecg, gen0, public_key0, witness0);
 
-    auto gen1 = ecg.curve.Multiply(27, ecg.base);
+    auto gen1 = ecg.curve.Multiply(27, base);
     auto witness1 = RandomInteger(2, ecg.order);
     auto public_key1 = ecg.curve.Multiply(witness1, gen1);
     SchnorrProtocol prot1(ecg, gen1, public_key1);
@@ -82,9 +85,10 @@ void TestSchnorrOrNIZKP()
 void TestElGamalOrNIZKP()
 { 
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
-    auto gen1 = ecg.base;
-    auto gen2 = ecg.curve.Multiply(27, ecg.base);
+    auto gen1 = base;
+    auto gen2 = ecg.curve.Multiply(27, base);
     auto witness = RandomInteger(2, ecg.order);
     auto public_key1 = ecg.curve.Multiply(witness, gen1);
     // auto public_key2 = ecg.curve.Multiply(witness, gen2);

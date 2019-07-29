@@ -4,6 +4,7 @@
 void TestECGroupAddition()
 {
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
     CryptoPP::Integer g_x("86918276961810349294276103416548851884759982251107");
     CryptoPP::Integer g_y("87194829221142880348582938487511785107150118762739500766654458540580527283772");
@@ -11,7 +12,7 @@ void TestECGroupAddition()
     auto g = CryptoPP::ECPPoint(g_x, g_y);
     auto g_doubled = ecg.curve.Add(g, g);
 
-    assert(g_doubled == ecg.base);
+    assert(g_doubled == base);
 }
 
 
@@ -20,22 +21,24 @@ void TestDecodePoint()
     std::string hex_string = "0479BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8";
     
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
     auto g = DecodeHexString(hex_string, ecg.curve);
-    assert(g == ecg.base);
+    assert(g == base);
 }
 
 
 void TestRandomPoint()
 {
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
     auto p = RandomInteger(1, ecg.order);
     auto q = RandomInteger(1, ecg.order);
     assert(p != q);
 
-    auto P = ecg.curve.Multiply(p, ecg.base);
-    auto Q = ecg.curve.Multiply(q, ecg.base);
+    auto P = ecg.curve.Multiply(p, base);
+    auto Q = ecg.curve.Multiply(q, base);
     assert(P.x != Q.x);
     assert(P.y != Q.y);
 }
@@ -44,6 +47,7 @@ void TestRandomPoint()
 void TestPointCompression()
 {
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
 
     CryptoPP::Integer p;
     CryptoPP::ECPPoint P;
@@ -52,7 +56,7 @@ void TestPointCompression()
 
     for (int i = 0; i < 80; i++) {
         p = RandomInteger(1, ecg.order);
-        P = ecg.curve.Multiply(p, ecg.base);
+        P = ecg.curve.Multiply(p, base);
 
         P_comp = CompressPoint(P);
         P_decomp = DecompressPoint(P_comp, ecg.curve);
@@ -65,13 +69,14 @@ void TestPointCompression()
 void TestWrite()
 {
     auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
     std::string id_file("IDs.txt");
     std::string token_file("tokens.txt");
 
     std::ofstream id_out(id_file);
     CryptoPP::ECPPoint ids[10];
     for (int i = 0; i < 10; i++) {
-        ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), ecg.base);
+        ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), base);
         WriteID(ids[i], id_out);
     }
     id_out.close();
@@ -80,7 +85,7 @@ void TestWrite()
     CryptoPP::ECPPoint tokens[10][5];
     for (int i = 0; i < 10; i++) {
         for (int option = 0; option < 5; option++) {
-            tokens[i][option] = ecg.curve.Multiply(RandomInteger(1, ecg.order), ecg.base);
+            tokens[i][option] = ecg.curve.Multiply(RandomInteger(1, ecg.order), base);
         }
         WriteTokens(tokens[i], 5, token_out);
     }
