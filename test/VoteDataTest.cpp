@@ -23,28 +23,6 @@ void TestReadTokens()
 {
     auto ecg = GenerateECGroup();
     auto base = GenerateECBase();
-    std::string id_file("IDs.txt");
-
-    std::ofstream id_out(id_file);
-    CryptoPP::ECPPoint ids[10];
-    for (int i = 0; i < 10; i++) {
-        ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), base);
-        WriteID(ids[i], id_out);
-    }
-    id_out.close();
-
-    VoteData data(10, 3);
-    data.readIDsFromFile(id_file);
-    for (int i = 0; i < 10; i++) {
-        assert(data.voterID(i) == ids[i]);
-    }
-}
-
-
-void TestReadIDs()
-{
-    auto ecg = GenerateECGroup();
-    auto base = GenerateECBase();
     std::string token_file("tokens.txt");
 
     std::ofstream token_out(token_file);
@@ -64,6 +42,28 @@ void TestReadIDs()
         for (int option = 0; option < 5; option++) {
             assert(data.token(i, option) == tokens[i][option]);
         }
+    }
+}
+
+
+void TestReadIDs()
+{
+    auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
+    std::string id_file("IDs.txt");
+
+    std::ofstream id_out(id_file);
+    CryptoPP::ECPPoint ids[10];
+    for (int i = 0; i < 10; i++) {
+        ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), base);
+        WriteID(ids[i], id_out);
+    }
+    id_out.close();
+
+    VoteData data(10, 3);
+    data.readIDsFromFile(id_file);
+    for (int i = 0; i < 10; i++) {
+        assert(data.voterID(i) == ids[i]);
     }
 }
 

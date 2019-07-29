@@ -3,6 +3,7 @@
 
 
 #include "Verifier.hpp"
+#include <array>
 #include <set>
 
 
@@ -44,14 +45,14 @@ private:
     const int num_voters_;
     const int num_options_;
 
-    CryptoPP::ECPPoint* voter_ids_;
-    CryptoPP::ECPPoint** tokens_;
+    std::vector<CryptoPP::ECPPoint> voter_ids_;
+    std::vector< std::vector<CryptoPP::ECPPoint> > tokens_;
 
-    char** key_hashes_;
-    char** vote_hashes_;
+    std::vector< std::array<char, 32> > key_hashes_;
+    std::vector< std::array<char, 32> > vote_hashes_;
 
-    std::string* options_;
-    std::string* ip_addrs_;
+    std::vector<std::string> options_;
+    std::vector<std::string> ip_addrs_;
     std::set<int> bad_senders_;
 
     Verifier* verifier_ = nullptr;

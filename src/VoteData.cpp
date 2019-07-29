@@ -6,38 +6,19 @@ VoteData::VoteData(int num_voters, int num_options)
                    num_voters_(num_voters), 
                    num_options_(num_options)
 {
-    voter_ids_ = new CryptoPP::ECPPoint[num_voters_];
-    tokens_ = new CryptoPP::ECPPoint*[num_voters_];
-    key_hashes_ = new char*[num_voters_];
-    vote_hashes_ = new char*[num_voters_];
+    voter_ids_.reserve(num_voters_);
+    tokens_.reserve(num_voters_);
 
-    for (int i = 0; i < num_voters_; i++) {
-        tokens_[i] = new CryptoPP::ECPPoint[num_options_];
-        key_hashes_[i] = new char[32];
-        vote_hashes_[i] = new char[32];
-    }
+    key_hashes_.resize(num_voters_);
+    vote_hashes_.resize(num_voters_);
 
-    options_ = new std::string[num_options_];
-    ip_addrs_ = new std::string[num_voters_];
+    options_.resize(num_voters_);
+    ip_addrs_.resize(num_voters_);
 }
 
 
 VoteData::~VoteData()
 {
-    for (int i = 0; i < num_voters_; i++) {
-        delete [] tokens_[i];
-        delete [] key_hashes_[i];
-        delete [] vote_hashes_[i];
-    }
-
-    delete [] voter_ids_;
-    delete [] tokens_;
-    delete [] key_hashes_;
-    delete [] vote_hashes_;
-
-    delete [] options_;
-    delete [] ip_addrs_;
-
     if (verifier_)
         delete verifier_;
 }
@@ -62,11 +43,10 @@ void VoteData::readIDsFromFile(const std::string& filename /*= ID_FILE*/)
 void VoteData::readOptionsFromFile(const std::string& filename /*= OPTION_FILE*/)
 {
     std::ifstream options_in(filename);
-    int i = 0;
-
-    do
-        options_in >> options_[i++];
-    while (!options_in.eof());
+    for (int i = 0; i < num_options_; i++) {
+        options_in >> options_[i];
+        assert(!options_in.eof());
+    }
     options_in.close();
 }
 
@@ -74,11 +54,10 @@ void VoteData::readOptionsFromFile(const std::string& filename /*= OPTION_FILE*/
 void VoteData::readIPsFromFile(const std::string& filename /*= IP_FILE*/)
 {
     std::ifstream ips_in(filename);
-    int i = 0;
-
-    do
-        ips_in >> ip_addrs_[i++];
-    while (!ips_in.eof());    
+    for (int i = 0; i < num_options_; i++) {
+        ips_in >> ip_addrs_[i];
+        assert(!ips_in.eof());
+    } 
     ips_in.close();
 }
 
@@ -118,7 +97,7 @@ void VoteData::setVerifier(const ECGroup& ecg,
                            const CryptoPP::ECPPoint& generator)
 {
     CryptoPP::ECPPoint id_sum;
-    auto* token_sums = new CryptoPP::ECPPoint[num_options_];
+    std::vector<CryptoPP::ECPPoint> token_sums(num_options_);
     for (int i = 0; i < num_voters_; i++) {
         id_sum = ecg.curve.Add(id_sum, voter_ids_[i]);
         for (int option = 0; option < num_options_; option++) {
@@ -127,8 +106,7 @@ void VoteData::setVerifier(const ECGroup& ecg,
         }
     }
 
-    verifier_ = new Verifier(ecg, generator, id_sum, token_sums, num_options_);
-    delete [] token_sums;
+    verifier_ = new Verifier(ecg, generator, id_sum, token_sums);
 }
 
 
@@ -166,7 +144,7 @@ void VoteData::writeVote(const Vote& vote, int index)
     filename += std::to_string(index);
     filename += ".txt";
 
-    vote.hash(vote_hashes_[index]);
+    vote.hash(vote_hashes_[index].data());
 
     std::ofstream vote_out(filename);
     for (int i = 0; i < num_options_; i++) {
@@ -182,7 +160,7 @@ void VoteData::writeKey(const Key& key, int index)
     filename += std::to_string(index);
     filename += ".txt";
 
-    key.hash(key_hashes_[index]);
+    key.hash(key_hashes_[index].data());
 
     std::ofstream key_out(filename);
     for (int i = 0; i < num_options_; i++) {

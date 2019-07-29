@@ -191,3 +191,43 @@ void ReadTokens(std::istream& in,
         tokens[i][option] = CryptoPP::ECPPoint(x, y);
     }
 }
+
+
+void ReadIDs(std::istream& in,
+             std::vector<CryptoPP::ECPPoint>& ids)
+{
+    CryptoPP::Integer x, y;
+
+    in >> x >> std::ws >> y >> std::ws;
+    ids.emplace_back(x, y);
+    while (!in.eof()) {
+        in >> x >> std::ws >> y >> std::ws;
+        ids.emplace_back(x, y);
+    }
+}
+
+
+void ReadTokens(std::istream& in,
+                std::vector< std::vector<CryptoPP::ECPPoint> >& tokens,
+                const int num_options)
+{
+    CryptoPP::Integer x, y;
+    int option = 0;
+
+    std::vector<CryptoPP::ECPPoint> token_row;
+    token_row.reserve(num_options);
+
+    in >> x >> std::ws >> y >> std::ws;
+    token_row.emplace_back(x, y);
+    while (!in.eof()) {
+        if (++option == num_options) {
+            tokens.emplace_back(token_row);
+            token_row.clear();
+            token_row.reserve(num_options);
+            option = 0;
+        }
+        in >> x >> std::ws >> y >> std::ws;
+        token_row.emplace_back(x, y);
+    }
+    tokens.emplace_back(token_row);
+}
