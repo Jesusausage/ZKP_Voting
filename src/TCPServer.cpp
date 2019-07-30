@@ -5,11 +5,12 @@ using namespace boost::asio::ip;
 
 
 TCPServer::TCPServer(boost::asio::io_context& io_context,
-                     std::vector< std::array<char, 32> >& hashes)
+                     char** hashes, size_t hashes_size)
                      :
                      io_context_(io_context),
                      acceptor_(io_context, tcp::endpoint(tcp::v4(), 1337)),
-                     hashes_(hashes)
+                     hashes_(hashes),
+                     hashes_size_(hashes_size)
 {}
 
 
@@ -33,18 +34,9 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
 }
 
 
-std::vector<char> TCPServer::makeMessage()
+boost::asio::mutable_buffer TCPServer::makeMessage()
 {
-    size_t msg_size = hashes_.size() * 32;
-    std::vector<char> ret;
-    ret.reserve(msg_size);
-
-    for (auto hash : hashes_) {
-        for (int i = 0; i < 32; i++)
-            ret.emplace_back(hash[i]);
-    }
-
-    return ret;
+    return boost::asio::buffer(hashes_, hashes_size_);
 }
 
 
@@ -62,9 +54,7 @@ boost::shared_ptr<TCPConnection> TCPConnection::create(
 
 void TCPConnection::start()
 {
-    auto msg = server_->makeMessage();
-
-    boost::asio::async_write(socket_, boost::asio::buffer(msg),
+    boost::asio::async_write(socket_, server_->makeMessage(),
                              boost::bind(&TCPConnection::handleWrite, shared_from_this(),
                                          boost::asio::placeholders::error,
                                          boost::asio::placeholders::bytes_transferred));

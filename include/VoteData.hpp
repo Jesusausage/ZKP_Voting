@@ -47,7 +47,7 @@ private:
     std::vector<CryptoPP::ECPPoint> voter_ids_;
     std::vector< std::vector<CryptoPP::ECPPoint> > tokens_;
 
-    std::vector< std::array<char, 32> > hashes_;
+    char** hashes_;
     std::set< std::array<char, 32> > bad_hashes_;
 
     std::vector<std::string> options_;

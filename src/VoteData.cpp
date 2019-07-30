@@ -12,7 +12,9 @@ VoteData::VoteData(int num_voters, int num_options)
     options_.resize(num_voters_);
     ip_addrs_.resize(num_voters_);
 
-    hashes_.resize(num_voters_);
+    hashes_ = new char*[num_voters_];
+    for (int i = 0; i < num_voters_; i++)
+        hashes_[i] = new char[32];
 }
 
 
@@ -20,6 +22,10 @@ VoteData::~VoteData()
 {
     if (verifier_)
         delete verifier_;
+
+    for (int i = 0; i < num_voters_; i++)
+        delete [] hashes_[i];
+    delete [] hashes_;
 }
 
 
@@ -70,6 +76,7 @@ void VoteData::processHashes(char** hashes, int sender_index)
             if (verifyVote(vote, i) && verifyKey(key, i)) {
                 writeVote(vote, i);
                 writeKey(key, i);
+                writeHash(vote, key, i);
             }
             else
                 addBadHash(hashes[i]);                 
@@ -191,7 +198,7 @@ void VoteData::writeHash(const Vote& vote, const Key& key, int index)
     std::string hash_data = vote.getHashData();
     hash_data += key.getHashData();
 
-    HashTo32(hash_data, hashes_[index].data());
+    HashTo32(hash_data, hashes_[index]);
 }
 
 

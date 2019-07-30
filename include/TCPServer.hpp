@@ -32,15 +32,16 @@ private:
 class TCPServer {
 public:
     TCPServer(boost::asio::io_context& io_context,
-              std::vector< std::array<char, 32> >& hashes);
+              char** hashes, size_t hashes_size);
               
-    std::vector<char> makeMessage();
+    boost::asio::mutable_buffer makeMessage();
 
 private:
     boost::asio::io_context& io_context_;
     boost::asio::ip::tcp::acceptor acceptor_;
 
-    std::vector< std::array<char, 32> >& hashes_;
+    char** hashes_;
+    size_t hashes_size_;
 
     void startAccept();
     void handleAccept(boost::shared_ptr<TCPConnection> new_connection,
