@@ -12,8 +12,7 @@ VoteData::VoteData(int num_voters, int num_options)
     options_.resize(num_voters_);
     ip_addrs_.resize(num_voters_);
 
-    key_hashes_.resize(num_voters_);
-    vote_hashes_.resize(num_voters_);
+    hashes_.resize(num_voters_);
 }
 
 
@@ -62,35 +61,30 @@ void VoteData::readIPsFromFile(const std::string& filename /*= IP_FILE*/)
 }
 
 
-void VoteData::processHashes(char** key_hashes, char** vote_hashes,
-                             int sender_index)
+void VoteData::processHashes(char** hashes, int sender_index)
 {
     for (int i = 0; i < num_voters_; i++) {
-        if (!validateHash(key_hashes[i], vote_hashes[i], i)) {
+        if (!validateHash(hashes[i], i)) {
             auto vote = requestVote(sender_index, i);
-            if (verifyVote(vote, i))
-                writeVote(vote, i);
-            else
-                addBadHash(vote_hashes[i]); 
-
             auto key = requestKey(sender_index, i);
-            if (verifyKey(key, i))
+            if (verifyVote(vote, i) && verifyKey(key, i)) {
+                writeVote(vote, i);
                 writeKey(key, i);
+            }
             else
-                addBadHash(key_hashes[i]);                     
+                addBadHash(hashes[i]);                 
         }
     }
 }
 
 
-bool VoteData::validateHash(char key_hash[32], char vote_hash[32], int i)
+bool VoteData::validateHash(char hash[32], int i)
 {
-    if (badHash(key_hash) || badHash(vote_hash))
+    if (badHash(hash))
         return false;
 
     for (int ch = 0; ch < 32; ch++) {
-        if (key_hash[ch] != key_hashes_[i][ch] ||
-            vote_hash[ch] != vote_hashes_[i][ch]) {
+        if (hash[ch] != hashes_[i][ch]) {
             return false;
         }
     }
@@ -170,8 +164,6 @@ void VoteData::writeVote(const Vote& vote, int index)
     filename += std::to_string(index);
     filename += ".txt";
 
-    vote.hash(vote_hashes_[index].data());
-
     std::ofstream vote_out(filename);
     for (int i = 0; i < num_options_; i++) {
         vote_out << vote.value(i).x << " " << vote.value(i).y << std::endl;
@@ -186,11 +178,26 @@ void VoteData::writeKey(const Key& key, int index)
     filename += std::to_string(index);
     filename += ".txt";
 
-    key.hash(key_hashes_[index].data());
-
     std::ofstream key_out(filename);
     for (int i = 0; i < num_options_; i++) {
         key_out << key.value(i).x << " " << key.value(i).y << std::endl;
     }
     key_out.close();
+}
+
+
+void VoteData::writeHash(const Vote& vote, const Key& key, int index)
+{
+    std::string hash_data = vote.getHashData();
+    hash_data += key.getHashData();
+
+    HashTo32(hash_data, hashes_[index].data());
+}
+
+
+void HashTo32(const std::string& hash_data, char output[32])
+{    
+    CryptoPP::SHA3_256 hash;
+    hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
+    hash.TruncatedFinal((CryptoPP::byte*)output, 32);
 }

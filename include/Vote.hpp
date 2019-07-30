@@ -36,7 +36,7 @@ public:
     void serialise(CryptoPP::byte* output, int& num_options) const;
     Vote(CryptoPP::byte* input, int num_options, const CryptoPP::ECP& ec);
 
-    void hash(char output[32]) const;
+    std::string getHashData() const;
 
 private:
     CryptoPP::ECPPoint* values_ = nullptr;

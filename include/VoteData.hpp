@@ -35,8 +35,7 @@ public:
     void readOptionsFromFile(const std::string& filename = OPTION_FILE);
     void readIPsFromFile(const std::string& filename = IP_FILE);
 
-    void processHashes(char** key_hashes, char** vote_hashes,
-                       int sender_index);
+    void processHashes(char** hashes, int sender_index);
 
     void setVerifier(const ECGroup& ecg,
                      const CryptoPP::ECPPoint& generator);
@@ -48,8 +47,7 @@ private:
     std::vector<CryptoPP::ECPPoint> voter_ids_;
     std::vector< std::vector<CryptoPP::ECPPoint> > tokens_;
 
-    std::vector< std::array<char, 32> > key_hashes_;
-    std::vector< std::array<char, 32> > vote_hashes_;
+    std::vector< std::array<char, 32> > hashes_;
     std::set< std::array<char, 32> > bad_hashes_;
 
     std::vector<std::string> options_;
@@ -58,7 +56,7 @@ private:
     Verifier* verifier_ = nullptr;
 
 
-    bool validateHash(char key_hashes[32], char vote_hashes[32], int i);
+    bool validateHash(char hash[32], int i);
     void addBadHash(char bad_hash[32]);
     bool badHash(char hash[32]);
 
@@ -70,7 +68,11 @@ private:
 
     void writeVote(const Vote& vote, int index);
     void writeKey(const Key& key, int index);
+    void writeHash(const Vote& vote, const Key& key, int index);
 };
+
+
+void HashTo32(const std::string& hash_data, char output[32]);
 
 
 #endif
