@@ -5,13 +5,11 @@ using namespace boost::asio::ip;
 
 
 TCPServer::TCPServer(boost::asio::io_context& io_context,
-                     std::vector< std::array<char, 32> >& vote_hashes,
-                     std::vector< std::array<char, 32> >& key_hashes)
+                     std::vector< std::array<char, 32> >& hashes)
                      :
                      io_context_(io_context),
                      acceptor_(io_context, tcp::endpoint(tcp::v4(), 1337)),
-                     vote_hashes_(vote_hashes),
-                     key_hashes_(key_hashes)
+                     hashes_(hashes)
 {}
 
 
@@ -37,15 +35,11 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
 
 std::vector<char> TCPServer::makeMessage()
 {
-    size_t msg_size = vote_hashes_.size() * 64;
+    size_t msg_size = hashes_.size() * 32;
     std::vector<char> ret;
     ret.reserve(msg_size);
 
-    for (auto hash : vote_hashes_) {
-        for (int i = 0; i < 32; i++)
-            ret.emplace_back(hash[i]);
-    }
-    for (auto hash : key_hashes_) {
+    for (auto hash : hashes_) {
         for (int i = 0; i < 32; i++)
             ret.emplace_back(hash[i]);
     }
