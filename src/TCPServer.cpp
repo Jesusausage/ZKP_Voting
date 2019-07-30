@@ -45,6 +45,10 @@ std::vector<char> TCPServer::makeMessage()
         for (int i = 0; i < 32; i++)
             ret.emplace_back(hash[i]);
     }
+    for (auto hash : key_hashes_) {
+        for (int i = 0; i < 32; i++)
+            ret.emplace_back(hash[i]);
+    }
 
     return ret;
 }
