@@ -8,15 +8,12 @@ KeyGen::KeyGen(const ECGroup& ecg,
                :
                ecg_(ecg),
                gen_(generator),
+               token_sums_(token_sums),
                id_(id),
                num_options_(token_sums.size()),
-               key_(token_sums.size()),
-               prot_(ecg, generator, 0)
-{
-    token_sums_ = new CryptoPP::ECPPoint[num_options_];
-    for (int i = 0; i < num_options_; i++)
-        token_sums_[i] = token_sums[i];
-}
+               prot_(ecg, generator, 0),
+               key_(token_sums.size())
+{}
 
 
 KeyGen::KeyGen(const ECGroup& ecg,
@@ -27,30 +24,15 @@ KeyGen::KeyGen(const ECGroup& ecg,
                :
                ecg_(ecg),
                gen_(generator),
+               token_sums_(token_sums, token_sums + num_options),
                id_(id),
                num_options_(num_options),
-               key_(num_options),
-               prot_(ecg, generator, 0)
-{
-    token_sums_ = new CryptoPP::ECPPoint[num_options_];
-    for (int i = 0; i < num_options_; i++)
-        token_sums_[i] = token_sums[i];
-}
+               prot_(ecg, generator, 0),
+               key_(num_options)
+{}
 
 
-KeyGen::~KeyGen()
-{
-    delete [] token_sums_;
-}
-
-
-void KeyGen::setIDKey(const CryptoPP::Integer& id_key)
-{
-    id_key_ = id_key;
-}
-
-
-Key KeyGen::getKeysAndProofs()
+const Key& KeyGen::getKeysAndProofs()
 {   
     generateKeys();
     return key_;

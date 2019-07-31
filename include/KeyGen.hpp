@@ -17,20 +17,21 @@ public:
            const CryptoPP::ECPPoint token_sums[],
            const CryptoPP::ECPPoint& id,
            const int num_options);
-    ~KeyGen();
 
-    void setIDKey(const CryptoPP::Integer& id_key);
-    Key getKeysAndProofs();
+    inline void setIDKey(const CryptoPP::Integer& id_key)
+        { id_key_ = id_key; }
+    const Key& getKeysAndProofs();
 
 private:
     const ECGroup& ecg_;
     const CryptoPP::ECPPoint& gen_;
+    std::vector<CryptoPP::ECPPoint> token_sums_;
     const CryptoPP::ECPPoint& id_;
-    CryptoPP::ECPPoint* token_sums_;
     const int num_options_;
 
-    ElGamalProtocol prot_;
     CryptoPP::Integer id_key_;
+
+    ElGamalProtocol prot_;
 
     Key key_;
 
