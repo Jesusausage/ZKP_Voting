@@ -11,7 +11,9 @@ TCPServer::TCPServer(boost::asio::io_context& io_context,
                      acceptor_(io_context, tcp::endpoint(tcp::v4(), 1337)),
                      hashes_(hashes),
                      hashes_size_(hashes_size)
-{}
+{
+    startAccept();
+}
 
 
 void TCPServer::startAccept()

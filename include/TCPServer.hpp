@@ -8,25 +8,7 @@
 #include <boost/asio.hpp>
 
 
-class TCPServer;
-
-
-class TCPConnection : public boost::enable_shared_from_this<TCPConnection> {
-public:
-    static boost::shared_ptr<TCPConnection> create(
-                            boost::asio::io_context& io_context,
-                            TCPServer* server);
-    void start();
-    boost::asio::ip::tcp::socket& socket();
-
-private:
-    boost::asio::ip::tcp::socket socket_;
-    TCPServer* server_;
-
-    TCPConnection(boost::asio::io_context& io_context, TCPServer* server);
-
-    void handleWrite(const boost::system::error_code&, size_t);
-};
+class TCPConnection;
 
 
 class TCPServer {
@@ -46,6 +28,24 @@ private:
     void startAccept();
     void handleAccept(boost::shared_ptr<TCPConnection> new_connection,
                       const boost::system::error_code& error);
+};
+
+
+class TCPConnection : public boost::enable_shared_from_this<TCPConnection> {
+public:
+    static boost::shared_ptr<TCPConnection> create(
+                            boost::asio::io_context& io_context,
+                            TCPServer* server);
+    void start();
+    boost::asio::ip::tcp::socket& socket();
+
+private:
+    boost::asio::ip::tcp::socket socket_;
+    TCPServer* server_;
+
+    TCPConnection(boost::asio::io_context& io_context, TCPServer* server);
+
+    void handleWrite(const boost::system::error_code&, size_t);
 };
 
 

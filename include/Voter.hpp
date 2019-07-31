@@ -20,21 +20,25 @@ public:
           const int num_options);
     ~Voter();
 
-    void setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys);
-    void setTokenKeys(const CryptoPP::Integer token_keys[]);
+    inline void setTokenKeys(const std::vector<CryptoPP::Integer>& token_keys)
+        { token_keys_ = token_keys; }
+    inline void setTokenKeys(const CryptoPP::Integer token_keys[])
+        { token_keys_ = std::vector<CryptoPP::Integer>(token_keys, token_keys+num_options_); }
     void castVote(int option);
-    Vote getVoteAndProofs();
+    inline const Vote& getVoteAndProofs() const
+        { return vote_; }
 
 private:
     const ECGroup& ecg_;
     const CryptoPP::ECPPoint& gen_;
     const CryptoPP::ECPPoint& id_sum_;
-    CryptoPP::ECPPoint* tokens_;    
+    const std::vector<CryptoPP::ECPPoint> tokens_;    
     const int num_options_;
+
+    std::vector<CryptoPP::Integer> token_keys_;
 
     ElGamalProtocol* prots_[2];
     OrProtocol* or_prot_;
-    CryptoPP::Integer* token_keys_;
 
     Vote vote_;
 };
