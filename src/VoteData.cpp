@@ -12,9 +12,9 @@ VoteData::VoteData(int num_voters, int num_options)
     options_.resize(num_voters_);
     ip_addrs_.resize(num_voters_);
 
-    hashes_ = new char*[num_voters_];
+    hashes_ = new CryptoPP::byte*[num_voters_];
     for (int i = 0; i < num_voters_; i++)
-        hashes_[i] = new char[32];
+        hashes_[i] = new CryptoPP::byte[32];
 }
 
 
@@ -67,7 +67,7 @@ void VoteData::readIPsFromFile(const std::string& filename /*= IP_FILE*/)
 }
 
 
-void VoteData::processHashes(char** hashes, int sender_index)
+void VoteData::processHashes(CryptoPP::byte** hashes, int sender_index)
 {
     for (int i = 0; i < num_voters_; i++) {
         if (!validateHash(hashes[i], i)) {
@@ -78,14 +78,15 @@ void VoteData::processHashes(char** hashes, int sender_index)
                 writeKey(key, i);
                 writeHash(vote, key, i);
             }
-            else
-                addBadHash(hashes[i]);                 
+            else {
+                addBadHash(hashes[i]);    
+            }
         }
     }
 }
 
 
-bool VoteData::validateHash(char hash[32], int i)
+bool VoteData::validateHash(CryptoPP::byte hash[32], int i)
 {
     if (badHash(hash))
         return false;
@@ -100,9 +101,9 @@ bool VoteData::validateHash(char hash[32], int i)
 }
 
 
-void VoteData::addBadHash(char bad_hash[32])
+void VoteData::addBadHash(CryptoPP::byte bad_hash[32])
 {
-    std::array<char, 32> hash;
+    std::array<CryptoPP::byte, 32> hash;
     for (int i = 0; i < 32; i++)
         hash[i] = bad_hash[i];
 
@@ -110,11 +111,12 @@ void VoteData::addBadHash(char bad_hash[32])
 }
 
 
-bool VoteData::badHash(char hash[32])
+bool VoteData::badHash(CryptoPP::byte hash[32])
 {
-    std::array<char, 32> h;
-    for (int i = 0; i < 32; i++)
+    std::array<CryptoPP::byte, 32> h;
+    for (int i = 0; i < 32; i++) {
         h[i] = hash[i];
+    }
 
     return (bad_hashes_.count(h) > 0);
 }
@@ -139,20 +141,50 @@ void VoteData::setVerifier(const ECGroup& ecg,
 
 Vote VoteData::requestVote(int sender_index, int vote_index)
 {
-    Vote vote; // ask ip_addrs[sender_index] for vote[vote_index]
+    auto ecg = GenerateECGroup();
+    auto gen = GenerateECBase();
+    auto id_sum = ecg.curve.Multiply(27, gen);
+    std::vector<CryptoPP::Integer> token_keys;
+    std::vector<CryptoPP::ECPPoint> tokens;
+    for (int i = 0; i < 3; i++) {
+        token_keys.push_back(RandomInteger(1, ecg.order));
+        tokens.push_back(ecg.curve.Multiply(token_keys[i], gen));
+    }
+
+    Voter voter(ecg, gen, id_sum, tokens);
+    voter.setTokenKeys(token_keys);
+    voter.castVote(1);
+    return voter.getVoteAndProofs();
+
+    Vote vote(3); // ask ip_addrs[sender_index] for vote[vote_index]
     return vote;
 }
 
 
 Key VoteData::requestKey(int sender_index, int key_index)
 {
-    Key key; // ask ip_addrs[sender_index] for key[key_index]
+    auto ecg = GenerateECGroup();
+    auto gen = GenerateECBase();
+    auto id_key = RandomInteger(2, ecg.order);
+    auto id = ecg.curve.Multiply(id_key, gen);
+    std::vector<CryptoPP::ECPPoint> token_sums;
+    for (int i = 0; i < 3; i++) {
+        auto x = RandomInteger(2, ecg.order);
+        token_sums.push_back(ecg.curve.Multiply(x, gen));
+    }
+
+    KeyGen key_gen(ecg, gen, token_sums, id);
+    key_gen.setIDKey(id_key);
+    return key_gen.getKeysAndProofs();
+
+    Key key(3); // ask ip_addrs[sender_index] for key[key_index]
     return key;
 }
 
 
 bool VoteData::verifyVote(const Vote& vote, int index)
 {
+    std::cout << "hi" << std::endl;
     verifier_->setTokens(tokens_[index]); 
     return verifier_->verifyVote(vote);
 }
@@ -160,6 +192,7 @@ bool VoteData::verifyVote(const Vote& vote, int index)
 
 bool VoteData::verifyKey(const Key& key, int index)
 {
+    std::cout << "hi" << std::endl;
     verifier_->setID(voter_ids_[index]);
     return verifier_->verifyKey(key);
 }
@@ -202,9 +235,9 @@ void VoteData::writeHash(const Vote& vote, const Key& key, int index)
 }
 
 
-void HashTo32(const std::string& hash_data, char output[32])
+void HashTo32(const std::string& hash_data, CryptoPP::byte output[32])
 {    
     CryptoPP::SHA3_256 hash;
     hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
-    hash.TruncatedFinal((CryptoPP::byte*)output, 32);
+    hash.TruncatedFinal(output, 32);
 }

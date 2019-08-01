@@ -86,7 +86,7 @@ void TestReadIPs()
 }
 
 
-void TestWriteVote()
+void VoteDataTest::testWriteVote()
 {
     auto ecg = GenerateECGroup();
     auto gen = GenerateECBase();
@@ -104,11 +104,11 @@ void TestWriteVote()
     Vote vote = voter.getVoteAndProofs();
 
     VoteData data(3, 10);
-    // data.writeVote(vote, 0);
+    data.writeVote(vote, 0);
 }
 
 
-void TestWriteKey()
+void VoteDataTest::testWriteKey()
 {
     auto ecg = GenerateECGroup();
     auto gen = GenerateECBase();
@@ -125,5 +125,45 @@ void TestWriteKey()
     Key key = key_gen.getKeysAndProofs();
 
     VoteData data(3, 10);
-    // data.writeKey(key, 0);
+    data.writeKey(key, 0);
+}
+
+
+void VoteDataTest::testProcessHashes()
+{
+    auto ecg = GenerateECGroup();
+    auto gen = GenerateECBase();
+
+    auto id_key = RandomInteger(2, ecg.order);
+    auto id = ecg.curve.Multiply(id_key, gen);
+    auto id_sum = id;
+
+    std::vector<CryptoPP::Integer> token_keys;
+    std::vector<CryptoPP::ECPPoint> tokens;
+    for (int i = 0; i < 3; i++) {
+        token_keys.push_back(RandomInteger(2, ecg.order));
+        tokens.push_back(ecg.curve.Multiply(token_keys[i], gen));
+    }
+    std::vector<CryptoPP::ECPPoint> token_sums = tokens;
+
+    Voter voter(ecg, gen, id_sum, tokens);
+    voter.setTokenKeys(token_keys);
+    voter.castVote(1);
+    Vote vote = voter.getVoteAndProofs();
+
+    KeyGen key_gen(ecg, gen, token_sums, id);
+    key_gen.setIDKey(id_key);
+    Key key = key_gen.getKeysAndProofs();
+
+    std::string hash_data = vote.getHashData();
+    hash_data += key.getHashData();
+
+    CryptoPP::byte** hash = new CryptoPP::byte*[1];
+    hash[0] = new CryptoPP::byte[32];
+    HashTo32(hash_data, hash[0]);
+
+    VoteData data(1, 3);
+    data.processHashes(hash, 0);
+
+    assert(data.badHash(hash[0]));
 }

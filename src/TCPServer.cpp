@@ -5,7 +5,7 @@ using namespace boost::asio::ip;
 
 
 TCPServer::TCPServer(boost::asio::io_context& io_context,
-                     char** hashes, size_t hashes_size)
+                     CryptoPP::byte** hashes, size_t hashes_size)
                      :
                      io_context_(io_context),
                      acceptor_(io_context, tcp::endpoint(tcp::v4(), 1337)),

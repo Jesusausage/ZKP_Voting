@@ -1,7 +1,8 @@
-#ifndef VOTE_DATA_HPP
-#define VOTE_DATA_HPP
+#ifndef TCP_SERVER_HPP
+#define TCP_SERVER_HPP
 
 
+#include "VoteData.hpp"
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -14,7 +15,7 @@ class TCPConnection;
 class TCPServer {
 public:
     TCPServer(boost::asio::io_context& io_context,
-              char** hashes, size_t hashes_size);
+              CryptoPP::byte** hashes, size_t hashes_size);
               
     boost::asio::mutable_buffer makeMessage();
 
@@ -22,7 +23,7 @@ private:
     boost::asio::io_context& io_context_;
     boost::asio::ip::tcp::acceptor acceptor_;
 
-    char** hashes_;
+    CryptoPP::byte** hashes_;
     size_t hashes_size_;
 
     void startAccept();
