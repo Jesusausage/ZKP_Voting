@@ -117,7 +117,7 @@ bool VoteData::badHash(CryptoPP::byte hash[32])
     for (int i = 0; i < 32; i++) {
         h[i] = hash[i];
     }
-    std::cout << bad_hashes_.count(h) << std::endl;
+    
     return (bad_hashes_.count(h) > 0);
 }
 

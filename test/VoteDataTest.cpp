@@ -170,8 +170,18 @@ void VoteDataTest::testProcessHashes()
     data.readIDsFromFile();
     data.readTokensFromFile();
     data.setVerifier(ecg, gen);
-
     data.processHashes(hash, 0);
-
     assert(data.badHash(hash[0]));
+
+    
+    VoteData data2(1, 3);
+    data2.readIDsFromFile();
+    data2.readTokensFromFile();
+    data2.setVerifier(ecg, gen);
+    data2.writeHash(vote, key, 0);
+    data2.processHashes(hash, 0);
+    assert(!data2.badHash(hash[0]));
+
+    delete [] hash[0];
+    delete [] hash;
 }
