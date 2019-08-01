@@ -117,7 +117,7 @@ bool VoteData::badHash(CryptoPP::byte hash[32])
     for (int i = 0; i < 32; i++) {
         h[i] = hash[i];
     }
-
+    std::cout << bad_hashes_.count(h) << std::endl;
     return (bad_hashes_.count(h) > 0);
 }
 
@@ -184,7 +184,6 @@ Key VoteData::requestKey(int sender_index, int key_index)
 
 bool VoteData::verifyVote(const Vote& vote, int index)
 {
-    std::cout << "hi" << std::endl;
     verifier_->setTokens(tokens_[index]); 
     return verifier_->verifyVote(vote);
 }
@@ -192,7 +191,6 @@ bool VoteData::verifyVote(const Vote& vote, int index)
 
 bool VoteData::verifyKey(const Key& key, int index)
 {
-    std::cout << "hi" << std::endl;
     verifier_->setID(voter_ids_[index]);
     return verifier_->verifyKey(key);
 }

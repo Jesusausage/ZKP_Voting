@@ -33,7 +33,7 @@ private:
     const CryptoPP::ECPPoint& gen_;
     const int num_options_;
     
-    const CryptoPP::ECPPoint& id_sum_;
+    const CryptoPP::ECPPoint id_sum_;
     CryptoPP::ECPPoint* tokens_;
 
     CryptoPP::ECPPoint* token_sums_;

@@ -163,6 +163,14 @@ void VoteDataTest::testProcessHashes()
     HashTo32(hash_data, hash[0]);
 
     VoteData data(1, 3);
+    std::ofstream ido("IDs.txt");
+    std::ofstream tokeno("tokens.txt");
+    WriteID(id, ido);
+    WriteTokens(tokens, tokeno);
+    data.readIDsFromFile();
+    data.readTokensFromFile();
+    data.setVerifier(ecg, gen);
+
     data.processHashes(hash, 0);
 
     assert(data.badHash(hash[0]));
