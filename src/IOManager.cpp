@@ -19,7 +19,7 @@ void IOManager::sendVote(int index)
 
     size_t length = 326 * num_options_;
     CryptoPP::byte* output = new CryptoPP::byte[length];
-    ReadVote(index, output, num_options_);
+    VoteData::readVote(index, output, num_options_);
 
     boost::system::error_code ignored_error;
     boost::asio::write(sock, boost::asio::buffer(output, length), ignored_error);
@@ -35,7 +35,7 @@ void IOManager::sendKey(int index)
 
     size_t length = 163 * num_options_;
     CryptoPP::byte* output = new CryptoPP::byte[length];
-    ReadKey(index, output, num_options_);
+    VoteData::readKey(index, output, num_options_);
 
     boost::system::error_code ignored_error;
     boost::asio::write(sock, boost::asio::buffer(output, length), ignored_error);

@@ -56,10 +56,11 @@ boost::shared_ptr<TCPConnection> TCPConnection::create(
 
 void TCPConnection::start()
 {
-    boost::asio::async_write(socket_, server_->makeMessage(),
-                             boost::bind(&TCPConnection::handleWrite, shared_from_this(),
-                                         boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred));
+    // CONNECTION ESTABLISHED, DO STUFF HERE
+
+    // boost::asio::async_write(socket_, server_->makeMessage(),
+    //                          boost::bind(&TCPConnection::handleWrite, 
+    //                                      shared_from_this()));
 }
 
 
@@ -77,5 +78,5 @@ TCPConnection::TCPConnection(boost::asio::io_context& io_context,
 {}
 
 
-void TCPConnection::handleWrite(const boost::system::error_code&, size_t)
+void TCPConnection::handleWrite()
 {}

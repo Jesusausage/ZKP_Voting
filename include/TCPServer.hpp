@@ -46,7 +46,7 @@ private:
 
     TCPConnection(boost::asio::io_context& io_context, TCPServer* server);
 
-    void handleWrite(const boost::system::error_code&, size_t);
+    void handleWrite();
 };
 
 

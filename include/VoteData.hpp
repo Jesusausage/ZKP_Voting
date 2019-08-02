@@ -40,6 +40,10 @@ public:
 
     void setVerifier(const ECGroup& ecg,
                      const CryptoPP::ECPPoint& generator);
+       
+    static void readVote(int index, CryptoPP::byte* output, int num_options);
+    static void readKey(int index, CryptoPP::byte* output, int num_options);
+    static void hashTo32(const std::string& hash_data, CryptoPP::byte output[32]);
 
 private:
     const int num_voters_;
@@ -73,9 +77,6 @@ private:
 };
 
 
-void ReadVote(int index, CryptoPP::byte* output, int num_options);
-void ReadKey(int index, CryptoPP::byte* output, int num_options);
-void HashTo32(const std::string& hash_data, CryptoPP::byte output[32]);
 
 
 #endif

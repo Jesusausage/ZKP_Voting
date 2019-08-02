@@ -107,7 +107,7 @@ void VoteDataTest::testWriteVote()
     data.writeVote(vote, 0);
 
     CryptoPP::byte output[3260];
-    ReadVote(0, output, 10);
+    VoteData::readVote(0, output, 10);
     Vote readvote(output, 10, ecg.curve);
 
     for (int i = 0; i < 10; i++) {
@@ -143,7 +143,7 @@ void VoteDataTest::testWriteKey()
     data.writeKey(key, 0);
     
     CryptoPP::byte output[1630];
-    ReadKey(0, output, 10);
+    VoteData::readKey(0, output, 10);
     Key readkey(output, 10, ecg.curve);
 
     for (int i = 0; i < 10; i++) {
@@ -185,7 +185,7 @@ void VoteDataTest::testProcessHashes()
 
     CryptoPP::byte** hash = new CryptoPP::byte*[1];
     hash[0] = new CryptoPP::byte[32];
-    HashTo32(hash_data, hash[0]);
+    VoteData::hashTo32(hash_data, hash[0]);
 
     VoteData data(1, 3);
     std::ofstream ido("IDs.txt");

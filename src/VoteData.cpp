@@ -232,16 +232,7 @@ void VoteData::writeKey(const Key& key, int index)
 }
 
 
-void VoteData::writeHash(const Vote& vote, const Key& key, int index)
-{
-    std::string hash_data = vote.getHashData();
-    hash_data += key.getHashData();
-
-    HashTo32(hash_data, hashes_[index]);
-}
-
-
-void ReadVote(int index, CryptoPP::byte* output, int num_options) 
+void VoteData::readVote(int index, CryptoPP::byte* output, int num_options) 
 {
     std::string filename = VOTE_FILE;
     filename += std::to_string(index);
@@ -252,7 +243,7 @@ void ReadVote(int index, CryptoPP::byte* output, int num_options)
 }
 
 
-void ReadKey(int index, CryptoPP::byte* output, int num_options) 
+void VoteData::readKey(int index, CryptoPP::byte* output, int num_options) 
 {
     std::string filename = KEY_FILE;
     filename += std::to_string(index);
@@ -263,7 +254,16 @@ void ReadKey(int index, CryptoPP::byte* output, int num_options)
 }
 
 
-void HashTo32(const std::string& hash_data, CryptoPP::byte output[32])
+void VoteData::writeHash(const Vote& vote, const Key& key, int index)
+{
+    std::string hash_data = vote.getHashData();
+    hash_data += key.getHashData();
+
+    hashTo32(hash_data, hashes_[index]);
+}
+
+
+void VoteData::hashTo32(const std::string& hash_data, CryptoPP::byte output[32])
 {    
     CryptoPP::SHA3_256 hash;
     hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
