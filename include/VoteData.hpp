@@ -46,7 +46,6 @@ private:
     std::vector< std::vector<CryptoPP::ECPPoint> > tokens_;
     std::vector<std::string> options_;
     std::vector<std::string> ip_addrs_;
-    std::vector<bool> received_;
 
     CryptoPP::byte* hashes_;
     std::set< std::array<CryptoPP::byte, 32> > bad_hashes_;

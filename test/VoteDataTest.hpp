@@ -17,6 +17,7 @@ public:
     static void testWriteVote();
     static void testWriteKey();
     static void testProcessHashes();
+    static void testSuccessfulVote();
 };
 
 

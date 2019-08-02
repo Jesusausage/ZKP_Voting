@@ -176,5 +176,62 @@ void VoteDataTest::testProcessHashes()
 
     VoteData data(ecg, gen, 10, 5);
     data.processVKPair(output, 0);
-    assert(data.badHash(hash + 0));
+    assert(data.badHash(hash));
+}
+
+
+void VoteDataTest::testSuccessfulVote()
+{
+    auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
+
+    std::ofstream token_out(TOKEN_FILE);
+    std::ofstream id_out(ID_FILE);
+
+    CryptoPP::Integer token_keys[10][5];
+    CryptoPP::ECPPoint tokens[10][5];
+    CryptoPP::ECPPoint token_sums[5];
+
+    CryptoPP::Integer id_keys[10];
+    CryptoPP::ECPPoint ids[10];
+    CryptoPP::ECPPoint id_sum;
+
+    for (int i = 0; i < 10; i++) {
+        for (int option = 0; option < 5; option++) {
+            token_keys[i][option] = RandomInteger(1, ecg.order);
+            tokens[i][option] = ecg.curve.Multiply(token_keys[i][option], base);
+            token_sums[option] = ecg.curve.Add(token_sums[option], tokens[i][option]);
+        }
+        WriteTokens(tokens[i], 5, token_out);
+        id_keys[i] = RandomInteger(1, ecg.order);
+        ids[i] = ecg.curve.Multiply(id_keys[i], base);
+        id_sum = ecg.curve.Add(id_sum, ids[i]);
+        WriteID(ids[i], id_out);
+    }
+    token_out.close();
+    id_out.close();
+
+    VoteData data(ecg, base, 10, 5);
+
+    Voter voter(ecg, base, id_sum, tokens[1], 5);
+    voter.setTokenKeys(token_keys[1]);
+    voter.castVote(1);
+    Vote vote = voter.getVoteAndProofs();
+
+    KeyGen key_gen(ecg, base, token_sums, ids[1], 5);
+    key_gen.setIDKey(id_keys[1]);
+    Key key = key_gen.getKeysAndProofs();
+
+    std::string hash_data = vote.getHashData();
+    hash_data += key.getHashData();
+    CryptoPP::byte hash[32];
+    VoteData::hashTo32(hash_data, hash); 
+
+    CryptoPP::byte output[2445];
+    int n;
+    vote.serialise(output, n);
+    key.serialise(output + 1630, n);
+
+    data.processVKPair(output, 1);
+    assert(!data.badHash(hash));
 }

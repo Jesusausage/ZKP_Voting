@@ -8,8 +8,7 @@ VoteData::VoteData(const ECGroup& ecg,
                    ecg_(ecg),
                    gen_(generator),
                    num_voters_(num_voters), 
-                   num_options_(num_options),
-                   received_(num_voters, false)
+                   num_options_(num_options)
 {
     voter_ids_.reserve(num_voters_);
     tokens_.reserve(num_voters_);
@@ -113,7 +112,6 @@ void VoteData::processVKPair(CryptoPP::byte* input, int index)
         writeVote(vote, index);
         writeKey(key, index);
         writeHash(vote, key, index);
-        received_[index] = true;
     }
     else {
         addBadHash(vote, key);

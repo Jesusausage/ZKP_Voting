@@ -47,6 +47,7 @@ int main() {
     VoteDataTest::testWriteVote();
     VoteDataTest::testWriteKey();
     VoteDataTest::testProcessHashes();
+    VoteDataTest::testSuccessfulVote();
     std::cout << "VoteData test success." << std::endl;
 
     return 0;
