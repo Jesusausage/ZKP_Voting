@@ -3,6 +3,7 @@
 
 
 #include "Verifier.hpp"
+#include "Errors.hpp"
 #include <array>
 #include <set>
 
@@ -21,20 +22,6 @@ class VoteData {
 public:
     VoteData(int num_voters, int num_options);
     ~VoteData();
-
-    // inline std::string option(int i) const 
-    //     { return options_[i]; }
-    // inline CryptoPP::ECPPoint voterID(int i) const 
-    //     { return voter_ids_[i]; }
-    // inline CryptoPP::ECPPoint token(int i, int option) const
-    //     { return tokens_[i][option]; }
-    // inline std::string ip(int i) const 
-    //     { return ip_addrs_[i]; }
-
-    void readTokensFromFile(const std::string& filename = TOKEN_FILE);
-    void readIDsFromFile(const std::string& filename = ID_FILE);
-    void readOptionsFromFile(const std::string& filename = OPTION_FILE);
-    void readIPsFromFile(const std::string& filename = IP_FILE);
 
     void processHashes(CryptoPP::byte* hashes, int sender_index);
 
@@ -60,6 +47,11 @@ private:
 
     Verifier* verifier_ = nullptr;
 
+
+    void readTokensFromFile();
+    void readIDsFromFile();
+    void readOptionsFromFile();
+    void readIPsFromFile();
 
     bool validateHash(CryptoPP::byte hash[32], int i);
     void addBadHash(CryptoPP::byte bad_hash[32]);

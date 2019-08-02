@@ -42,10 +42,8 @@ int main() {
     // TestVoteDecryption();
     // std::cout << "Verification test success." << std::endl; 
 
-    VoteDataTest::testReadOptions();
-    VoteDataTest::testReadTokens();
-    VoteDataTest::testReadIDs();
-    VoteDataTest::testReadIPs();
+    VoteDataTest::testReadOptionsAndIPs();
+    VoteDataTest::testReadTokensAndIDs();
     VoteDataTest::testWriteVote();
     VoteDataTest::testWriteKey();
     VoteDataTest::testProcessHashes();

@@ -13,6 +13,11 @@ VoteData::VoteData(int num_voters, int num_options)
     ip_addrs_.resize(num_voters_);
 
     hashes_ = new CryptoPP::byte[num_voters_ * 32];
+
+    readTokensFromFile();
+    readIDsFromFile();
+    readOptionsFromFile();
+    readIPsFromFile();
 }
 
 
@@ -25,25 +30,37 @@ VoteData::~VoteData()
 }
 
 
-void VoteData::readTokensFromFile(const std::string& filename /*= TOKEN_FILE*/)
+void VoteData::readTokensFromFile()
 {
-    std::ifstream token_in(filename);
+    std::ifstream token_in(TOKEN_FILE);
+    if (!token_in.is_open()) {
+        std::cerr << "Error opening tokens file." << std::endl;
+        exit(FILE_OPENING_ERROR);
+    }
     ReadTokens(token_in, tokens_, num_options_);
     token_in.close();
 }
 
 
-void VoteData::readIDsFromFile(const std::string& filename /*= ID_FILE*/)
+void VoteData::readIDsFromFile()
 {
-    std::ifstream id_in(filename);
+    std::ifstream id_in(ID_FILE);
+    if (!id_in.is_open()) {
+        std::cerr << "Error opening tokens file." << std::endl;
+        exit(FILE_OPENING_ERROR);
+    }
     ReadIDs(id_in, voter_ids_);
     id_in.close();
 }
 
 
-void VoteData::readOptionsFromFile(const std::string& filename /*= OPTION_FILE*/)
+void VoteData::readOptionsFromFile()
 {
-    std::ifstream options_in(filename);
+    std::ifstream options_in(OPTION_FILE);
+    if (!options_in.is_open()) {
+        std::cerr << "Error opening tokens file." << std::endl;
+        exit(FILE_OPENING_ERROR);
+    }
     for (int i = 0; i < num_options_; i++) {
         options_in >> options_[i];
         assert(!options_in.eof());
@@ -52,9 +69,13 @@ void VoteData::readOptionsFromFile(const std::string& filename /*= OPTION_FILE*/
 }
 
 
-void VoteData::readIPsFromFile(const std::string& filename /*= IP_FILE*/)
+void VoteData::readIPsFromFile()
 {
-    std::ifstream ips_in(filename);
+    std::ifstream ips_in(IP_FILE);
+    if (!ips_in.is_open()) {
+        std::cerr << "Error opening tokens file." << std::endl;
+        exit(FILE_OPENING_ERROR);
+    }
     for (int i = 0; i < num_options_; i++) {
         ips_in >> ip_addrs_[i];
         assert(!ips_in.eof());

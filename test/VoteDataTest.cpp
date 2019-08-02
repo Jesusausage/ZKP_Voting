@@ -1,88 +1,67 @@
 #include "VoteDataTest.hpp"
 
 
-void VoteDataTest::testReadOptions()
+void VoteDataTest::testReadOptionsAndIPs()
 {
-    std::string filename = "options.txt";
-
-    std::ofstream opts(filename);
+    std::ofstream opts(OPTION_FILE);
     opts << "Celery" << std::endl 
          << "Carrot" << std::endl 
-         << "Onion" << std::endl;
+         << "Onion" << std::endl
+         << "Tomato" << std::endl
+         << "Potato" << std::endl;
     opts.close();
+    std::ofstream ips(IP_FILE);
+    ips << "292.168.27.1" << std::endl 
+         << "192.168.27.2" << std::endl 
+         << "192.168.27.3" << std::endl
+         << "192.168.27.4" << std::endl
+         << "192.168.27.5" << std::endl;
+    ips.close();
 
-    VoteData data(10, 3);
-    data.readOptionsFromFile(filename);
+    VoteData data(10, 5);
+
     assert(data.options_[0] == "Celery");
     assert(data.options_[1] == "Carrot");
     assert(data.options_[2] == "Onion");
+    assert(data.options_[3] == "Tomato");
+    assert(data.options_[4] == "Potato");
+
+    assert(data.ip_addrs_[0] == "292.168.27.1");
+    assert(data.ip_addrs_[1] == "192.168.27.2");
+    assert(data.ip_addrs_[2] == "192.168.27.3");
+    assert(data.ip_addrs_[3] == "192.168.27.4");
+    assert(data.ip_addrs_[4] == "192.168.27.5");
 }
 
 
-void VoteDataTest::testReadTokens()
+void VoteDataTest::testReadTokensAndIDs()
 {
     auto ecg = GenerateECGroup();
     auto base = GenerateECBase();
-    std::string token_file("tokens.txt");
 
-    std::ofstream token_out(token_file);
+    std::ofstream token_out(TOKEN_FILE);
+    std::ofstream id_out(ID_FILE);
     CryptoPP::ECPPoint tokens[10][5];
+    CryptoPP::ECPPoint ids[10];
     for (int i = 0; i < 10; i++) {
         for (int option = 0; option < 5; option++) {
             tokens[i][option] = ecg.curve.Multiply(RandomInteger(1, ecg.order), base);
         }
         WriteTokens(tokens[i], 5, token_out);
+        ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), base);
+        WriteID(ids[i], id_out);
     }
     token_out.close();
+    id_out.close();
 
     VoteData data(10, 5);
-    data.readTokensFromFile(token_file);
 
     for (int i = 0; i < 10; i++) {
         for (int option = 0; option < 5; option++) {
             assert(data.tokens_[i][option] == tokens[i][option]);
         }
-    }
-}
-
-
-void VoteDataTest::testReadIDs()
-{
-    auto ecg = GenerateECGroup();
-    auto base = GenerateECBase();
-    std::string id_file("IDs.txt");
-
-    std::ofstream id_out(id_file);
-    CryptoPP::ECPPoint ids[10];
-    for (int i = 0; i < 10; i++) {
-        ids[i] = ecg.curve.Multiply(RandomInteger(1, ecg.order), base);
-        WriteID(ids[i], id_out);
-    }
-    id_out.close();
-
-    VoteData data(10, 3);
-    data.readIDsFromFile(id_file);
-    for (int i = 0; i < 10; i++) {
         assert(data.voter_ids_[i] == ids[i]);
     }
-}
-
-
-void VoteDataTest::testReadIPs()
-{    
-    std::string filename = "IPs.txt";
-
-    std::ofstream opts(filename);
-    opts << "192.168.27.1" << std::endl 
-         << "192.168.26.1" << std::endl 
-         << "192.168.27.193" << std::endl;
-    opts.close();
-
-    VoteData data(3, 3);
-    data.readIPsFromFile(filename);
-    assert(data.ip_addrs_[0] == "192.168.27.1");
-    assert(data.ip_addrs_[1] == "192.168.26.1");
-    assert(data.ip_addrs_[2] == "192.168.27.193");
 }
 
 
@@ -93,24 +72,24 @@ void VoteDataTest::testWriteVote()
     auto id_sum = ecg.curve.Multiply(27, gen);
     std::vector<CryptoPP::Integer> token_keys;
     std::vector<CryptoPP::ECPPoint> tokens;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
         token_keys.push_back(RandomInteger(1, ecg.order));
         tokens.push_back(ecg.curve.Multiply(token_keys[i], gen));
     }
 
     Voter voter(ecg, gen, id_sum, tokens);
     voter.setTokenKeys(token_keys);
-    voter.castVote(8);
+    voter.castVote(2);
     Vote vote = voter.getVoteAndProofs();
 
-    VoteData data(3, 10);
+    VoteData data(10, 5);
     data.writeVote(vote, 0);
 
-    CryptoPP::byte output[3260];
-    VoteData::readVote(0, output, 10);
-    Vote readvote(output, 10, ecg.curve);
+    CryptoPP::byte output[1630];
+    VoteData::readVote(0, output, 5);
+    Vote readvote(output, 5, ecg.curve);
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
         ElGamalProtocol prot0(ecg, gen, 0);
         ElGamalProtocol prot1(ecg, gen, 1);
         prot0.setParams(id_sum, tokens[i], readvote.value(i));
@@ -130,7 +109,7 @@ void VoteDataTest::testWriteKey()
     auto id_key = RandomInteger(2, ecg.order);
     auto id = ecg.curve.Multiply(id_key, gen);
     std::vector<CryptoPP::ECPPoint> token_sums;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
         auto x = RandomInteger(2, ecg.order);
         token_sums.push_back(ecg.curve.Multiply(x, gen));
     }
@@ -139,14 +118,14 @@ void VoteDataTest::testWriteKey()
     key_gen.setIDKey(id_key);
     Key key = key_gen.getKeysAndProofs();
 
-    VoteData data(3, 10);
+    VoteData data(10, 5);
     data.writeKey(key, 0);
     
-    CryptoPP::byte output[1630];
-    VoteData::readKey(0, output, 10);
-    Key readkey(output, 10, ecg.curve);
+    CryptoPP::byte output[815];
+    VoteData::readKey(0, output, 5);
+    Key readkey(output, 5, ecg.curve);
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
         ElGamalProtocol prot(ecg, gen, 0);
         prot.setParams(token_sums[i], id, readkey.value(i));
         assert(prot.verifyNIZKP(readkey.proof(i)) == true);
@@ -165,7 +144,7 @@ void VoteDataTest::testProcessHashes()
 
     std::vector<CryptoPP::Integer> token_keys;
     std::vector<CryptoPP::ECPPoint> tokens;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 5; i++) {
         token_keys.push_back(RandomInteger(2, ecg.order));
         tokens.push_back(ecg.curve.Multiply(token_keys[i], gen));
     }
@@ -186,21 +165,12 @@ void VoteDataTest::testProcessHashes()
     CryptoPP::byte* hash = new CryptoPP::byte[1 * 32];
     VoteData::hashTo32(hash_data, hash + 0);
 
-    VoteData data(1, 3);
-    std::ofstream ido("IDs.txt");
-    std::ofstream tokeno("tokens.txt");
-    WriteID(id, ido);
-    WriteTokens(tokens, tokeno);
-    data.readIDsFromFile();
-    data.readTokensFromFile();
+    VoteData data(10, 5);
     data.setVerifier(ecg, gen);
     data.processHashes(hash, 0);
     assert(data.badHash(hash + 0));
-
     
-    VoteData data2(1, 3);
-    data2.readIDsFromFile();
-    data2.readTokensFromFile();
+    VoteData data2(10, 5);
     data2.setVerifier(ecg, gen);
     data2.writeHash(vote, key, 0);
     data2.processHashes(hash, 0);
