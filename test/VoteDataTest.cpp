@@ -105,6 +105,18 @@ void VoteDataTest::testWriteVote()
 
     VoteData data(3, 10);
     data.writeVote(vote, 0);
+
+    auto readvote = data.readVote(0);
+    for (int i = 0; i < 10; i++) {
+        ElGamalProtocol prot0(ecg, gen, 0);
+        ElGamalProtocol prot1(ecg, gen, 1);
+        prot0.setParams(id_sum, tokens[i], readvote.value(i));
+        prot1.setParams(id_sum, tokens[i], readvote.value(i));
+
+        SigmaProtocol* prots[2] = {&prot0, &prot1};
+        OrProtocol prot(prots, 2);
+        assert(prot.verifyNIZKP(readvote.proof(i)) == true);
+    }
 }
 
 
@@ -126,6 +138,13 @@ void VoteDataTest::testWriteKey()
 
     VoteData data(3, 10);
     data.writeKey(key, 0);
+    
+    auto readkey = data.readKey(0);
+    for (int i = 0; i < 10; i++) {
+        ElGamalProtocol prot(ecg, gen, 0);
+        prot.setParams(token_sums[i], id, readkey.value(i));
+        assert(prot.verifyNIZKP(readkey.proof(i)) == true);
+    }
 }
 
 

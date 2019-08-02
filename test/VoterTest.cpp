@@ -20,10 +20,10 @@ void TestVoting()
     voter.castVote(8);
     Vote vote = voter.getVoteAndProofs();
 
-    CryptoPP::byte o[3260];
+    char o[3260];
     int n;
-    vote.serialise(o, n);
-    Vote ote(o, n, ecg.curve);
+    vote.serialise((CryptoPP::byte*)o, n);
+    Vote ote((CryptoPP::byte*)o, n, ecg.curve);
 
     // for (int i = 0; i < 10; i++) {
     //     std::cout << i << std::endl;

@@ -32,8 +32,8 @@ int main() {
     // TestElGamalOrNIZKP();
     // std::cout << "OrProtocol test success." << std::endl;
 
-    // TestVoting();
-    // std::cout << "Voter test success." << std::endl;
+    TestVoting();
+    std::cout << "Voter test success." << std::endl;
 
     // TestKeyGeneration();
     // std::cout << "KeyGen test success." << std::endl;

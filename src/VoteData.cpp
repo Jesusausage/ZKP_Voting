@@ -117,7 +117,7 @@ bool VoteData::badHash(CryptoPP::byte hash[32])
     for (int i = 0; i < 32; i++) {
         h[i] = hash[i];
     }
-    
+
     return (bad_hashes_.count(h) > 0);
 }
 
@@ -200,13 +200,17 @@ void VoteData::writeVote(const Vote& vote, int index)
 {
     std::string filename = VOTE_FILE;
     filename += std::to_string(index);
-    filename += ".txt";
 
-    std::ofstream vote_out(filename);
-    for (int i = 0; i < num_options_; i++) {
-        vote_out << vote.value(i).x << " " << vote.value(i).y << std::endl;
-    }
+    size_t length = 326 * num_options_;
+    char* o = new char[length];
+    int n;
+    vote.serialise((CryptoPP::byte*)o, n);
+
+    std::fstream vote_out(filename, std::ios::out | std::ios::binary);
+    vote_out.write(o, length);
     vote_out.close();
+
+    delete [] o;
 }
 
 
@@ -214,13 +218,59 @@ void VoteData::writeKey(const Key& key, int index)
 {
     std::string filename = KEY_FILE;
     filename += std::to_string(index);
-    filename += ".txt";
 
-    std::ofstream key_out(filename);
-    for (int i = 0; i < num_options_; i++) {
-        key_out << key.value(i).x << " " << key.value(i).y << std::endl;
-    }
+    size_t length = 163 * num_options_;
+    char* o = new char[length];
+    int n;
+    key.serialise((CryptoPP::byte*)o, n);
+
+    std::fstream key_out(filename, std::ios::out | std::ios::binary);
+    key_out.write(o, length);
     key_out.close();
+
+    delete [] o;
+}
+
+
+Vote VoteData::readVote(int index) 
+{
+    std::string filename = VOTE_FILE;
+    filename += std::to_string(index);
+
+    size_t length = 326 * num_options_;
+    char* in = new char[length];
+
+    std::fstream vote_in(filename, std::ios::in | std::ios::binary);
+    vote_in.read(in, length);
+    vote_in.close();
+
+    auto ecg = GenerateECGroup();
+    Vote vote((CryptoPP::byte*)in, num_options_, ecg.curve);
+
+    delete [] in;
+
+    return vote;
+}
+
+
+Key VoteData::readKey(int index) 
+{
+    std::string filename = KEY_FILE;
+    filename += std::to_string(index);
+
+    size_t length = 163 * num_options_;
+    char* in = new char[length];
+
+    std::fstream key_in(filename, std::ios::in | std::ios::binary);
+    key_in.read(in, length);
+    key_in.close();
+
+    auto ecg = GenerateECGroup();
+    Key key((CryptoPP::byte*)in, num_options_, ecg.curve);
+
+    delete [] in;
+
+    return key;
 }
 
 
