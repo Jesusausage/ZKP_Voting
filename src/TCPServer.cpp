@@ -4,13 +4,12 @@
 using namespace boost::asio::ip;
 
 
-TCPServer::TCPServer(boost::asio::io_context& io_context,
-                     CryptoPP::byte** hashes, size_t hashes_size)
+TCPServer::TCPServer(const VoteData& vote_data,
+                     boost::asio::io_context& io_context)
                      :
+                     vote_data_(vote_data),
                      io_context_(io_context),
-                     acceptor_(io_context, tcp::endpoint(tcp::v4(), 1337)),
-                     hashes_(hashes),
-                     hashes_size_(hashes_size)
+                     acceptor_(io_context, tcp::endpoint(tcp::v4(), 1337))
 {
     startAccept();
 }
@@ -38,8 +37,20 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
 
 boost::asio::mutable_buffer TCPServer::makeMessage()
 {
-
-    return boost::asio::buffer(hashes_[0], hashes_size_);
+    switch (msg_type_) {
+    case HASHES: 
+        break;
+    case REQUEST:
+        break;
+    case VOTE:
+        break;
+    case KEY:
+        break;
+    default:
+        bool nothing[1];
+        return boost::asio::buffer(nothing, 0);
+        break;
+    }
 }
 
 

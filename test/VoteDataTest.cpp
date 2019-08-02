@@ -1,7 +1,7 @@
 #include "VoteDataTest.hpp"
 
 
-void TestReadOptions()
+void VoteDataTest::testReadOptions()
 {
     std::string filename = "options.txt";
 
@@ -13,13 +13,13 @@ void TestReadOptions()
 
     VoteData data(10, 3);
     data.readOptionsFromFile(filename);
-    assert(data.option(0) == "Celery");
-    assert(data.option(1) == "Carrot");
-    assert(data.option(2) == "Onion");
+    assert(data.options_[0] == "Celery");
+    assert(data.options_[1] == "Carrot");
+    assert(data.options_[2] == "Onion");
 }
 
 
-void TestReadTokens()
+void VoteDataTest::testReadTokens()
 {
     auto ecg = GenerateECGroup();
     auto base = GenerateECBase();
@@ -40,13 +40,13 @@ void TestReadTokens()
 
     for (int i = 0; i < 10; i++) {
         for (int option = 0; option < 5; option++) {
-            assert(data.token(i, option) == tokens[i][option]);
+            assert(data.tokens_[i][option] == tokens[i][option]);
         }
     }
 }
 
 
-void TestReadIDs()
+void VoteDataTest::testReadIDs()
 {
     auto ecg = GenerateECGroup();
     auto base = GenerateECBase();
@@ -63,12 +63,12 @@ void TestReadIDs()
     VoteData data(10, 3);
     data.readIDsFromFile(id_file);
     for (int i = 0; i < 10; i++) {
-        assert(data.voterID(i) == ids[i]);
+        assert(data.voter_ids_[i] == ids[i]);
     }
 }
 
 
-void TestReadIPs()
+void VoteDataTest::testReadIPs()
 {    
     std::string filename = "IPs.txt";
 
@@ -80,9 +80,9 @@ void TestReadIPs()
 
     VoteData data(3, 3);
     data.readIPsFromFile(filename);
-    assert(data.ip(0) == "192.168.27.1");
-    assert(data.ip(1) == "192.168.26.1");
-    assert(data.ip(2) == "192.168.27.193");
+    assert(data.ip_addrs_[0] == "192.168.27.1");
+    assert(data.ip_addrs_[1] == "192.168.26.1");
+    assert(data.ip_addrs_[2] == "192.168.27.193");
 }
 
 

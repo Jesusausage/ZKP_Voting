@@ -32,8 +32,8 @@ int main() {
     // TestElGamalOrNIZKP();
     // std::cout << "OrProtocol test success." << std::endl;
 
-    TestVoting();
-    std::cout << "Voter test success." << std::endl;
+    // TestVoting();
+    // std::cout << "Voter test success." << std::endl;
 
     // TestKeyGeneration();
     // std::cout << "KeyGen test success." << std::endl;
@@ -42,10 +42,10 @@ int main() {
     // TestVoteDecryption();
     // std::cout << "Verification test success." << std::endl; 
 
-    TestReadOptions();
-    TestReadTokens();
-    TestReadIDs();
-    TestReadIPs();
+    VoteDataTest::testReadOptions();
+    VoteDataTest::testReadTokens();
+    VoteDataTest::testReadIDs();
+    VoteDataTest::testReadIPs();
     VoteDataTest::testWriteVote();
     VoteDataTest::testWriteKey();
     VoteDataTest::testProcessHashes();

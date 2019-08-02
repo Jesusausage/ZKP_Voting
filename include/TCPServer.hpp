@@ -14,18 +14,19 @@ class TCPConnection;
 
 class TCPServer {
 public:
-    TCPServer(boost::asio::io_context& io_context,
-              CryptoPP::byte** hashes, size_t hashes_size);
+    TCPServer(const VoteData& vote_data, boost::asio::io_context& io_context);
               
     static enum MsgType { HASHES, REQUEST, VOTE, KEY };
+    inline void setMsgType(MsgType msg_type)
+        { msg_type_ = msg_type; }
     boost::asio::mutable_buffer makeMessage();
 
 private:
+    const VoteData& vote_data_;
     boost::asio::io_context& io_context_;
     boost::asio::ip::tcp::acceptor acceptor_;
 
-    CryptoPP::byte** hashes_;
-    size_t hashes_size_;
+    MsgType msg_type_;
 
     void startAccept();
     void handleAccept(boost::shared_ptr<TCPConnection> new_connection,

@@ -7,14 +7,15 @@
 #include <iostream>
 
 
-void TestReadOptions();
-void TestReadTokens();
-void TestReadIDs();
-void TestReadIPs();
+
 
 
 class VoteDataTest {
 public:
+    static void testReadOptions();
+    static void testReadTokens();
+    static void testReadIDs();
+    static void testReadIPs();
     static void testWriteVote();
     static void testWriteKey();
     static void testProcessHashes();

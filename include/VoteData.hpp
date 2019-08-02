@@ -22,14 +22,14 @@ public:
     VoteData(int num_voters, int num_options);
     ~VoteData();
 
-    inline std::string option(int i) const 
-        { return options_[i]; }
-    inline CryptoPP::ECPPoint voterID(int i) const 
-        { return voter_ids_[i]; }
-    inline CryptoPP::ECPPoint token(int i, int option) const
-        { return tokens_[i][option]; }
-    inline std::string ip(int i) const 
-        { return ip_addrs_[i]; }
+    // inline std::string option(int i) const 
+    //     { return options_[i]; }
+    // inline CryptoPP::ECPPoint voterID(int i) const 
+    //     { return voter_ids_[i]; }
+    // inline CryptoPP::ECPPoint token(int i, int option) const
+    //     { return tokens_[i][option]; }
+    // inline std::string ip(int i) const 
+    //     { return ip_addrs_[i]; }
 
     void readTokensFromFile(const std::string& filename = TOKEN_FILE);
     void readIDsFromFile(const std::string& filename = ID_FILE);
