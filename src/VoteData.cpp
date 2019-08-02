@@ -1,10 +1,15 @@
 #include "VoteData.hpp"
 
 
-VoteData::VoteData(int num_voters, int num_options)
+VoteData::VoteData(const ECGroup& ecg,
+                   const CryptoPP::ECPPoint& generator,
+                   int num_voters, int num_options)
                    :
+                   ecg_(ecg),
+                   gen_(generator),
                    num_voters_(num_voters), 
-                   num_options_(num_options)
+                   num_options_(num_options),
+                   received_(num_voters, false)
 {
     voter_ids_.reserve(num_voters_);
     tokens_.reserve(num_voters_);
@@ -18,6 +23,7 @@ VoteData::VoteData(int num_voters, int num_options)
     readIDsFromFile();
     readOptionsFromFile();
     readIPsFromFile();
+    setVerifier();
 }
 
 
@@ -89,18 +95,58 @@ void VoteData::processHashes(CryptoPP::byte* hashes, int sender_index)
     for (int i = 0; i < num_voters_; i++) {
         int offset = 32 * i;
         if (!validateHash(hashes + offset, i)) {
-            auto vote = requestVote(sender_index, i);
-            auto key = requestKey(sender_index, i);
-            if (verifyVote(vote, i) && verifyKey(key, i)) {
-                writeVote(vote, i);
-                writeKey(key, i);
-                writeHash(vote, key, i);
-            }
-            else {
-                addBadHash(hashes + offset);    
-            }
+            auto msg = makeRequestMsg(i);
+            // SEND MSG TO sender_index
         }
     }
+}
+
+
+void VoteData::processVKPair(CryptoPP::byte* input, int index)
+{
+    size_t vote_length = 326 * num_options_;
+
+    Vote vote(input, num_options_, ecg_.curve);
+    Key key(input + vote_length, num_options_, ecg_.curve);
+
+    if (verifyVote(vote, index) && verifyKey(key, index)) {
+        writeVote(vote, index);
+        writeKey(key, index);
+        writeHash(vote, key, index);
+        received_[index] = true;
+    }
+    else {
+        addBadHash(vote, key);
+    }
+}
+
+
+boost::asio::const_buffer VoteData::makeHashesMsg()
+{
+    size_t length = 32 * num_voters_;
+    return boost::asio::const_buffer(hashes_, length);
+}
+
+
+boost::asio::const_buffer VoteData::makeRequestMsg(int index)
+{
+    int req[1] = { index };
+    return boost::asio::const_buffer(req, 1);
+}
+
+
+boost::asio::const_buffer VoteData::makeVKPairMsg(int index)
+{
+    size_t length = 489 * num_options_;
+    CryptoPP::byte* output = new CryptoPP::byte[length];
+
+    readVote(index, output, num_options_);
+    size_t offset = 326 * num_options_;
+    readKey(index, output + offset, num_options_);
+    auto ret = boost::asio::const_buffer(output, length);
+
+    delete [] output;
+    return ret;
 }
 
 
@@ -120,11 +166,13 @@ bool VoteData::validateHash(CryptoPP::byte hash[32], int i)
 }
 
 
-void VoteData::addBadHash(CryptoPP::byte bad_hash[32])
+void VoteData::addBadHash(const Vote& vote, const Key& key)
 {
+    std::string hash_data = vote.getHashData();
+    hash_data += key.getHashData();
+
     std::array<CryptoPP::byte, 32> hash;
-    for (int i = 0; i < 32; i++)
-        hash[i] = bad_hash[i];
+    hashTo32(hash_data, hash.data()); 
 
     bad_hashes_.insert(hash);
 }
@@ -141,63 +189,19 @@ bool VoteData::badHash(CryptoPP::byte hash[32])
 }
 
 
-void VoteData::setVerifier(const ECGroup& ecg, 
-                           const CryptoPP::ECPPoint& generator)
+void VoteData::setVerifier()
 {
     CryptoPP::ECPPoint id_sum;
     std::vector<CryptoPP::ECPPoint> token_sums(num_options_);
     for (int i = 0; i < num_voters_; i++) {
-        id_sum = ecg.curve.Add(id_sum, voter_ids_[i]);
+        id_sum = ecg_.curve.Add(id_sum, voter_ids_[i]);
         for (int option = 0; option < num_options_; option++) {
-            token_sums[option] = ecg.curve.Add(token_sums[option],
+            token_sums[option] = ecg_.curve.Add(token_sums[option],
                                                tokens_[i][option]);
         }
     }
 
-    verifier_ = new Verifier(ecg, generator, id_sum, token_sums);
-}
-
-
-Vote VoteData::requestVote(int sender_index, int vote_index)
-{
-    auto ecg = GenerateECGroup();
-    auto gen = GenerateECBase();
-    auto id_sum = ecg.curve.Multiply(27, gen);
-    std::vector<CryptoPP::Integer> token_keys;
-    std::vector<CryptoPP::ECPPoint> tokens;
-    for (int i = 0; i < 3; i++) {
-        token_keys.push_back(RandomInteger(1, ecg.order));
-        tokens.push_back(ecg.curve.Multiply(token_keys[i], gen));
-    }
-
-    Voter voter(ecg, gen, id_sum, tokens);
-    voter.setTokenKeys(token_keys);
-    voter.castVote(1);
-    return voter.getVoteAndProofs();
-
-    Vote vote(3); // ask ip_addrs[sender_index] for vote[vote_index]
-    return vote;
-}
-
-
-Key VoteData::requestKey(int sender_index, int key_index)
-{
-    auto ecg = GenerateECGroup();
-    auto gen = GenerateECBase();
-    auto id_key = RandomInteger(2, ecg.order);
-    auto id = ecg.curve.Multiply(id_key, gen);
-    std::vector<CryptoPP::ECPPoint> token_sums;
-    for (int i = 0; i < 3; i++) {
-        auto x = RandomInteger(2, ecg.order);
-        token_sums.push_back(ecg.curve.Multiply(x, gen));
-    }
-
-    KeyGen key_gen(ecg, gen, token_sums, id);
-    key_gen.setIDKey(id_key);
-    return key_gen.getKeysAndProofs();
-
-    Key key(3); // ask ip_addrs[sender_index] for key[key_index]
-    return key;
+    verifier_ = new Verifier(ecg_, gen_, id_sum, token_sums);
 }
 
 

@@ -4,6 +4,7 @@
 
 #include "Verifier.hpp"
 #include "Errors.hpp"
+#include <boost/asio.hpp>
 #include <array>
 #include <set>
 
@@ -20,30 +21,35 @@
 class VoteData {
     friend class VoteDataTest;
 public:
-    VoteData(int num_voters, int num_options);
+    VoteData(const ECGroup& ecg, const CryptoPP::ECPPoint& generator,
+             int num_voters, int num_options);
     ~VoteData();
 
     void processHashes(CryptoPP::byte* hashes, int sender_index);
+    void processVKPair(CryptoPP::byte* input, int index);
 
-    void setVerifier(const ECGroup& ecg,
-                     const CryptoPP::ECPPoint& generator);
+    boost::asio::const_buffer makeHashesMsg();
+    boost::asio::const_buffer makeRequestMsg(int index);
+    boost::asio::const_buffer makeVKPairMsg(int index);
        
     static void readVote(int index, CryptoPP::byte* output, int num_options);
     static void readKey(int index, CryptoPP::byte* output, int num_options);
     static void hashTo32(const std::string& hash_data, CryptoPP::byte output[32]);
 
 private:
+    const ECGroup& ecg_;
+    const CryptoPP::ECPPoint& gen_;
     const int num_voters_;
     const int num_options_;
 
     std::vector<CryptoPP::ECPPoint> voter_ids_;
     std::vector< std::vector<CryptoPP::ECPPoint> > tokens_;
+    std::vector<std::string> options_;
+    std::vector<std::string> ip_addrs_;
+    std::vector<bool> received_;
 
     CryptoPP::byte* hashes_;
     std::set< std::array<CryptoPP::byte, 32> > bad_hashes_;
-
-    std::vector<std::string> options_;
-    std::vector<std::string> ip_addrs_;
 
     Verifier* verifier_ = nullptr;
 
@@ -52,13 +58,11 @@ private:
     void readIDsFromFile();
     void readOptionsFromFile();
     void readIPsFromFile();
+    void setVerifier();
 
     bool validateHash(CryptoPP::byte hash[32], int i);
-    void addBadHash(CryptoPP::byte bad_hash[32]);
+    void addBadHash(const Vote& vote, const Key& key);
     bool badHash(CryptoPP::byte hash[32]);
-
-    Vote requestVote(int sender_index, int vote_index);
-    Key requestKey(int sender_index, int key_index);
 
     bool verifyVote(const Vote& vote, int index);
     bool verifyKey(const Key& key, int index);

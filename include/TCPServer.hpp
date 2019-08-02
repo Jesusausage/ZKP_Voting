@@ -6,7 +6,6 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/asio.hpp>
 
 
 class TCPConnection;
@@ -16,7 +15,7 @@ class TCPServer {
 public:
     TCPServer(const VoteData& vote_data, boost::asio::io_context& io_context);
               
-    static enum MsgType { HASHES, REQUEST, VOTE, KEY };
+    static enum MsgType { HASHES, REQUEST, VKPAIR };
     inline void setMsgType(MsgType msg_type)
         { msg_type_ = msg_type; }
     boost::asio::mutable_buffer makeMessage();

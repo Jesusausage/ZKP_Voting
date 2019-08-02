@@ -3,6 +3,9 @@
 
 void VoteDataTest::testReadOptionsAndIPs()
 {
+    auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
+
     std::ofstream opts(OPTION_FILE);
     opts << "Celery" << std::endl 
          << "Carrot" << std::endl 
@@ -18,7 +21,7 @@ void VoteDataTest::testReadOptionsAndIPs()
          << "192.168.27.5" << std::endl;
     ips.close();
 
-    VoteData data(10, 5);
+    VoteData data(ecg, base, 10, 5);
 
     assert(data.options_[0] == "Celery");
     assert(data.options_[1] == "Carrot");
@@ -54,7 +57,7 @@ void VoteDataTest::testReadTokensAndIDs()
     token_out.close();
     id_out.close();
 
-    VoteData data(10, 5);
+    VoteData data(ecg, base, 10, 5);
 
     for (int i = 0; i < 10; i++) {
         for (int option = 0; option < 5; option++) {
@@ -69,6 +72,7 @@ void VoteDataTest::testWriteVote()
 {
     auto ecg = GenerateECGroup();
     auto gen = GenerateECBase();
+
     auto id_sum = ecg.curve.Multiply(27, gen);
     std::vector<CryptoPP::Integer> token_keys;
     std::vector<CryptoPP::ECPPoint> tokens;
@@ -82,7 +86,7 @@ void VoteDataTest::testWriteVote()
     voter.castVote(2);
     Vote vote = voter.getVoteAndProofs();
 
-    VoteData data(10, 5);
+    VoteData data(ecg, gen, 10, 5);
     data.writeVote(vote, 0);
 
     CryptoPP::byte output[1630];
@@ -106,6 +110,7 @@ void VoteDataTest::testWriteKey()
 {
     auto ecg = GenerateECGroup();
     auto gen = GenerateECBase();
+
     auto id_key = RandomInteger(2, ecg.order);
     auto id = ecg.curve.Multiply(id_key, gen);
     std::vector<CryptoPP::ECPPoint> token_sums;
@@ -118,7 +123,7 @@ void VoteDataTest::testWriteKey()
     key_gen.setIDKey(id_key);
     Key key = key_gen.getKeysAndProofs();
 
-    VoteData data(10, 5);
+    VoteData data(ecg, gen, 10, 5);
     data.writeKey(key, 0);
     
     CryptoPP::byte output[815];
@@ -161,20 +166,15 @@ void VoteDataTest::testProcessHashes()
 
     std::string hash_data = vote.getHashData();
     hash_data += key.getHashData();
+    CryptoPP::byte hash[32];
+    VoteData::hashTo32(hash_data, hash); 
 
-    CryptoPP::byte* hash = new CryptoPP::byte[1 * 32];
-    VoteData::hashTo32(hash_data, hash + 0);
+    CryptoPP::byte output[2445];
+    int n;
+    vote.serialise(output, n);
+    key.serialise(output + 1630, n);
 
-    VoteData data(10, 5);
-    data.setVerifier(ecg, gen);
-    data.processHashes(hash, 0);
+    VoteData data(ecg, gen, 10, 5);
+    data.processVKPair(output, 0);
     assert(data.badHash(hash + 0));
-    
-    VoteData data2(10, 5);
-    data2.setVerifier(ecg, gen);
-    data2.writeHash(vote, key, 0);
-    data2.processHashes(hash, 0);
-    assert(!data2.badHash(hash + 0));
-
-    delete [] hash;
 }

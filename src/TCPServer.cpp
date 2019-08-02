@@ -42,9 +42,7 @@ boost::asio::mutable_buffer TCPServer::makeMessage()
         break;
     case REQUEST:
         break;
-    case VOTE:
-        break;
-    case KEY:
+    case VKPAIR:
         break;
     default:
         bool nothing[1];
