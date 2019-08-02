@@ -11,6 +11,8 @@ class IOManager {
 public:
 
 private:
+    boost::asio::io_context io_context_;
+    
 };
 
 

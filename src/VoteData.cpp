@@ -232,45 +232,25 @@ void VoteData::writeKey(const Key& key, int index)
 }
 
 
-Vote VoteData::readVote(int index) 
+void VoteData::readVote(int index, CryptoPP::byte* output) 
 {
     std::string filename = VOTE_FILE;
     filename += std::to_string(index);
 
-    size_t length = 326 * num_options_;
-    char* in = new char[length];
-
     std::fstream vote_in(filename, std::ios::in | std::ios::binary);
-    vote_in.read(in, length);
+    vote_in.read((char*)output, 326 * num_options_);
     vote_in.close();
-
-    auto ecg = GenerateECGroup();
-    Vote vote((CryptoPP::byte*)in, num_options_, ecg.curve);
-
-    delete [] in;
-
-    return vote;
 }
 
 
-Key VoteData::readKey(int index) 
+void VoteData::readKey(int index, CryptoPP::byte* output) 
 {
     std::string filename = KEY_FILE;
     filename += std::to_string(index);
 
-    size_t length = 163 * num_options_;
-    char* in = new char[length];
-
     std::fstream key_in(filename, std::ios::in | std::ios::binary);
-    key_in.read(in, length);
+    key_in.read((char*)output, 163 * num_options_);
     key_in.close();
-
-    auto ecg = GenerateECGroup();
-    Key key((CryptoPP::byte*)in, num_options_, ecg.curve);
-
-    delete [] in;
-
-    return key;
 }
 
 
