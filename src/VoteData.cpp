@@ -232,34 +232,34 @@ void VoteData::writeKey(const Key& key, int index)
 }
 
 
-void VoteData::readVote(int index, CryptoPP::byte* output) 
-{
-    std::string filename = VOTE_FILE;
-    filename += std::to_string(index);
-
-    std::fstream vote_in(filename, std::ios::in | std::ios::binary);
-    vote_in.read((char*)output, 326 * num_options_);
-    vote_in.close();
-}
-
-
-void VoteData::readKey(int index, CryptoPP::byte* output) 
-{
-    std::string filename = KEY_FILE;
-    filename += std::to_string(index);
-
-    std::fstream key_in(filename, std::ios::in | std::ios::binary);
-    key_in.read((char*)output, 163 * num_options_);
-    key_in.close();
-}
-
-
 void VoteData::writeHash(const Vote& vote, const Key& key, int index)
 {
     std::string hash_data = vote.getHashData();
     hash_data += key.getHashData();
 
     HashTo32(hash_data, hashes_[index]);
+}
+
+
+void ReadVote(int index, CryptoPP::byte* output, int num_options) 
+{
+    std::string filename = VOTE_FILE;
+    filename += std::to_string(index);
+
+    std::fstream vote_in(filename, std::ios::in | std::ios::binary);
+    vote_in.read((char*)output, 326 * num_options);
+    vote_in.close();
+}
+
+
+void ReadKey(int index, CryptoPP::byte* output, int num_options) 
+{
+    std::string filename = KEY_FILE;
+    filename += std::to_string(index);
+
+    std::fstream key_in(filename, std::ios::in | std::ios::binary);
+    key_in.read((char*)output, 163 * num_options);
+    key_in.close();
 }
 
 

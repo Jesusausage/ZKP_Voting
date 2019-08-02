@@ -36,9 +36,6 @@ public:
     void readOptionsFromFile(const std::string& filename = OPTION_FILE);
     void readIPsFromFile(const std::string& filename = IP_FILE);
 
-    void readVote(int index, CryptoPP::byte* output);
-    void readKey(int index, CryptoPP::byte* output);
-
     void processHashes(CryptoPP::byte** hashes, int sender_index);
 
     void setVerifier(const ECGroup& ecg,
@@ -76,6 +73,8 @@ private:
 };
 
 
+void ReadVote(int index, CryptoPP::byte* output, int num_options);
+void ReadKey(int index, CryptoPP::byte* output, int num_options);
 void HashTo32(const std::string& hash_data, CryptoPP::byte output[32]);
 
 

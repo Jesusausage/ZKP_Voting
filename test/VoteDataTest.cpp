@@ -107,7 +107,7 @@ void VoteDataTest::testWriteVote()
     data.writeVote(vote, 0);
 
     CryptoPP::byte output[3260];
-    data.readVote(0, output);
+    ReadVote(0, output, 10);
     Vote readvote(output, 10, ecg.curve);
 
     for (int i = 0; i < 10; i++) {
@@ -143,9 +143,9 @@ void VoteDataTest::testWriteKey()
     data.writeKey(key, 0);
     
     CryptoPP::byte output[1630];
-    data.readKey(0, output);
+    ReadKey(0, output, 10);
     Key readkey(output, 10, ecg.curve);
-    
+
     for (int i = 0; i < 10; i++) {
         ElGamalProtocol prot(ecg, gen, 0);
         prot.setParams(token_sums[i], id, readkey.value(i));
