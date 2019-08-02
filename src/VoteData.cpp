@@ -12,9 +12,7 @@ VoteData::VoteData(int num_voters, int num_options)
     options_.resize(num_voters_);
     ip_addrs_.resize(num_voters_);
 
-    hashes_ = new CryptoPP::byte*[num_voters_];
-    for (int i = 0; i < num_voters_; i++)
-        hashes_[i] = new CryptoPP::byte[32];
+    hashes_ = new CryptoPP::byte[num_voters_ * 32];
 }
 
 
@@ -23,8 +21,6 @@ VoteData::~VoteData()
     if (verifier_)
         delete verifier_;
 
-    for (int i = 0; i < num_voters_; i++)
-        delete [] hashes_[i];
     delete [] hashes_;
 }
 
@@ -67,10 +63,11 @@ void VoteData::readIPsFromFile(const std::string& filename /*= IP_FILE*/)
 }
 
 
-void VoteData::processHashes(CryptoPP::byte** hashes, int sender_index)
+void VoteData::processHashes(CryptoPP::byte* hashes, int sender_index)
 {
     for (int i = 0; i < num_voters_; i++) {
-        if (!validateHash(hashes[i], i)) {
+        int offset = 32 * i;
+        if (!validateHash(hashes + offset, i)) {
             auto vote = requestVote(sender_index, i);
             auto key = requestKey(sender_index, i);
             if (verifyVote(vote, i) && verifyKey(key, i)) {
@@ -79,7 +76,7 @@ void VoteData::processHashes(CryptoPP::byte** hashes, int sender_index)
                 writeHash(vote, key, i);
             }
             else {
-                addBadHash(hashes[i]);    
+                addBadHash(hashes + offset);    
             }
         }
     }
@@ -91,8 +88,9 @@ bool VoteData::validateHash(CryptoPP::byte hash[32], int i)
     if (badHash(hash))
         return false;
 
+    int offset = 32 * i;
     for (int ch = 0; ch < 32; ch++) {
-        if (hash[ch] != hashes_[i][ch]) {
+        if (hash[ch] != hashes_[offset + ch]) {
             return false;
         }
     }
@@ -259,7 +257,8 @@ void VoteData::writeHash(const Vote& vote, const Key& key, int index)
     std::string hash_data = vote.getHashData();
     hash_data += key.getHashData();
 
-    hashTo32(hash_data, hashes_[index]);
+    int offset = 32 * index;
+    hashTo32(hash_data, hashes_ + offset);
 }
 
 

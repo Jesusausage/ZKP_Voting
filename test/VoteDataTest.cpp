@@ -183,9 +183,8 @@ void VoteDataTest::testProcessHashes()
     std::string hash_data = vote.getHashData();
     hash_data += key.getHashData();
 
-    CryptoPP::byte** hash = new CryptoPP::byte*[1];
-    hash[0] = new CryptoPP::byte[32];
-    VoteData::hashTo32(hash_data, hash[0]);
+    CryptoPP::byte* hash = new CryptoPP::byte[1 * 32];
+    VoteData::hashTo32(hash_data, hash + 0);
 
     VoteData data(1, 3);
     std::ofstream ido("IDs.txt");
@@ -196,7 +195,7 @@ void VoteDataTest::testProcessHashes()
     data.readTokensFromFile();
     data.setVerifier(ecg, gen);
     data.processHashes(hash, 0);
-    assert(data.badHash(hash[0]));
+    assert(data.badHash(hash + 0));
 
     
     VoteData data2(1, 3);
@@ -205,8 +204,7 @@ void VoteDataTest::testProcessHashes()
     data2.setVerifier(ecg, gen);
     data2.writeHash(vote, key, 0);
     data2.processHashes(hash, 0);
-    assert(!data2.badHash(hash[0]));
+    assert(!data2.badHash(hash + 0));
 
-    delete [] hash[0];
     delete [] hash;
 }

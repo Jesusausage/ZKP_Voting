@@ -17,6 +17,7 @@ public:
     TCPServer(boost::asio::io_context& io_context,
               CryptoPP::byte** hashes, size_t hashes_size);
               
+    static enum MsgType { HASHES, REQUEST, VOTE, KEY };
     boost::asio::mutable_buffer makeMessage();
 
 private:

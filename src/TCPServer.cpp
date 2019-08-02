@@ -38,7 +38,8 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
 
 boost::asio::mutable_buffer TCPServer::makeMessage()
 {
-    return boost::asio::buffer(hashes_, hashes_size_);
+
+    return boost::asio::buffer(hashes_[0], hashes_size_);
 }
 
 
