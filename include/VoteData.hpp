@@ -26,16 +26,14 @@ public:
              int num_voters, int num_options);
     ~VoteData();
 
-    void processHashes(CryptoPP::byte* hashes, int sender_index);
+    void processReceived(bool received[]);
     void processVKPair(CryptoPP::byte* input, int index);
 
-    boost::asio::const_buffer makeHashesMsg() const;
-    boost::asio::const_buffer makeRequestMsg(int index) const;
+    boost::asio::const_buffer makeReceivedMsg() const;
     boost::asio::const_buffer makeVKPairMsg(int index) const;
        
     static void readVote(int index, CryptoPP::byte* output, int num_options);
     static void readKey(int index, CryptoPP::byte* output, int num_options);
-    static void hashTo32(const std::string& hash_data, CryptoPP::byte output[32]);
 
 private:
     const ECGroup& ecg_;
@@ -49,8 +47,6 @@ private:
     std::vector<std::string> ip_addrs_;
 
     std::vector<bool> received_;
-    CryptoPP::byte* hashes_;
-    std::set< std::array<CryptoPP::byte, 32> > bad_hashes_;
 
     Verifier* verifier_ = nullptr;
 
@@ -65,16 +61,11 @@ private:
     void readIPsFromFile();
     void setVerifier();
 
-    bool validateHash(CryptoPP::byte hash[32], int i);
-    void addBadHash(const Vote& vote, const Key& key);
-    bool badHash(CryptoPP::byte hash[32]);
-
     bool verifyVote(const Vote& vote, int index);
     bool verifyKey(const Key& key, int index);
 
     void writeVote(const Vote& vote, int index);
     void writeKey(const Key& key, int index);
-    void writeHash(const Vote& vote, const Key& key, int index);
 };
 
 

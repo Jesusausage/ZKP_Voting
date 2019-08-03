@@ -1,49 +1,34 @@
 #include <boost/asio.hpp>
 #include <iostream>
-#include <cryptopp/integer.h>
-#include "KeyGen.hpp"
-#include "Verifier.hpp"
 
 
 int main(int argc, char** argv)
 {
+    using namespace boost::asio::ip;
+
     if (argc != 2)
         return 1;
 
     boost::asio::io_context io_context;
-    boost::asio::ip::tcp::resolver resolver(io_context);
-    boost::asio::ip::tcp::resolver::results_type endpoints =
-        resolver.resolve(argv[1], "1300");
+    tcp::resolver resolver(io_context);
+    tcp::resolver::results_type endpoints = resolver.resolve(argv[1], "1300");
 
-    boost::asio::ip::tcp::socket socket(io_context);
+    tcp::socket socket(io_context);
     boost::asio::connect(socket, endpoints);
 
-    int size[1];
-    boost::system::error_code error;
-    boost::asio::read(socket, boost::asio::buffer(size), 
-                      boost::asio::transfer_exactly(4));
-    
-    assert(size[0] == 10);
+    {
+        std::cout << "reading..." << std::endl;
+        boost::asio::streambuf msg_in;
 
-    CryptoPP::byte msg[1630];
-    boost::asio::read(socket, boost::asio::buffer(msg));
+        size_t len = boost::asio::read_until(socket, msg_in, "\r\n\r\n");
 
-    auto ecg = GenerateECGroup();
-    auto gen = ecg.base;
-    auto id_key = CryptoPP::Integer(27);
-    auto id = ecg.curve.Multiply(id_key, gen);
-    std::vector<CryptoPP::ECPPoint> token_sums;
-    for (int i = 0; i < 10; i++) {
-        token_sums.push_back(ecg.curve.Multiply(42 + i, gen));
+        std::cout << "...finished:" << std::endl;
+        std::cout << &msg_in << std::endl;
     }
 
-    Key ey(msg, 10, ecg.curve);
-    for (int i = 0; i < 10; i++) {
-        std::cout << i << std::endl;
-        ElGamalProtocol prot(ecg, gen, 0);
-        prot.setParams(token_sums[i], id, ey.value(i));
-        assert(prot.verifyNIZKP(ey.proof(i)) == true);
-    }
+    std::string msg_out = "hello from client\r\n\r\n";
+    boost::system::error_code ignored_error;
+    boost::asio::write(socket, boost::asio::buffer(msg_out), ignored_error);
 
     return 0;
 }

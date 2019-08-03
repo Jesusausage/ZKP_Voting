@@ -6,3 +6,4 @@ Release/*
 *.json
 *.txt
 output/*
+include/temp

@@ -1,41 +1,33 @@
 #include <boost/asio.hpp>
 #include <iostream>
-#include <cryptopp/integer.h>
-#include "KeyGen.hpp"
 
 
 int main()
 {
-    using namespace boost::asio;
+    using namespace boost::asio::ip;
 
-    io_context io_context;
-    ip::tcp::acceptor acceptor(io_context, ip::tcp::endpoint(ip::tcp::v4(), 1300));
+    boost::asio::io_context io;
+    tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 1300));
 
     while (true) {
-        ip::tcp::socket socket(io_context);
-        acceptor.accept(socket);
-
-        auto ecg = GenerateECGroup();
-        auto gen = ecg.base;
-        auto id_key = CryptoPP::Integer(27);
-        auto id = ecg.curve.Multiply(id_key, gen);
-        std::vector<CryptoPP::ECPPoint> token_sums;
-        for (int i = 0; i < 10; i++) {
-            token_sums.push_back(ecg.curve.Multiply(42 + i, gen));
-        }
-
-        KeyGen key_gen(ecg, gen, token_sums, id);
-        key_gen.setIDKey(id_key);
-        Key key = key_gen.getKeysAndProofs();
-        CryptoPP::byte msg[1630];
-        int opts[1];
-        key.serialise(msg, opts[0]);        
+        tcp::socket socket(io);
+        acceptor.accept(socket);      
 
         std::cout << "running" << std::endl;
 
+        std::string msg_out = "hello from server\r\n\r\n";
         boost::system::error_code ignored_error;
-        boost::asio::write(socket, buffer(opts), ignored_error);
-        boost::asio::write(socket, buffer(msg), ignored_error);
+        boost::asio::write(socket, boost::asio::buffer(msg_out), ignored_error);
+
+        {
+            std::cout << "reading..." << std::endl;
+            boost::asio::streambuf msg_in;
+
+            size_t len = boost::asio::read_until(socket, msg_in, "\r\n\r\n");
+
+            std::cout << "...finished:" << std::endl;
+            std::cout << &msg_in << std::endl;
+        }
     }
 
     return 0;
