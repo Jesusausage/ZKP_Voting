@@ -9,6 +9,7 @@ VoteData::VoteData(const ECGroup& ecg,
                    gen_(generator),
                    num_voters_(num_voters), 
                    num_options_(num_options),
+                   received_(num_voters, false),
                    client_(*this, io_context_),
                    server_(*this, &client_, io_context_)
 {
@@ -91,18 +92,6 @@ void VoteData::readIPsFromFile()
 }
 
 
-void VoteData::processHashes(CryptoPP::byte* hashes, int sender_index)
-{
-    for (int i = 0; i < num_voters_; i++) {
-        int offset = 32 * i;
-        if (!validateHash(hashes + offset, i)) {
-            auto msg = makeRequestMsg(i);
-            // SEND MSG TO sender_index
-        }
-    }
-}
-
-
 void VoteData::processVKPair(CryptoPP::byte* input, int index)
 {
     size_t vote_length = 326 * num_options_;
@@ -114,17 +103,11 @@ void VoteData::processVKPair(CryptoPP::byte* input, int index)
         writeVote(vote, index);
         writeKey(key, index);
         writeHash(vote, key, index);
+        received_[index] = true;
     }
     else {
         addBadHash(vote, key);
     }
-}
-
-
-boost::asio::const_buffer VoteData::makeHashesMsg() const
-{
-    size_t length = 32 * num_voters_;
-    return boost::asio::const_buffer(hashes_, length);
 }
 
 
@@ -147,45 +130,6 @@ boost::asio::const_buffer VoteData::makeVKPairMsg(int index) const
 
     delete [] output;
     return ret;
-}
-
-
-bool VoteData::validateHash(CryptoPP::byte hash[32], int i)
-{
-    if (badHash(hash))
-        return false;
-
-    int offset = 32 * i;
-    for (int ch = 0; ch < 32; ch++) {
-        if (hash[ch] != hashes_[offset + ch]) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-void VoteData::addBadHash(const Vote& vote, const Key& key)
-{
-    std::string hash_data = vote.getHashData();
-    hash_data += key.getHashData();
-
-    std::array<CryptoPP::byte, 32> hash;
-    hashTo32(hash_data, hash.data()); 
-
-    bad_hashes_.insert(hash);
-}
-
-
-bool VoteData::badHash(CryptoPP::byte hash[32])
-{
-    std::array<CryptoPP::byte, 32> h;
-    for (int i = 0; i < 32; i++) {
-        h[i] = hash[i];
-    }
-
-    return (bad_hashes_.count(h) > 0);
 }
 
 
@@ -277,6 +221,14 @@ void VoteData::readKey(int index, CryptoPP::byte* output, int num_options)
 }
 
 
+void VoteData::hashTo32(const std::string& hash_data, CryptoPP::byte output[32])
+{    
+    CryptoPP::SHA3_256 hash;
+    hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
+    hash.TruncatedFinal(output, 32);
+}
+
+
 void VoteData::writeHash(const Vote& vote, const Key& key, int index)
 {
     std::string hash_data = vote.getHashData();
@@ -287,9 +239,59 @@ void VoteData::writeHash(const Vote& vote, const Key& key, int index)
 }
 
 
-void VoteData::hashTo32(const std::string& hash_data, CryptoPP::byte output[32])
-{    
-    CryptoPP::SHA3_256 hash;
-    hash.Update((CryptoPP::byte*)hash_data.data(), hash_data.size());
-    hash.TruncatedFinal(output, 32);
+void VoteData::processHashes(CryptoPP::byte* hashes, int sender_index)
+{
+    for (int i = 0; i < num_voters_; i++) {
+        int offset = 32 * i;
+        if (!validateHash(hashes + offset, i)) {
+            auto msg = makeRequestMsg(i);
+            // SEND MSG TO sender_index
+        }
+    }
+}
+
+
+boost::asio::const_buffer VoteData::makeHashesMsg() const
+{
+    size_t length = 32 * num_voters_;
+    return boost::asio::const_buffer(hashes_, length);
+}
+
+
+bool VoteData::validateHash(CryptoPP::byte hash[32], int i)
+{
+    if (badHash(hash))
+        return false;
+
+    int offset = 32 * i;
+    for (int ch = 0; ch < 32; ch++) {
+        if (hash[ch] != hashes_[offset + ch]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+void VoteData::addBadHash(const Vote& vote, const Key& key)
+{
+    std::string hash_data = vote.getHashData();
+    hash_data += key.getHashData();
+
+    std::array<CryptoPP::byte, 32> hash;
+    hashTo32(hash_data, hash.data()); 
+
+    bad_hashes_.insert(hash);
+}
+
+
+bool VoteData::badHash(CryptoPP::byte hash[32])
+{
+    std::array<CryptoPP::byte, 32> h;
+    for (int i = 0; i < 32; i++) {
+        h[i] = hash[i];
+    }
+
+    return (bad_hashes_.count(h) > 0);
 }
