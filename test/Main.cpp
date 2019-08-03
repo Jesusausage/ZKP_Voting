@@ -6,6 +6,7 @@
 #include "KeyGenTest.hpp"
 #include "VerifierTest.hpp"
 #include "VoteDataTest.hpp"
+#include "TCPServerTest.hpp"
 
 
 int main() {
@@ -49,6 +50,9 @@ int main() {
     VoteDataTest::testProcessHashes();
     VoteDataTest::testSuccessfulVote();
     std::cout << "VoteData test success." << std::endl;
+
+    TestIntByteConversion();
+    std::cout << "TCPServer test success." << std::endl;
 
     return 0;
 }

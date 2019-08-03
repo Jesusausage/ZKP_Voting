@@ -5,14 +5,34 @@
 using namespace boost::asio::ip;
 
 
-TCPServer::TCPServer(const VoteData& vote_data,
+TCPServer::TCPServer(VoteData& vote_data,
                      boost::asio::io_context& io_context)
                      :
                      vote_data_(vote_data),
                      io_context_(io_context),
-                     acceptor_(io_context, tcp::endpoint(tcp::v4(), 1337))
+                     acceptor_(io_context, tcp::endpoint(tcp::v4(), PORT)),
+                     resolver_(io_context)
+{
+    srand(time(nullptr));
+}
+
+
+void TCPServer::startServer()
 {
     startAccept();
+}
+
+
+void TCPServer::startClient()
+{
+    client_active_ = true;
+    startConnect();
+}
+
+
+void TCPServer::stopClient()
+{
+    client_active_ = false;
 }
 
 
@@ -36,6 +56,32 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
 }
 
 
+void TCPServer::startConnect()
+{
+    int num_voters = vote_data_.numVoters();
+    bool* received = new bool[num_voters];
+
+    while (client_active_) {
+        int ip_index = rand() % num_voters;
+        auto endpoints = resolver_.resolve(vote_data_.ip(ip_index), 
+                                            std::to_string(PORT));
+        tcp::socket socket(io_context_);
+        boost::system::error_code ec;
+        boost::asio::connect(socket, endpoints, ec);
+        if (!ec) {
+            boost::asio::read(socket, 
+                              boost::asio::buffer(received, num_voters));
+            int index = vote_data_.processReceived(received);
+
+            auto buffer = vote_data_.makeVKPairMsg(index);
+            boost::asio::write(socket, buffer);
+        }
+    }
+
+    delete [] received;
+}
+
+
 boost::asio::const_buffer TCPServer::makeReceivedMessage()
 {
     return vote_data_.makeReceivedMsg();
@@ -54,9 +100,9 @@ int TCPServer::numOptions()
 }
 
 
-int TCPServer::waitForResponse(tcp::socket& sock)
+void TCPServer::processVKPair(CryptoPP::byte* data, int index)
 {
-    return 0;
+    vote_data_.processVKPair(data, index);
 }
 
 
@@ -99,22 +145,28 @@ TCPConnection::TCPConnection(boost::asio::io_context& io_context,
 void TCPConnection::handleWrite(const boost::system::error_code& /*error*/,
                                 size_t /*bytes_transferred*/)
 {
-    CryptoPP::byte index[4];
-    boost::asio::read(socket_, boost::asio::buffer(index),
-                      boost::asio::transfer_exactly(4));
-
+    CryptoPP::byte raw_index[4];
     size_t length = 489 * server_->numOptions();
     auto* in = new CryptoPP::byte[length];
 
-    boost::asio::read(socket_, boost::asio::buffer(in, length), 
-                      boost::asio::transfer_exactly(length));
+    boost::asio::read(socket_, boost::asio::buffer(raw_index),
+                      boost::asio::transfer_exactly(4));
+    int index = ByteToInt(raw_index);
+
+    if (index >= 0) {
+        boost::asio::read(socket_, boost::asio::buffer(in, length), 
+                        boost::asio::transfer_exactly(length));  
+        server_->processVKPair(in, index);
+    }
+
+    delete [] in;
 }
 
 
 /* ======================================================================== */
 
 
-int byteToInt(const CryptoPP::byte ch[4])
+int ByteToInt(const CryptoPP::byte ch[4])
 {
     return (int)ch[0] * (int)16777216 
          + (int)ch[1] * (int)65536
@@ -123,7 +175,7 @@ int byteToInt(const CryptoPP::byte ch[4])
 }
 
 
-void intToByte(int n, CryptoPP::byte output[4])
+void IntToByte(int n, CryptoPP::byte output[4])
 {
     int first = n / 16777216;
     output[0] = first;
@@ -133,7 +185,7 @@ void intToByte(int n, CryptoPP::byte output[4])
     output[1] = second;
 
     n %= 65536;
-    int third = n % 256;
+    int third = n / 256;
     output[2] = third;
 
     n %= 256;

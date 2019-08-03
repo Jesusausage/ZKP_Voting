@@ -92,9 +92,15 @@ void VoteData::readIPsFromFile()
 }
 
 
-void VoteData::processReceived(bool received[])
+int VoteData::processReceived(bool received[])
 {
+    for (int i = 0; i < num_voters_; ++i) {
+        if (received[i] == true &&
+            received_[i] == false)
+            return i;
+    }
 
+    return -1;
 }
 
 
@@ -121,11 +127,19 @@ boost::asio::const_buffer VoteData::makeReceivedMsg() const
 
 boost::asio::const_buffer VoteData::makeVKPairMsg(int index) const
 {
-    size_t length = 489 * num_options_;
-    CryptoPP::byte* output = new CryptoPP::byte[length];
+    if (index < 0) {
+        CryptoPP::byte out[4];
+        IntToByte(-1, out);
+        return boost::asio::const_buffer(out, 4);
+    }
 
-    readVote(index, output, num_options_);
-    size_t offset = 326 * num_options_;
+    size_t length = 489 * num_options_ + 4;
+    CryptoPP::byte* output = new CryptoPP::byte[length];
+    
+    IntToByte(index, output);
+    size_t offset = 4;
+    readVote(index, output + offset, num_options_);
+    offset += 326 * num_options_;
     readKey(index, output + offset, num_options_);
     auto ret = boost::asio::const_buffer(output, length);
 

@@ -25,7 +25,7 @@ public:
              int num_voters, int num_options);
     ~VoteData();
 
-    void processReceived(bool received[]);
+    int processReceived(bool received[]);
     void processVKPair(CryptoPP::byte* input, int index);
 
     boost::asio::const_buffer makeReceivedMsg() const;
@@ -33,6 +33,10 @@ public:
 
     inline int numOptions() const
         { return num_options_; }
+    inline int numVoters() const
+        { return num_voters_; }
+    inline std::string ip(int index) const
+        { return ip_addrs_[index]; }
        
     static void readVote(int index, CryptoPP::byte* output, int num_options);
     static void readKey(int index, CryptoPP::byte* output, int num_options);

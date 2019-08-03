@@ -7,9 +7,6 @@
 #include <iostream>
 
 
-
-
-
 class VoteDataTest {
 public:
     static void testReadOptionsAndIPs();

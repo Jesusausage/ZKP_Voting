@@ -9,29 +9,41 @@
 #include <cryptopp/cryptlib.h>
 
 
+static const int PORT = 1337;
+
+
 class TCPConnection;
 class VoteData;
 
 
 class TCPServer {
 public:
-    TCPServer(const VoteData& vote_data, 
+    TCPServer(VoteData& vote_data, 
               boost::asio::io_context& io_context);
+
+    void startServer();
+    void startClient();
+    void stopClient();
               
     boost::asio::const_buffer makeReceivedMessage();
     boost::asio::const_buffer makeVKMessage(int index);
     int numOptions();
 
-    int waitForResponse(boost::asio::ip::tcp::socket& sock);
+    void processVKPair(CryptoPP::byte* data, int index);
 
 private:
-    const VoteData& vote_data_;
+    VoteData& vote_data_;
     boost::asio::io_context& io_context_;
     boost::asio::ip::tcp::acceptor acceptor_;
+    boost::asio::ip::tcp::resolver resolver_;
+
+    bool client_active_ = false;
 
     void startAccept();
     void handleAccept(boost::shared_ptr<TCPConnection> new_connection,
                       const boost::system::error_code& error);
+
+    void startConnect();
 };
 
 
@@ -60,8 +72,8 @@ private:
 /* ====================================================================== */
 
 
-int byteToInt(const CryptoPP::byte ch[4]);
-void intToByte(int n, CryptoPP::byte output[4]);
+int ByteToInt(const CryptoPP::byte ch[4]);
+void IntToByte(int n, CryptoPP::byte output[4]);
 
 
 #endif
