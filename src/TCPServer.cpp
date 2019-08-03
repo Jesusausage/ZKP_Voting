@@ -38,7 +38,7 @@ void TCPServer::stopClient()
 
 void TCPServer::startAccept()
 {
-    boost::shared_ptr<TCPConnection> new_connection = TCPConnection::create(io_context_, this);
+    auto new_connection = TCPConnection::create(io_context_, vote_data_);
     acceptor_.async_accept(new_connection->socket(), 
                            boost::bind(&TCPServer::handleAccept, this,
                                        new_connection,
@@ -82,45 +82,21 @@ void TCPServer::startConnect()
 }
 
 
-boost::asio::const_buffer TCPServer::makeReceivedMessage()
-{
-    return vote_data_.makeReceivedMsg();
-}
-
-
-boost::asio::const_buffer TCPServer::makeVKMessage(int index)
-{
-    return vote_data_.makeVKPairMsg(index);
-}
-
-
-int TCPServer::numOptions()
-{
-    return vote_data_.numOptions();
-}
-
-
-void TCPServer::processVKPair(CryptoPP::byte* data, int index)
-{
-    vote_data_.processVKPair(data, index);
-}
-
-
 /* ======================================================================== */
 
 
 boost::shared_ptr<TCPConnection> TCPConnection::create(
                     boost::asio::io_context& io_context,
-                    TCPServer* server)
+                    VoteData& vote_data)
 {
     return boost::shared_ptr<TCPConnection>(new TCPConnection(io_context, 
-                                                              server));
+                                                              vote_data));
 }
 
 
 void TCPConnection::start()
 {
-    boost::asio::async_write(socket_, server_->makeReceivedMessage(),
+    boost::asio::async_write(socket_, vote_data_.makeReceivedMsg(),
                              boost::bind(&TCPConnection::handleWrite, 
                                          shared_from_this(),
                                          boost::asio::placeholders::error,
@@ -128,17 +104,11 @@ void TCPConnection::start()
 }
 
 
-tcp::socket& TCPConnection::socket()
-{
-    return socket_;
-}
-
-
 TCPConnection::TCPConnection(boost::asio::io_context& io_context,
-                             TCPServer* server)
+                             VoteData& vote_data)
                              :
                              socket_(io_context),
-                             server_(server)
+                             vote_data_(vote_data)
 {}
 
 
@@ -146,7 +116,7 @@ void TCPConnection::handleWrite(const boost::system::error_code& /*error*/,
                                 size_t /*bytes_transferred*/)
 {
     CryptoPP::byte raw_index[4];
-    size_t length = 489 * server_->numOptions();
+    size_t length = 489 * vote_data_.numOptions();
     auto* in = new CryptoPP::byte[length];
 
     boost::asio::read(socket_, boost::asio::buffer(raw_index),
@@ -155,8 +125,8 @@ void TCPConnection::handleWrite(const boost::system::error_code& /*error*/,
 
     if (index >= 0) {
         boost::asio::read(socket_, boost::asio::buffer(in, length), 
-                        boost::asio::transfer_exactly(length));  
-        server_->processVKPair(in, index);
+                          boost::asio::transfer_exactly(length));  
+        vote_data_.processVKPair(in, index);
     }
 
     delete [] in;

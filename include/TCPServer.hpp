@@ -24,12 +24,6 @@ public:
     void startServer();
     void startClient();
     void stopClient();
-              
-    boost::asio::const_buffer makeReceivedMessage();
-    boost::asio::const_buffer makeVKMessage(int index);
-    int numOptions();
-
-    void processVKPair(CryptoPP::byte* data, int index);
 
 private:
     VoteData& vote_data_;
@@ -54,15 +48,17 @@ class TCPConnection : public boost::enable_shared_from_this<TCPConnection> {
 public:
     static boost::shared_ptr<TCPConnection> create(
                             boost::asio::io_context& io_context,
-                            TCPServer* server);
+                            VoteData& vote_data);
     void start();
-    boost::asio::ip::tcp::socket& socket();
+    inline boost::asio::ip::tcp::socket& socket()
+        { return socket_; }
 
 private:
     boost::asio::ip::tcp::socket socket_;
-    TCPServer* server_;
+    VoteData& vote_data_;
 
-    TCPConnection(boost::asio::io_context& io_context, TCPServer* server);
+    TCPConnection(boost::asio::io_context& io_context, 
+                  VoteData& vote_data);
 
     void handleWrite(const boost::system::error_code& /*error*/,
                      size_t /*bytes_transferred*/);
