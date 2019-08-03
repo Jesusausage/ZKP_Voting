@@ -2,35 +2,41 @@
 #define TCP_SERVER_HPP
 
 
-#include "VoteData.hpp"
+#include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
 
 class TCPConnection;
+class TCPClient;
+class VoteData;
 
 
 class TCPServer {
 public:
-    TCPServer(const VoteData& vote_data, boost::asio::io_context& io_context);
+    TCPServer(const VoteData& vote_data, 
+              TCPClient* client,
+              boost::asio::io_context& io_context);
               
-    static enum MsgType { HASHES, REQUEST, VKPAIR };
-    inline void setMsgType(MsgType msg_type)
-        { msg_type_ = msg_type; }
-    boost::asio::mutable_buffer makeMessage();
+    boost::asio::const_buffer makeHashesMessage();
+    boost::asio::const_buffer makeVKMessage(int index);
+
+    int waitForClientRequest(boost::asio::ip::tcp::socket& sock);
 
 private:
     const VoteData& vote_data_;
+    TCPClient* client_;
     boost::asio::io_context& io_context_;
     boost::asio::ip::tcp::acceptor acceptor_;
-
-    MsgType msg_type_;
 
     void startAccept();
     void handleAccept(boost::shared_ptr<TCPConnection> new_connection,
                       const boost::system::error_code& error);
 };
+
+
+/* ====================================================================== */
 
 
 class TCPConnection : public boost::enable_shared_from_this<TCPConnection> {
@@ -47,7 +53,8 @@ private:
 
     TCPConnection(boost::asio::io_context& io_context, TCPServer* server);
 
-    void handleWrite();
+    void handleWrite(const boost::system::error_code& /*error*/,
+                     size_t /*bytes_transferred*/);
 };
 
 

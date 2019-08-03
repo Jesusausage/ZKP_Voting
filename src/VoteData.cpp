@@ -8,7 +8,9 @@ VoteData::VoteData(const ECGroup& ecg,
                    ecg_(ecg),
                    gen_(generator),
                    num_voters_(num_voters), 
-                   num_options_(num_options)
+                   num_options_(num_options),
+                   client_(*this, io_context_),
+                   server_(*this, &client_, io_context_)
 {
     voter_ids_.reserve(num_voters_);
     tokens_.reserve(num_voters_);
@@ -119,21 +121,21 @@ void VoteData::processVKPair(CryptoPP::byte* input, int index)
 }
 
 
-boost::asio::const_buffer VoteData::makeHashesMsg()
+boost::asio::const_buffer VoteData::makeHashesMsg() const
 {
     size_t length = 32 * num_voters_;
     return boost::asio::const_buffer(hashes_, length);
 }
 
 
-boost::asio::const_buffer VoteData::makeRequestMsg(int index)
+boost::asio::const_buffer VoteData::makeRequestMsg(int index) const
 {
     int req[1] = { index };
     return boost::asio::const_buffer(req, 1);
 }
 
 
-boost::asio::const_buffer VoteData::makeVKPairMsg(int index)
+boost::asio::const_buffer VoteData::makeVKPairMsg(int index) const
 {
     size_t length = 489 * num_options_;
     CryptoPP::byte* output = new CryptoPP::byte[length];

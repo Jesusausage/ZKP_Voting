@@ -1,13 +1,17 @@
 #include "TCPServer.hpp"
+#include "TCPClient.hpp"
+#include "VoteData.hpp"
 
 
 using namespace boost::asio::ip;
 
 
 TCPServer::TCPServer(const VoteData& vote_data,
+                     TCPClient* client,
                      boost::asio::io_context& io_context)
                      :
                      vote_data_(vote_data),
+                     client_(client),
                      io_context_(io_context),
                      acceptor_(io_context, tcp::endpoint(tcp::v4(), 1337))
 {
@@ -35,20 +39,21 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
 }
 
 
-boost::asio::mutable_buffer TCPServer::makeMessage()
+boost::asio::const_buffer TCPServer::makeHashesMessage()
 {
-    switch (msg_type_) {
-    case HASHES: 
-        break;
-    case REQUEST:
-        break;
-    case VKPAIR:
-        break;
-    default:
-        bool nothing[1];
-        return boost::asio::buffer(nothing, 0);
-        break;
-    }
+    return vote_data_.makeHashesMsg();
+}
+
+
+boost::asio::const_buffer TCPServer::makeVKMessage(int index)
+{
+    return vote_data_.makeVKPairMsg(index);
+}
+
+
+int TCPServer::waitForClientRequest(tcp::socket& sock)
+{
+    return client_->receiveRequest(sock);
 }
 
 
@@ -66,11 +71,11 @@ boost::shared_ptr<TCPConnection> TCPConnection::create(
 
 void TCPConnection::start()
 {
-    // CONNECTION ESTABLISHED, DO STUFF HERE
-
-    // boost::asio::async_write(socket_, server_->makeMessage(),
-    //                          boost::bind(&TCPConnection::handleWrite, 
-    //                                      shared_from_this()));
+    boost::asio::async_write(socket_, server_->makeHashesMessage(),
+                             boost::bind(&TCPConnection::handleWrite, 
+                                         shared_from_this(),
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
 }
 
 
@@ -88,5 +93,14 @@ TCPConnection::TCPConnection(boost::asio::io_context& io_context,
 {}
 
 
-void TCPConnection::handleWrite()
-{}
+void TCPConnection::handleWrite(const boost::system::error_code& /*error*/,
+                                size_t /*bytes_transferred*/)
+{
+    int request = server_->waitForClientRequest(socket_);
+
+    boost::asio::async_write(socket_, server_->makeVKMessage(request), 
+                             boost::bind(&TCPConnection::handleWrite,
+                                         shared_from_this(),
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
+}

@@ -4,7 +4,8 @@
 
 #include "Verifier.hpp"
 #include "Errors.hpp"
-#include <boost/asio.hpp>
+#include "TCPServer.hpp"
+#include "TCPClient.hpp"
 #include <array>
 #include <set>
 
@@ -28,9 +29,9 @@ public:
     void processHashes(CryptoPP::byte* hashes, int sender_index);
     void processVKPair(CryptoPP::byte* input, int index);
 
-    boost::asio::const_buffer makeHashesMsg();
-    boost::asio::const_buffer makeRequestMsg(int index);
-    boost::asio::const_buffer makeVKPairMsg(int index);
+    boost::asio::const_buffer makeHashesMsg() const;
+    boost::asio::const_buffer makeRequestMsg(int index) const;
+    boost::asio::const_buffer makeVKPairMsg(int index) const;
        
     static void readVote(int index, CryptoPP::byte* output, int num_options);
     static void readKey(int index, CryptoPP::byte* output, int num_options);
@@ -51,6 +52,10 @@ private:
     std::set< std::array<CryptoPP::byte, 32> > bad_hashes_;
 
     Verifier* verifier_ = nullptr;
+
+    boost::asio::io_context io_context_;
+    TCPClient client_;
+    TCPServer server_;    
 
 
     void readTokensFromFile();
