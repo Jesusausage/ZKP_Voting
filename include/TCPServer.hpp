@@ -6,27 +6,26 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <cryptopp/cryptlib.h>
 
 
 class TCPConnection;
-class TCPClient;
 class VoteData;
 
 
 class TCPServer {
 public:
     TCPServer(const VoteData& vote_data, 
-              TCPClient* client,
               boost::asio::io_context& io_context);
               
-    boost::asio::const_buffer makeHashesMessage();
+    boost::asio::const_buffer makeReceivedMessage();
     boost::asio::const_buffer makeVKMessage(int index);
+    int numOptions();
 
-    int waitForClientRequest(boost::asio::ip::tcp::socket& sock);
+    int waitForResponse(boost::asio::ip::tcp::socket& sock);
 
 private:
     const VoteData& vote_data_;
-    TCPClient* client_;
     boost::asio::io_context& io_context_;
     boost::asio::ip::tcp::acceptor acceptor_;
 
@@ -56,6 +55,13 @@ private:
     void handleWrite(const boost::system::error_code& /*error*/,
                      size_t /*bytes_transferred*/);
 };
+
+
+/* ====================================================================== */
+
+
+int byteToInt(const CryptoPP::byte ch[4]);
+void intToByte(int n, CryptoPP::byte output[4]);
 
 
 #endif

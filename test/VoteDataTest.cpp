@@ -164,11 +164,6 @@ void VoteDataTest::testProcessHashes()
     key_gen.setIDKey(id_key);
     Key key = key_gen.getKeysAndProofs();
 
-    std::string hash_data = vote.getHashData();
-    hash_data += key.getHashData();
-    CryptoPP::byte hash[32];
-    VoteData::hashTo32(hash_data, hash); 
-
     CryptoPP::byte output[2445];
     int n;
     vote.serialise(output, n);
@@ -176,7 +171,7 @@ void VoteDataTest::testProcessHashes()
 
     VoteData data(ecg, gen, 10, 5);
     data.processVKPair(output, 0);
-    assert(data.badHash(hash));
+    assert(data.received_[0] == false);
 }
 
 
@@ -222,16 +217,11 @@ void VoteDataTest::testSuccessfulVote()
     key_gen.setIDKey(id_keys[1]);
     Key key = key_gen.getKeysAndProofs();
 
-    std::string hash_data = vote.getHashData();
-    hash_data += key.getHashData();
-    CryptoPP::byte hash[32];
-    VoteData::hashTo32(hash_data, hash); 
-
     CryptoPP::byte output[2445];
     int n;
     vote.serialise(output, n);
     key.serialise(output + 1630, n);
 
     data.processVKPair(output, 1);
-    assert(!data.badHash(hash));
+    assert(data.received_[1] == true);
 }

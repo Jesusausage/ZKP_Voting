@@ -9,15 +9,17 @@ VoteData::VoteData(const ECGroup& ecg,
                    gen_(generator),
                    num_voters_(num_voters), 
                    num_options_(num_options),
-                   received_(num_voters, false),
-                   client_(*this, io_context_),
-                   server_(*this, &client_, io_context_)
+                   server_(*this, io_context_)
 {
     voter_ids_.reserve(num_voters_);
     tokens_.reserve(num_voters_);
 
     options_.resize(num_voters_);
     ip_addrs_.resize(num_voters_);
+
+    received_ = new bool[num_voters_];
+    for (int i = 0; i < num_voters_; ++i)
+        received_[i] = false;
 
     readTokensFromFile();
     readIDsFromFile();
@@ -31,6 +33,8 @@ VoteData::~VoteData()
 {
     if (verifier_)
         delete verifier_;
+
+    delete [] received_;
 }
 
 
@@ -111,7 +115,7 @@ void VoteData::processVKPair(CryptoPP::byte* input, int index)
 
 boost::asio::const_buffer VoteData::makeReceivedMsg() const
 {
-    return boost::asio::buffer(received_);
+    return boost::asio::buffer(received_, num_voters_);
 }
 
 

@@ -5,7 +5,6 @@
 #include "Verifier.hpp"
 #include "Errors.hpp"
 #include "TCPServer.hpp"
-#include "TCPClient.hpp"
 #include <array>
 #include <set>
 
@@ -31,6 +30,9 @@ public:
 
     boost::asio::const_buffer makeReceivedMsg() const;
     boost::asio::const_buffer makeVKPairMsg(int index) const;
+
+    inline int numOptions() const
+        { return num_options_; }
        
     static void readVote(int index, CryptoPP::byte* output, int num_options);
     static void readKey(int index, CryptoPP::byte* output, int num_options);
@@ -46,12 +48,11 @@ private:
     std::vector<std::string> options_;
     std::vector<std::string> ip_addrs_;
 
-    std::vector<bool> received_;
+    bool* received_;
 
     Verifier* verifier_ = nullptr;
 
     boost::asio::io_context io_context_;
-    TCPClient client_;
     TCPServer server_;    
 
 

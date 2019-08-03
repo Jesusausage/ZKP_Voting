@@ -1,5 +1,4 @@
 #include "TCPServer.hpp"
-#include "TCPClient.hpp"
 #include "VoteData.hpp"
 
 
@@ -7,11 +6,9 @@ using namespace boost::asio::ip;
 
 
 TCPServer::TCPServer(const VoteData& vote_data,
-                     TCPClient* client,
                      boost::asio::io_context& io_context)
                      :
                      vote_data_(vote_data),
-                     client_(client),
                      io_context_(io_context),
                      acceptor_(io_context, tcp::endpoint(tcp::v4(), 1337))
 {
@@ -39,9 +36,9 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
 }
 
 
-boost::asio::const_buffer TCPServer::makeHashesMessage()
+boost::asio::const_buffer TCPServer::makeReceivedMessage()
 {
-    return vote_data_.makeHashesMsg();
+    return vote_data_.makeReceivedMsg();
 }
 
 
@@ -51,9 +48,15 @@ boost::asio::const_buffer TCPServer::makeVKMessage(int index)
 }
 
 
-int TCPServer::waitForClientRequest(tcp::socket& sock)
+int TCPServer::numOptions()
 {
-    return client_->receiveRequest(sock);
+    return vote_data_.numOptions();
+}
+
+
+int TCPServer::waitForResponse(tcp::socket& sock)
+{
+    return 0;
 }
 
 
@@ -71,7 +74,7 @@ boost::shared_ptr<TCPConnection> TCPConnection::create(
 
 void TCPConnection::start()
 {
-    boost::asio::async_write(socket_, server_->makeHashesMessage(),
+    boost::asio::async_write(socket_, server_->makeReceivedMessage(),
                              boost::bind(&TCPConnection::handleWrite, 
                                          shared_from_this(),
                                          boost::asio::placeholders::error,
@@ -96,11 +99,43 @@ TCPConnection::TCPConnection(boost::asio::io_context& io_context,
 void TCPConnection::handleWrite(const boost::system::error_code& /*error*/,
                                 size_t /*bytes_transferred*/)
 {
-    int request = server_->waitForClientRequest(socket_);
+    CryptoPP::byte index[4];
+    boost::asio::read(socket_, boost::asio::buffer(index),
+                      boost::asio::transfer_exactly(4));
 
-    boost::asio::async_write(socket_, server_->makeVKMessage(request), 
-                             boost::bind(&TCPConnection::handleWrite,
-                                         shared_from_this(),
-                                         boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred));
+    size_t length = 489 * server_->numOptions();
+    auto* in = new CryptoPP::byte[length];
+
+    boost::asio::read(socket_, boost::asio::buffer(in, length), 
+                      boost::asio::transfer_exactly(length));
+}
+
+
+/* ======================================================================== */
+
+
+int byteToInt(const CryptoPP::byte ch[4])
+{
+    return (int)ch[0] * (int)16777216 
+         + (int)ch[1] * (int)65536
+         + (int)ch[2] * (int)256
+         + (int)ch[3];
+}
+
+
+void intToByte(int n, CryptoPP::byte output[4])
+{
+    int first = n / 16777216;
+    output[0] = first;
+
+    n %= 16777216;
+    int second = n / 65536;
+    output[1] = second;
+
+    n %= 65536;
+    int third = n % 256;
+    output[2] = third;
+
+    n %= 256;
+    output[3] = n;
 }
