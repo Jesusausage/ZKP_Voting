@@ -13,7 +13,7 @@ TCPServer::TCPServer(VoteData& vote_data,
                      acceptor_(io_context, tcp::endpoint(tcp::v4(), PORT)),
                      resolver_(io_context)
 {
-    srand(time(nullptr));
+    srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 
@@ -138,26 +138,26 @@ void TCPConnection::handleWrite(const boost::system::error_code& /*error*/,
 
 int ByteToInt(const CryptoPP::byte ch[4])
 {
-    return (int)ch[0] * (int)16777216 
-         + (int)ch[1] * (int)65536
-         + (int)ch[2] * (int)256
-         + (int)ch[3];
+    return static_cast<int>(ch[0]) * 16777216 
+         + static_cast<int>(ch[1]) * 65536
+         + static_cast<int>(ch[2]) * 256
+         + static_cast<int>(ch[3]);
 }
 
 
 void IntToByte(int n, CryptoPP::byte output[4])
 {
     int first = n / 16777216;
-    output[0] = first;
+    output[0] = static_cast<char>(first);
 
     n %= 16777216;
     int second = n / 65536;
-    output[1] = second;
+    output[1] = static_cast<char>(second);
 
     n %= 65536;
     int third = n / 256;
-    output[2] = third;
+    output[2] = static_cast<char>(third);
 
     n %= 256;
-    output[3] = n;
+    output[3] = static_cast<char>(n);
 }
