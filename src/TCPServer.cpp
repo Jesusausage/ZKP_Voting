@@ -70,6 +70,8 @@ void TCPServer::startConnect()
         boost::asio::connect(new_connection->socket(), endpoints, ec);
 
         if (!ec) {
+            for (int i = 0; i < num_voters; ++i)
+                received[i] = false;
             boost::asio::read(new_connection->socket(), 
                               boost::asio::buffer(received, num_voters));
             int index = vote_data_.processReceived(received);
