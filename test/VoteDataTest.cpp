@@ -15,10 +15,10 @@ void VoteDataTest::testReadOptionsAndIPs()
     opts.close();
     std::ofstream ips(IP_FILE);
     ips << "292.168.27.1" << std::endl 
-         << "192.168.27.2" << std::endl 
-         << "192.168.27.3" << std::endl
-         << "192.168.27.4" << std::endl
-         << "192.168.27.5" << std::endl;
+        << "192.168.27.2" << std::endl 
+        << "192.168.27.3" << std::endl
+        << "192.168.27.4" << std::endl
+        << "192.168.27.5" << std::endl;
     ips.close();
 
     VoteData data(ecg, base, 10, 5);

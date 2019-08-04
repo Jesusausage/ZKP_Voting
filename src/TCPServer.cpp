@@ -50,7 +50,7 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
                              const boost::system::error_code& error)
 {
     if (!error)
-        new_connection->start();
+        new_connection->sendReceived();
     
     startAccept();
 }
@@ -64,17 +64,16 @@ void TCPServer::startConnect()
     while (client_active_) {
         int ip_index = rand() % num_voters;
         auto endpoints = resolver_.resolve(vote_data_.ip(ip_index), 
-                                            std::to_string(PORT));
-        tcp::socket socket(io_context_);
+                                           std::to_string(PORT));
+        auto new_connection = TCPConnection::create(io_context_, vote_data_);
         boost::system::error_code ec;
-        boost::asio::connect(socket, endpoints, ec);
+        boost::asio::connect(new_connection->socket(), endpoints, ec);
+
         if (!ec) {
-            boost::asio::read(socket, 
+            boost::asio::read(new_connection->socket(), 
                               boost::asio::buffer(received, num_voters));
             int index = vote_data_.processReceived(received);
-
-            auto buffer = vote_data_.makeVKPairMsg(index);
-            boost::asio::write(socket, buffer);
+            new_connection->sendVKPair(index);
         }
     }
 
@@ -94,16 +93,6 @@ boost::shared_ptr<TCPConnection> TCPConnection::create(
 }
 
 
-void TCPConnection::start()
-{
-    boost::asio::async_write(socket_, vote_data_.makeReceivedMsg(),
-                             boost::bind(&TCPConnection::handleWrite, 
-                                         shared_from_this(),
-                                         boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred));
-}
-
-
 TCPConnection::TCPConnection(boost::asio::io_context& io_context,
                              VoteData& vote_data)
                              :
@@ -112,25 +101,48 @@ TCPConnection::TCPConnection(boost::asio::io_context& io_context,
 {}
 
 
-void TCPConnection::handleWrite(const boost::system::error_code& /*error*/,
-                                size_t /*bytes_transferred*/)
+void TCPConnection::sendReceived()
+{
+    boost::asio::async_write(socket_, vote_data_.makeReceivedMsg(),
+                             boost::bind(&TCPConnection::handleWriteReceived, 
+                                         shared_from_this(),
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
+}
+
+
+void TCPConnection::sendVKPair(int index)
+{
+    boost::asio::async_write(socket_, vote_data_.makeVKPairMsg(index),
+                             boost::bind(&TCPConnection::handleWriteVKPair,
+                                         shared_from_this(),
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
+}
+
+
+void TCPConnection::handleWriteReceived(const boost::system::error_code& /*error*/,
+                                        size_t /*bytes_transferred*/)
 {
     CryptoPP::byte raw_index[4];
-    size_t length = 489 * vote_data_.numOptions();
-    auto* in = new CryptoPP::byte[length];
-
     boost::asio::read(socket_, boost::asio::buffer(raw_index),
                       boost::asio::transfer_exactly(4));
     int index = ByteToInt(raw_index);
 
     if (index >= 0) {
+        size_t length = 489 * vote_data_.numOptions();
+        auto* in = new CryptoPP::byte[length];
         boost::asio::read(socket_, boost::asio::buffer(in, length), 
                           boost::asio::transfer_exactly(length));  
         vote_data_.processVKPair(in, index);
+        delete [] in;
     }
-
-    delete [] in;
 }
+
+
+void TCPConnection::handleWriteVKPair(const boost::system::error_code& /*error*/,
+                                      size_t /*bytes_transferred*/)
+{}
 
 
 /* ======================================================================== */
