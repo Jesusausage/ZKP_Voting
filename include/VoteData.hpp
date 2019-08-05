@@ -5,6 +5,7 @@
 #include "Verifier.hpp"
 #include "Errors.hpp"
 #include "TCPServer.hpp"
+#include "TCPClient.hpp"
 #include <array>
 #include <set>
 
@@ -56,8 +57,10 @@ private:
 
     Verifier* verifier_ = nullptr;
 
-    boost::asio::io_context io_context_;
+    boost::asio::io_context server_io_;
     TCPServer server_;    
+    boost::asio::io_context client_io_;
+    TCPClient client_;
 
 
     void readTokensFromFile();

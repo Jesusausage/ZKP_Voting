@@ -9,7 +9,8 @@ VoteData::VoteData(const ECGroup& ecg,
                    gen_(generator),
                    num_voters_(num_voters), 
                    num_options_(num_options),
-                   server_(*this, io_context_)
+                   server_(*this, server_io_),
+                   client_(*this, client_io_)
 {
     voter_ids_.reserve(num_voters_);
     tokens_.reserve(num_voters_);
