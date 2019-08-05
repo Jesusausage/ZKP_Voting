@@ -18,6 +18,8 @@
 #define OPTION_FILE "options.txt"
 #define IP_FILE "IPs.txt"
 
+#define PRIV_KEY_FILE "private_keys.txt"
+
 
 class VoteData {
     friend class VoteDataTest;
@@ -50,6 +52,8 @@ private:
 
     std::vector<CryptoPP::ECPPoint> voter_ids_;
     std::vector< std::vector<CryptoPP::ECPPoint> > tokens_;
+    CryptoPP::ECPPoint id_sum_;
+    std::vector<CryptoPP::ECPPoint> token_sums_;
     std::vector<std::string> options_;
     std::vector<std::string> ip_addrs_;
 
@@ -67,7 +71,9 @@ private:
     void readIDsFromFile();
     void readOptionsFromFile();
     void readIPsFromFile();
-    void setVerifier();
+    void setSums();
+
+    void getUserVote();
 
     bool verifyVote(const Vote& vote, int index);
     bool verifyKey(const Key& key, int index);

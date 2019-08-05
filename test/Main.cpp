@@ -43,12 +43,13 @@ int main() {
     // TestVoteDecryption();
     // std::cout << "Verification test success." << std::endl; 
 
-    VoteDataTest::testReadOptionsAndIPs();
-    VoteDataTest::testReadTokensAndIDs();
-    VoteDataTest::testWriteVote();
-    VoteDataTest::testWriteKey();
-    VoteDataTest::testProcessHashes();
-    VoteDataTest::testSuccessfulVote();
+    // VoteDataTest::testReadOptionsAndIPs();
+    // VoteDataTest::testReadTokensAndIDs();
+    // VoteDataTest::testWriteVote();
+    // VoteDataTest::testWriteKey();
+    // VoteDataTest::testProcessHashes();
+    // VoteDataTest::testSuccessfulVote();
+    VoteDataTest::testGetUserVote();
     std::cout << "VoteData test success." << std::endl;
 
     TestIntByteConversion();

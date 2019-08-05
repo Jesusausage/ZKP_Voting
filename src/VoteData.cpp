@@ -12,7 +12,6 @@ VoteData::VoteData(const ECGroup& ecg,
 {
     voter_ids_.reserve(num_voters_);
     tokens_.reserve(num_voters_);
-
     options_.resize(num_voters_);
 
     received_ = new bool[num_voters_];
@@ -23,7 +22,10 @@ VoteData::VoteData(const ECGroup& ecg,
     readIDsFromFile();
     readOptionsFromFile();
     readIPsFromFile();
-    setVerifier();
+
+    setSums();
+    verifier_ = new Verifier(ecg_, gen_, id_sum_, token_sums_);
+    getUserVote();
 
     srand(static_cast<unsigned int>(time(nullptr)));
     server_ = new TCPServer(*this, server_io_);
@@ -36,7 +38,7 @@ VoteData::~VoteData()
     delete verifier_;
     delete server_;
     delete client_;
-    
+
     delete [] received_;
 }
 
@@ -160,19 +162,59 @@ std::string VoteData::randomIP() const
 }
 
 
-void VoteData::setVerifier()
+void VoteData::setSums()
 {
-    CryptoPP::ECPPoint id_sum;
-    std::vector<CryptoPP::ECPPoint> token_sums(num_options_);
+    token_sums_.resize(num_options_);
+
     for (int i = 0; i < num_voters_; i++) {
-        id_sum = ecg_.curve.Add(id_sum, voter_ids_[i]);
+        id_sum_ = ecg_.curve.Add(id_sum_, voter_ids_[i]);
         for (int option = 0; option < num_options_; option++) {
-            token_sums[option] = ecg_.curve.Add(token_sums[option],
-                                               tokens_[i][option]);
+            token_sums_[option] = ecg_.curve.Add(token_sums_[option],
+                                                 tokens_[i][option]);
+        }
+    }
+}
+
+
+void VoteData::getUserVote()
+{
+    std::fstream priv_in(PRIV_KEY_FILE, std::ios::in);
+    if (!priv_in.is_open()) {
+        std::cerr << "Error opening " << PRIV_KEY_FILE << std::endl;
+        exit(FILE_OPENING_ERROR);
+    }
+    CryptoPP::Integer id_key;
+    std::vector<CryptoPP::Integer> token_keys(num_options_);
+    priv_in >> id_key >> std::ws;
+    for (int i = 0; i < num_options_; ++i)
+        priv_in >> token_keys[i] >> std::ws;
+    priv_in.close();
+
+    auto id = ecg_.curve.Multiply(id_key, gen_);
+    int voter_index = 0;
+    for (int i = 0; i < num_voters_; ++i) {
+        if (voter_ids_[i] == id) {
+            voter_index = i;
+            break;
         }
     }
 
-    verifier_ = new Verifier(ecg_, gen_, id_sum, token_sums);
+    Voter voter(ecg_, gen_, id_sum_, tokens_[voter_index]);
+    voter.setTokenKeys(token_keys);
+    voter.castVote(0);
+    Vote vote = voter.getVoteAndProofs();
+
+    KeyGen keygen(ecg_, gen_, token_sums_, voter_ids_[voter_index]);
+    keygen.setIDKey(id_key);
+    Key key = keygen.getKeysAndProofs();
+
+    if (!verifyVote(vote, voter_index) || !verifyKey(key, voter_index)) {
+        std::cerr << "Private keys invalid." << std::endl;
+        exit(INVALID_PRIV_KEY);
+    }
+    writeVote(vote, voter_index);
+    writeKey(key, voter_index);
+    received_[voter_index] = true;
 }
 
 
