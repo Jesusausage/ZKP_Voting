@@ -42,7 +42,7 @@ void VoteData::readTokensFromFile()
 {
     std::ifstream token_in(TOKEN_FILE);
     if (!token_in.is_open()) {
-        std::cerr << "Error opening tokens file." << std::endl;
+        std::cerr << "Error opening " << TOKEN_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
     ReadTokens(token_in, tokens_, num_options_);
@@ -54,7 +54,7 @@ void VoteData::readIDsFromFile()
 {
     std::ifstream id_in(ID_FILE);
     if (!id_in.is_open()) {
-        std::cerr << "Error opening tokens file." << std::endl;
+        std::cerr << "Error opening " << ID_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
     ReadIDs(id_in, voter_ids_);
@@ -66,7 +66,7 @@ void VoteData::readOptionsFromFile()
 {
     std::ifstream options_in(OPTION_FILE);
     if (!options_in.is_open()) {
-        std::cerr << "Error opening tokens file." << std::endl;
+        std::cerr << "Error opening " << OPTION_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
     for (int i = 0; i < num_options_; i++) {
@@ -81,7 +81,7 @@ void VoteData::readIPsFromFile()
 {
     std::ifstream ips_in(IP_FILE);
     if (!ips_in.is_open()) {
-        std::cerr << "Error opening tokens file." << std::endl;
+        std::cerr << "Error opening " << IP_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
     for (int i = 0; i < num_options_; i++) {
@@ -220,6 +220,10 @@ void VoteData::readVote(int index, CryptoPP::byte* output, int num_options)
     filename += std::to_string(index);
 
     std::fstream vote_in(filename, std::ios::in | std::ios::binary);
+    if (!vote_in.is_open()) {
+        std::cerr << "Error opening " << filename << std::endl;
+        return;
+    }
     vote_in.read((char*)output, 326 * num_options);
     vote_in.close();
 }
@@ -231,6 +235,10 @@ void VoteData::readKey(int index, CryptoPP::byte* output, int num_options)
     filename += std::to_string(index);
 
     std::fstream key_in(filename, std::ios::in | std::ios::binary);
+    if (!key_in.is_open()) {
+        std::cerr << "Error opening " << filename << std::endl;
+        return;
+    }
     key_in.read((char*)output, 163 * num_options);
     key_in.close();
 }

@@ -46,10 +46,10 @@ private:
 
 class TCPConnection : public boost::enable_shared_from_this<TCPConnection> {
 public:
-    static boost::shared_ptr<TCPConnection> create(
-                            boost::asio::io_context& io_context,
-                            VoteData& vote_data);
-    void start();
+    static boost::shared_ptr<TCPConnection> create(boost::asio::io_context& io_context,
+                                                   VoteData& vote_data);
+    void sendReceived();
+    void sendVKPair(int index);
     inline boost::asio::ip::tcp::socket& socket()
         { return socket_; }
 
@@ -60,8 +60,10 @@ private:
     TCPConnection(boost::asio::io_context& io_context, 
                   VoteData& vote_data);
 
-    void handleWrite(const boost::system::error_code& /*error*/,
-                     size_t /*bytes_transferred*/);
+    void handleWriteReceived(const boost::system::error_code& /*error*/,
+                             size_t /*bytes_transferred*/);
+    void handleWriteVKPair(const boost::system::error_code& /*error*/,
+                           size_t /*bytes_transferred*/);
 };
 
 
