@@ -9,36 +9,41 @@ TCPClient::TCPClient(VoteData& vote_data,
                      boost::asio::io_context& io_context)
                      :
                      vote_data_(vote_data),
-                     io_(io_context),
-                     resolver_(io_context)
+                     io_(io_context)
 {
-    srand(static_cast<unsigned int>(time(nullptr)));
     startConnect();
 }
 
 
 void TCPClient::startConnect()
 {
-    int num_voters = vote_data_.numVoters();
-    bool* received = new bool[num_voters];
+    tcp::endpoint endpoint(address::from_string(vote_data_.randomIP()),
+                           PORT);
+    auto connection = TCPConnection::create(io_, vote_data_);
+    connection->socket().async_connect(endpoint, 
+                                       boost::bind(&TCPClient::handleConnect,
+                                                   this,
+                                                   connection,
+                                                   boost::asio::placeholders::error));
+}
 
-    while (true) {
-        int ip_index = rand() % num_voters;
-        auto endpoints = resolver_.resolve(vote_data_.ip(ip_index), 
-                                           std::to_string(PORT));
-        auto new_connection = TCPConnection::create(io_, vote_data_);
-        boost::system::error_code ec;
-        boost::asio::connect(new_connection->socket(), endpoints, ec);
 
-        if (!ec) {
-            for (int i = 0; i < num_voters; ++i)
-                received[i] = false;
-            boost::asio::read(new_connection->socket(), 
-                              boost::asio::buffer(received, num_voters));
-            int index = vote_data_.processReceived(received);
-            new_connection->sendVKPair(index);
-        }
+void TCPClient::handleConnect(boost::shared_ptr<TCPConnection> connection,
+                              const boost::system::error_code& error)
+{
+    if (!error) {
+        int num_voters = vote_data_.numVoters();
+        bool* received = new bool[num_voters];
+        for (int i = 0; i < num_voters; ++i)
+            received[i] = false;
+
+        boost::asio::read(connection->socket(), 
+                          boost::asio::buffer(received, num_voters));
+        int index = vote_data_.processReceived(received);
+        connection->sendVKPair(index);
+
+        delete [] received;
     }
 
-    delete [] received;
+    startConnect();
 }

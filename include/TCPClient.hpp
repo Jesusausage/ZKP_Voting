@@ -16,9 +16,10 @@ public:
 private:
     VoteData& vote_data_;
     boost::asio::io_context& io_;
-    boost::asio::ip::tcp::resolver resolver_;
 
     void startConnect();
+    void handleConnect(boost::shared_ptr<TCPConnection> new_connection,
+                       const boost::system::error_code& error);
 };
 
 

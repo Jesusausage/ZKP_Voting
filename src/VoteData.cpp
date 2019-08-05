@@ -8,15 +8,12 @@ VoteData::VoteData(const ECGroup& ecg,
                    ecg_(ecg),
                    gen_(generator),
                    num_voters_(num_voters), 
-                   num_options_(num_options),
-                   server_(*this, server_io_),
-                   client_(*this, client_io_)
+                   num_options_(num_options)
 {
     voter_ids_.reserve(num_voters_);
     tokens_.reserve(num_voters_);
 
     options_.resize(num_voters_);
-    ip_addrs_.resize(num_voters_);
 
     received_ = new bool[num_voters_];
     for (int i = 0; i < num_voters_; ++i)
@@ -27,14 +24,19 @@ VoteData::VoteData(const ECGroup& ecg,
     readOptionsFromFile();
     readIPsFromFile();
     setVerifier();
+
+    srand(static_cast<unsigned int>(time(nullptr)));
+    server_ = new TCPServer(*this, server_io_);
+    client_ = new TCPClient(*this, client_io_);
 }
 
 
 VoteData::~VoteData()
 {
-    if (verifier_)
-        delete verifier_;
-
+    delete verifier_;
+    delete server_;
+    delete client_;
+    
     delete [] received_;
 }
 
@@ -85,10 +87,12 @@ void VoteData::readIPsFromFile()
         std::cerr << "Error opening " << IP_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
-    for (int i = 0; i < num_options_; i++) {
-        ips_in >> ip_addrs_[i];
-        assert(!ips_in.eof());
-    } 
+    std::string ip;
+    ips_in >> ip;
+    while (!ips_in.eof()) {
+        ip_addrs_.push_back(ip);
+        ips_in >> ip;
+    }
     ips_in.close();
 }
 
@@ -146,6 +150,13 @@ boost::asio::const_buffer VoteData::makeVKPairMsg(int index) const
 
     delete [] output;
     return ret;
+}
+
+
+std::string VoteData::randomIP() const
+{
+    size_t index = rand() % ip_addrs_.size();
+    return ip_addrs_[index];
 }
 
 

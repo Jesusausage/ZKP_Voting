@@ -36,8 +36,8 @@ public:
         { return num_options_; }
     inline int numVoters() const
         { return num_voters_; }
-    inline std::string ip(int index) const
-        { return ip_addrs_[index]; }
+
+    std::string randomIP() const;
        
     static void readVote(int index, CryptoPP::byte* output, int num_options);
     static void readKey(int index, CryptoPP::byte* output, int num_options);
@@ -58,9 +58,9 @@ private:
     Verifier* verifier_ = nullptr;
 
     boost::asio::io_context server_io_;
-    TCPServer server_;    
+    TCPServer* server_ = nullptr;    
     boost::asio::io_context client_io_;
-    TCPClient client_;
+    TCPClient* client_ = nullptr;
 
 
     void readTokensFromFile();
