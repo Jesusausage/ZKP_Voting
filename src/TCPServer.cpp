@@ -25,14 +25,7 @@ void TCPServer::startServer()
 
 void TCPServer::startClient()
 {
-    client_active_ = true;
     startConnect();
-}
-
-
-void TCPServer::stopClient()
-{
-    client_active_ = false;
 }
 
 
@@ -61,7 +54,7 @@ void TCPServer::startConnect()
     int num_voters = vote_data_.numVoters();
     bool* received = new bool[num_voters];
 
-    while (client_active_) {
+    while (true) {
         int ip_index = rand() % num_voters;
         auto endpoints = resolver_.resolve(vote_data_.ip(ip_index), 
                                            std::to_string(PORT));

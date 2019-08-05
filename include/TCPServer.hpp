@@ -23,15 +23,12 @@ public:
 
     void startServer();
     void startClient();
-    void stopClient();
 
 private:
     VoteData& vote_data_;
     boost::asio::io_context& io_context_;
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::resolver resolver_;
-
-    bool client_active_ = false;
 
     void startAccept();
     void handleAccept(boost::shared_ptr<TCPConnection> new_connection,
