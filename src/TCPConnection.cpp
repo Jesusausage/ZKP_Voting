@@ -102,26 +102,24 @@ void IntToByte(int n, CryptoPP::byte output[4])
 void TCPConnection::makeReceivedMsg()
 {
     received_msg_ = vote_data_.received();
-    msg_len_ = vote_data_.numVoters();
+    num_voters_ = vote_data_.numVoters();
 }
 
 
 void TCPConnection::makeVKPairMsg(int index)
 {
     if (index < 0) {
-        vkpair_msg_ = new CryptoPP::byte[4];
-        IntToByte(-1, vkpair_msg_);
-        msg_len_ = 4;
+        vkpair_msg_.resize(4);
+        IntToByte(-1, vkpair_msg_.data());
     }
     else {
         int num_options = vote_data_.numOptions();
-        msg_len_ = 489 * num_options + 4;
-        vkpair_msg_ = new CryptoPP::byte[msg_len_];
+        vkpair_msg_.resize(489 * num_options + 4);
         
-        IntToByte(index, vkpair_msg_);
+        IntToByte(index, vkpair_msg_.data());
         size_t offset = 4;
-        VoteData::readVote(index, vkpair_msg_ + offset, num_options);
+        VoteData::readVote(index, vkpair_msg_.data() + offset, num_options);
         offset += 326 * num_options;
-        VoteData::readKey(index, vkpair_msg_ + offset, num_options);
+        VoteData::readKey(index, vkpair_msg_.data() + offset, num_options);
     }
 }

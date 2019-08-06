@@ -29,8 +29,9 @@ private:
     VoteData& vote_data_;
 
     bool* received_msg_;
-    CryptoPP::byte* vkpair_msg_;
-    size_t msg_len_;
+    int num_voters_;
+    
+    std::vector<CryptoPP::byte> vkpair_msg_;
 
     TCPConnection(boost::asio::io_context& io_context, 
                   VoteData& vote_data);
