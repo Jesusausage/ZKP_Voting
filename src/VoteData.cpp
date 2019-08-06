@@ -95,9 +95,10 @@ void VoteData::readIPsFromFile()
 int VoteData::processReceived(bool received[])
 {
     for (int i = 0; i < num_voters_; ++i) {
-        if (received[i] == true &&
-            received_[i] == false)
+        if (received[i] == false &&
+            received_[i] == true) {
             return i;
+        }
     }
 
     return -1;
