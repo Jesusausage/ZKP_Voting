@@ -26,18 +26,12 @@ VoteData::VoteData(const ECGroup& ecg,
     setSums();
     verifier_ = new Verifier(ecg_, gen_, id_sum_, token_sums_);
     getUserVote();
-
-    srand(static_cast<unsigned int>(time(nullptr)));
-    server_ = new TCPServer(*this, server_io_);
-    client_ = new TCPClient(*this, client_io_);
 }
 
 
 VoteData::~VoteData()
 {
     delete verifier_;
-    delete server_;
-    delete client_;
 
     delete [] received_;
 }
@@ -157,7 +151,10 @@ boost::asio::const_buffer VoteData::makeVKPairMsg(int index) const
 
 std::string VoteData::randomIP() const
 {
-    size_t index = rand() % ip_addrs_.size();
+    int index = rand() % ip_addrs_.size();
+    while (index == voter_index_)
+        index = rand() % ip_addrs_.size();
+
     return ip_addrs_[index];
 }
 
@@ -178,47 +175,47 @@ void VoteData::setSums()
 
 void VoteData::getUserVote()
 {
+    readPrivFromFile();
+
+    Voter voter(ecg_, gen_, id_sum_, tokens_[voter_index_]);
+    voter.setTokenKeys(token_keys_);
+    voter.castVote(0);
+    Vote vote = voter.getVoteAndProofs();
+
+    KeyGen keygen(ecg_, gen_, token_sums_, voter_ids_[voter_index_]);
+    keygen.setIDKey(id_key_);
+    Key key = keygen.getKeysAndProofs();
+
+    if (!verifyVote(vote, voter_index_) || !verifyKey(key, voter_index_)) {
+        std::cerr << "Private keys invalid." << std::endl;
+        exit(INVALID_PRIV_KEY);
+    }
+    writeVote(vote, voter_index_);
+    writeKey(key, voter_index_);
+    received_[voter_index_] = true;
+}
+
+
+void VoteData::readPrivFromFile()
+{
     std::fstream priv_in(PRIV_KEY_FILE, std::ios::in);
     if (!priv_in.is_open()) {
         std::cerr << "Error opening " << PRIV_KEY_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
-    CryptoPP::Integer id_key;
-    std::vector<CryptoPP::Integer> token_keys(num_options_);
-    priv_in >> id_key >> std::ws;
+    token_keys_.resize(num_options_);
+    priv_in >> id_key_ >> std::ws;
     for (int i = 0; i < num_options_; ++i)
-        priv_in >> token_keys[i] >> std::ws;
+        priv_in >> token_keys_[i] >> std::ws;
     priv_in.close();
 
-    auto id = ecg_.curve.Multiply(id_key, gen_);
-    int voter_index = 0;
+    auto id = ecg_.curve.Multiply(id_key_, gen_);
     for (int i = 0; i < num_voters_; ++i) {
         if (voter_ids_[i] == id) {
-            voter_index = i;
+            voter_index_ = i;
             break;
         }
     }
-
-    Voter voter(ecg_, gen_, id_sum_, tokens_[voter_index]);
-    voter.setTokenKeys(token_keys);
-    voter.castVote(0);
-    Vote vote = voter.getVoteAndProofs();
-
-    KeyGen keygen(ecg_, gen_, token_sums_, voter_ids_[voter_index]);
-    keygen.setIDKey(id_key);
-    Key key = keygen.getKeysAndProofs();
-
-    if (!verifyVote(vote, voter_index) || !verifyKey(key, voter_index)) {
-        std::cerr << "Private keys invalid." << std::endl;
-        exit(INVALID_PRIV_KEY);
-    }
-    writeVote(vote, voter_index);
-    writeKey(key, voter_index);
-    received_[voter_index] = true;
-
-    // make priv_keys, voter_index member variables
-    // separate priv_key reading fns
-    // randomIP doesnt generate voter_index
 }
 
 

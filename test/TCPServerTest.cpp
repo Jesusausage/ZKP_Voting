@@ -12,11 +12,11 @@ void TestIntByteConversion()
     IntToByte(a, ch);
     assert(ByteToInt(ch) == a);
 
-    a = 67889443;
+    a = 672;
     IntToByte(a, ch);
     assert(ByteToInt(ch) == a);
 
-    a = 672;
+    a = -1;
     IntToByte(a, ch);
     assert(ByteToInt(ch) == a);
 }

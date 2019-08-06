@@ -61,10 +61,9 @@ private:
 
     Verifier* verifier_ = nullptr;
 
-    boost::asio::io_context server_io_;
-    TCPServer* server_ = nullptr;    
-    boost::asio::io_context client_io_;
-    TCPClient* client_ = nullptr;
+    int voter_index_;
+    CryptoPP::Integer id_key_;
+    std::vector<CryptoPP::Integer> token_keys_;
 
 
     void readTokensFromFile();
@@ -74,6 +73,7 @@ private:
     void setSums();
 
     void getUserVote();
+    void readPrivFromFile();
 
     bool verifyVote(const Vote& vote, int index);
     bool verifyKey(const Key& key, int index);

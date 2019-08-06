@@ -32,6 +32,7 @@ void TCPClient::handleConnect(boost::shared_ptr<TCPConnection> connection,
                               const boost::system::error_code& error)
 {
     if (!error) {
+        std::cout << "handling connect" << std::endl;
         int num_voters = vote_data_.numVoters();
         bool* received = new bool[num_voters];
         for (int i = 0; i < num_voters; ++i)
@@ -44,6 +45,11 @@ void TCPClient::handleConnect(boost::shared_ptr<TCPConnection> connection,
 
         delete [] received;
     }
+    else
+    {
+        std::cout << "handleConnect: " << error.message() << std::endl;
+    }
+    
 
     startConnect();
 }

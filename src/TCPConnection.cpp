@@ -47,11 +47,12 @@ void TCPConnection::sendVKPair(int index)
 void TCPConnection::handleWriteReceived(const boost::system::error_code& /*error*/,
                                         size_t /*bytes_transferred*/)
 {
+    std::cout << "written received" << std::endl;
     CryptoPP::byte raw_index[4];
     boost::asio::read(socket_, boost::asio::buffer(raw_index),
                       boost::asio::transfer_exactly(4));
     int index = ByteToInt(raw_index);
-
+    
     if (index >= 0) {
         size_t length = 489 * vote_data_.numOptions();
         auto* in = new CryptoPP::byte[length];
@@ -65,7 +66,9 @@ void TCPConnection::handleWriteReceived(const boost::system::error_code& /*error
 
 void TCPConnection::handleWriteVKPair(const boost::system::error_code& /*error*/,
                                       size_t /*bytes_transferred*/)
-{}
+{
+    std::cout << "written vkpair" << std::endl;
+}
 
 
 /* ======================================================================== */
@@ -73,26 +76,25 @@ void TCPConnection::handleWriteVKPair(const boost::system::error_code& /*error*/
 
 int ByteToInt(const CryptoPP::byte ch[4])
 {
-    return static_cast<int>(ch[0]) * 16777216 
-         + static_cast<int>(ch[1]) * 65536
-         + static_cast<int>(ch[2]) * 256
-         + static_cast<int>(ch[3]);
+    int abs = static_cast<int>(ch[1]) * 65536
+            + static_cast<int>(ch[2]) * 256
+            + static_cast<int>(ch[3]);
+    return (ch[0] == 1) ? -abs : abs;
 }
 
 
 void IntToByte(int n, CryptoPP::byte output[4])
 {
-    int first = n / 16777216;
-    output[0] = static_cast<char>(first);
+    output[0] = (n < 0) ? 1 : 0;
+    n = abs(n);
 
-    n %= 16777216;
-    int second = n / 65536;
-    output[1] = static_cast<char>(second);
+    int first = n / 65526;
+    output[1] = static_cast<unsigned char>(first);
 
     n %= 65536;
-    int third = n / 256;
-    output[2] = static_cast<char>(third);
+    int second = n / 256;
+    output[2] = static_cast<unsigned char>(second);
 
     n %= 256;
-    output[3] = static_cast<char>(n);
+    output[3] = static_cast<unsigned char>(n);
 }

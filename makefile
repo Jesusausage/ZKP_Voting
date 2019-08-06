@@ -5,7 +5,7 @@ TESTOBJ = $(TEST:test/%.cpp=build/test/%.o)
 DEP = $(OBJ:%.o=%.d)
 TESTDEP = $(TESTOBJ:%.o=%.d)
 FLAGS = -Wall -c -MMD -O3
-LIBS = -lcryptopp -lpthread -lboost_system
+LIBS = -lcryptopp -lpthread -lboost_system -lboost_thread
 INC = -I include
 
 runtests: $(OBJ) $(TESTOBJ)

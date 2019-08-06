@@ -8,6 +8,8 @@
 #include "VoteDataTest.hpp"
 #include "TCPServerTest.hpp"
 
+#include <boost/thread/thread.hpp>
+
 
 int main() {
     // TestECGroupAddition();
@@ -49,11 +51,23 @@ int main() {
     // VoteDataTest::testWriteKey();
     // VoteDataTest::testProcessHashes();
     // VoteDataTest::testSuccessfulVote();
-    VoteDataTest::testGetUserVote();
-    std::cout << "VoteData test success." << std::endl;
+    // VoteDataTest::testGetUserVote();
+    // std::cout << "VoteData test success." << std::endl;
 
     TestIntByteConversion();
     std::cout << "TCPServer test success." << std::endl;
+
+    auto ecg = GenerateECGroup();
+    auto gen = GenerateECBase();
+    VoteData data(ecg, gen, 10, 5);
+    boost::asio::io_context sio;
+    boost::asio::io_context cio;
+    TCPServer ser(data, sio);
+    TCPClient cli(data, cio);
+    boost::thread t1(boost::bind(&boost::asio::io_context::run, &sio));
+    boost::thread t2(boost::bind(&boost::asio::io_context::run, &cio));
+    t1.join();
+    t2.join();
 
     return 0;
 }

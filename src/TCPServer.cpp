@@ -29,8 +29,13 @@ void TCPServer::startAccept()
 void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
                              const boost::system::error_code& error)
 {
-    if (!error)
+    if (!error) {
+        std::cout << "handling accept" << std::endl;
         new_connection->sendReceived();
+    }
+    else {
+        std::cout << "handleAccept: " << error.message() << std::endl;
+    }
     
     startAccept();
 }
