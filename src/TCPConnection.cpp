@@ -49,8 +49,7 @@ void TCPConnection::handleWriteReceived(const boost::system::error_code& /*error
 {
     std::cout << "written received" << std::endl;
     CryptoPP::byte raw_index[4];
-    boost::asio::read(socket_, boost::asio::buffer(raw_index),
-                      boost::asio::transfer_exactly(4));
+    boost::asio::read(socket_, boost::asio::buffer(raw_index));
     int index = ByteToInt(raw_index);
     
     if (index >= 0) {

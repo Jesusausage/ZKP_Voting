@@ -87,7 +87,6 @@ void VoteData::readIPsFromFile()
     for (int i = 0; i < num_voters_; i++) {
         ips_in >> ip_addrs_[i];
         assert(!ips_in.eof());
-        std::cout  << i << std::endl;
     }
     ips_in.close();
 }

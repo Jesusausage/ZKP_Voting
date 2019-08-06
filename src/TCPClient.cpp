@@ -35,9 +35,6 @@ void TCPClient::handleConnect(boost::shared_ptr<TCPConnection> connection,
         std::cout << "handling connect" << std::endl;
         int num_voters = vote_data_.numVoters();
         bool* received = new bool[num_voters];
-        for (int i = 0; i < num_voters; ++i)
-            received[i] = false;
-
         boost::asio::read(connection->socket(), 
                           boost::asio::buffer(received, num_voters));
         int index = vote_data_.processReceived(received);
