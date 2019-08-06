@@ -51,8 +51,8 @@ int main() {
     // VoteDataTest::testWriteKey();
     // VoteDataTest::testProcessHashes();
     // VoteDataTest::testSuccessfulVote();
-    // VoteDataTest::testGetUserVote();
-    // std::cout << "VoteData test success." << std::endl;
+    VoteDataTest::testGetUserVote();
+    std::cout << "VoteData test success." << std::endl;
 
     TestIntByteConversion();
     std::cout << "TCPServer test success." << std::endl;

@@ -18,7 +18,12 @@ void VoteDataTest::testReadOptionsAndIPs()
         << "192.168.27.2" << std::endl 
         << "192.168.27.3" << std::endl
         << "192.168.27.4" << std::endl
-        << "192.168.27.5" << std::endl;
+        << "192.168.27.5" << std::endl
+        << "192.168.27.2" << std::endl 
+        << "192.168.27.3" << std::endl
+        << "192.168.27.4" << std::endl
+        << "192.168.27.5" << std::endl
+        << "192.168.27.1" << std::endl;
     ips.close();
 
     VoteData data(ecg, base, 10, 5);
@@ -34,6 +39,7 @@ void VoteDataTest::testReadOptionsAndIPs()
     assert(data.ip_addrs_[2] == "192.168.27.3");
     assert(data.ip_addrs_[3] == "192.168.27.4");
     assert(data.ip_addrs_[4] == "192.168.27.5");
+    assert(data.ip_addrs_[9] == "192.168.27.1");
 }
 
 

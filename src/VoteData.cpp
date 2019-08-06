@@ -12,7 +12,8 @@ VoteData::VoteData(const ECGroup& ecg,
 {
     voter_ids_.reserve(num_voters_);
     tokens_.reserve(num_voters_);
-    options_.resize(num_voters_);
+    options_.resize(num_options_);
+    ip_addrs_.resize(num_voters_);
 
     received_ = new bool[num_voters_];
     for (int i = 0; i < num_voters_; ++i)
@@ -83,11 +84,10 @@ void VoteData::readIPsFromFile()
         std::cerr << "Error opening " << IP_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
-    std::string ip;
-    ips_in >> ip;
-    while (!ips_in.eof()) {
-        ip_addrs_.push_back(ip);
-        ips_in >> ip;
+    for (int i = 0; i < num_voters_; i++) {
+        ips_in >> ip_addrs_[i];
+        assert(!ips_in.eof());
+        std::cout  << i << std::endl;
     }
     ips_in.close();
 }
