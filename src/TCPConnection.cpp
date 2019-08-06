@@ -24,7 +24,8 @@ TCPConnection::TCPConnection(boost::asio::io_context& io_context,
 
 void TCPConnection::sendReceived()
 {
-    boost::asio::async_write(socket_, vote_data_.makeReceivedMsg(),
+    message_ = vote_data_.makeReceivedMsg();
+    boost::asio::async_write(socket_, message_,
                              boost::bind(&TCPConnection::handleWriteReceived, 
                                          shared_from_this(),
                                          boost::asio::placeholders::error,
@@ -34,7 +35,8 @@ void TCPConnection::sendReceived()
 
 void TCPConnection::sendVKPair(int index)
 {
-    boost::asio::async_write(socket_, vote_data_.makeVKPairMsg(index),
+    message_ = vote_data_.makeVKPairMsg(index);
+    boost::asio::async_write(socket_, message_,
                              boost::bind(&TCPConnection::handleWriteVKPair,
                                          shared_from_this(),
                                          boost::asio::placeholders::error,

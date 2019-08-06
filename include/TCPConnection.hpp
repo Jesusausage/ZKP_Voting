@@ -27,6 +27,7 @@ public:
 private:
     boost::asio::ip::tcp::socket socket_;
     VoteData& vote_data_;
+    boost::asio::const_buffer message_;
 
     TCPConnection(boost::asio::io_context& io_context, 
                   VoteData& vote_data);
