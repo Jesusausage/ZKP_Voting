@@ -31,8 +31,8 @@ public:
     int processReceived(bool received[]);
     void processVKPair(CryptoPP::byte* input, int index);
 
-    boost::asio::const_buffer makeReceivedMsg() const;
-    boost::asio::const_buffer makeVKPairMsg(int index) const;
+    inline bool* received() const
+        { return received_; }
 
     inline int numOptions() const
         { return num_options_; }

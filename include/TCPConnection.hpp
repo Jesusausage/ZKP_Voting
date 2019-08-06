@@ -27,10 +27,16 @@ public:
 private:
     boost::asio::ip::tcp::socket socket_;
     VoteData& vote_data_;
-    boost::asio::const_buffer message_;
+
+    bool* received_msg_;
+    CryptoPP::byte* vkpair_msg_;
+    size_t msg_len_;
 
     TCPConnection(boost::asio::io_context& io_context, 
                   VoteData& vote_data);
+
+    void makeReceivedMsg();
+    void makeVKPairMsg(int index);
 
     void handleWriteReceived(const boost::system::error_code& /*error*/,
                              size_t /*bytes_transferred*/);

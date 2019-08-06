@@ -120,35 +120,6 @@ void VoteData::processVKPair(CryptoPP::byte* input, int index)
 }
 
 
-boost::asio::const_buffer VoteData::makeReceivedMsg() const
-{
-    return boost::asio::buffer(received_, num_voters_);
-}
-
-
-boost::asio::const_buffer VoteData::makeVKPairMsg(int index) const
-{
-    if (index < 0) {
-        CryptoPP::byte out[4];
-        IntToByte(-1, out);
-        return boost::asio::const_buffer(out, 4);
-    }
-
-    size_t length = 489 * num_options_ + 4;
-    CryptoPP::byte* output = new CryptoPP::byte[length];
-    
-    IntToByte(index, output);
-    size_t offset = 4;
-    readVote(index, output + offset, num_options_);
-    offset += 326 * num_options_;
-    readKey(index, output + offset, num_options_);
-    auto ret = boost::asio::const_buffer(output, length);
-
-    delete [] output;
-    return ret;
-}
-
-
 std::string VoteData::randomIP() const
 {
     int index = rand() % ip_addrs_.size();
