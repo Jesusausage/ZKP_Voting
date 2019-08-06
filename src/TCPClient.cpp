@@ -17,10 +17,10 @@ TCPClient::TCPClient(VoteData& vote_data,
 
 void TCPClient::startConnect()
 {
-    tcp::endpoint endpoint(address::from_string(vote_data_.randomIP()),
-                           PORT);
+    boost::shared_ptr<tcp::endpoint> endpoint(
+        new tcp::endpoint(address::from_string(vote_data_.randomIP()), PORT));
     auto connection = TCPConnection::create(io_, vote_data_);
-    connection->socket().async_connect(endpoint, 
+    connection->socket().async_connect(*endpoint, 
                                        boost::bind(&TCPClient::handleConnect,
                                                    this,
                                                    connection,

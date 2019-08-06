@@ -215,6 +215,10 @@ void VoteData::getUserVote()
     writeVote(vote, voter_index);
     writeKey(key, voter_index);
     received_[voter_index] = true;
+
+    // make priv_keys, voter_index member variables
+    // separate priv_key reading fns
+    // randomIP doesnt generate voter_index
 }
 
 
