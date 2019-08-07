@@ -3,7 +3,8 @@
 
 
 #define FILE_OPENING_ERROR 10
-#define INVALID_PRIV_KEY 11
+#define INCOMPLETE_FILE_ERROR 11
+#define INVALID_PRIV_KEY 12
 
 
 #endif

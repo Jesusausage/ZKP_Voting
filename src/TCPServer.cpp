@@ -1,5 +1,4 @@
 #include "TCPServer.hpp"
-#include "VoteData.hpp"
 
 
 using namespace boost::asio::ip;

@@ -1,13 +1,15 @@
-#include "ECGroupTest.hpp"
-#include "SchnorrProtocolTest.hpp"
-#include "ElGamalProtocolTest.hpp"
-#include "OrProtocolTest.hpp"
-#include "VoterTest.hpp"
-#include "KeyGenTest.hpp"
-#include "VerifierTest.hpp"
-#include "VoteDataTest.hpp"
-#include "TCPServerTest.hpp"
+// #include "ECGroupTest.hpp"
+// #include "SchnorrProtocolTest.hpp"
+// #include "ElGamalProtocolTest.hpp"
+// #include "OrProtocolTest.hpp"
+// #include "VoterTest.hpp"
+// #include "KeyGenTest.hpp"
+// #include "VerifierTest.hpp"
+// #include "VoteDataTest.hpp"
+// #include "TCPServerTest.hpp"
 
+#include "TCPServer.hpp"
+#include "TCPClient.hpp"
 #include <boost/thread/thread.hpp>
 
 
@@ -54,8 +56,8 @@ int main() {
     // VoteDataTest::testGetUserVote();
     // std::cout << "VoteData test success." << std::endl;
 
-    TestIntByteConversion();
-    std::cout << "TCPServer test success." << std::endl;
+    // TestIntByteConversion();
+    // std::cout << "TCPServer test success." << std::endl;
 
     auto ecg = GenerateECGroup();
     auto gen = GenerateECBase();

@@ -70,8 +70,11 @@ void VoteData::readOptionsFromFile()
         exit(FILE_OPENING_ERROR);
     }
     for (int i = 0; i < num_options_; i++) {
-        options_in >> options_[i];
-        assert(!options_in.eof());
+        if (options_in.eof()) {
+            std::cerr << "Incomplete options file: " << OPTION_FILE << std::endl;
+            exit(INCOMPLETE_FILE_ERROR);
+        }
+        options_in >> options_[i];        
     }
     options_in.close();
 }
@@ -85,8 +88,11 @@ void VoteData::readIPsFromFile()
         exit(FILE_OPENING_ERROR);
     }
     for (int i = 0; i < num_voters_; i++) {
+        if (ips_in.eof()) {
+            std::cerr << "Incomplete IP file: " << IP_FILE << std::endl;
+            exit(INCOMPLETE_FILE_ERROR);
+        }
         ips_in >> ip_addrs_[i];
-        assert(!ips_in.eof());
     }
     ips_in.close();
 }

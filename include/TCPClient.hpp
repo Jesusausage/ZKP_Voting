@@ -2,10 +2,8 @@
 #define TCP_CLIENT_HPP
 
 
+#include "VoteData.hpp"
 #include "TCPConnection.hpp"
-
-
-class VoteData;
 
 
 class TCPClient {

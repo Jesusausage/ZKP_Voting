@@ -4,8 +4,6 @@
 
 #include "Verifier.hpp"
 #include "Errors.hpp"
-#include "TCPServer.hpp"
-#include "TCPClient.hpp"
 #include <array>
 #include <set>
 

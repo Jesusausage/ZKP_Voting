@@ -2,6 +2,7 @@
 #define TCP_CONNECTION_HPP
 
 
+#include "VoteData.hpp"
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
@@ -10,9 +11,6 @@
 
 
 #define PORT 1337
-
-
-class VoteData;
 
 
 class TCPConnection {
