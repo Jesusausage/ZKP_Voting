@@ -5,15 +5,6 @@
 using namespace boost::asio::ip;
 
 
-boost::shared_ptr<TCPConnection> TCPConnection::create(
-                    boost::asio::io_context& io_context,
-                    VoteData& vote_data)
-{
-    return boost::shared_ptr<TCPConnection>(new TCPConnection(io_context, 
-                                                              vote_data));
-}
-
-
 TCPConnection::TCPConnection(boost::asio::io_context& io_context,
                              VoteData& vote_data)
                              :
@@ -22,30 +13,33 @@ TCPConnection::TCPConnection(boost::asio::io_context& io_context,
 {}
 
 
-void TCPConnection::sendReceived()
+ServerConnection::ServerConnection(boost::asio::io_context& io_context,
+                                   VoteData& vote_data)
+                                   :
+                                   TCPConnection(io_context, vote_data)
+{}
+
+
+void ServerConnection::makeReceivedMsg()
+{
+    received_msg_ = vote_data_.received();
+    num_voters_ = vote_data_.numVoters();
+}
+
+
+void ServerConnection::sendReceived()
 {
     makeReceivedMsg();
     boost::asio::async_write(socket_, boost::asio::buffer(received_msg_, num_voters_),
-                             boost::bind(&TCPConnection::handleWriteReceived, 
-                                         shared_from_this(),
+                             boost::bind(&ServerConnection::handleWriteReceived, 
+                                         this,
                                          boost::asio::placeholders::error,
                                          boost::asio::placeholders::bytes_transferred));
 }
 
 
-void TCPConnection::sendVKPair(int index)
-{
-    makeVKPairMsg(index);
-    boost::asio::async_write(socket_, boost::asio::buffer(vkpair_msg_),
-                             boost::bind(&TCPConnection::handleWriteVKPair,
-                                         shared_from_this(),
-                                         boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred));
-}
-
-
-void TCPConnection::handleWriteReceived(const boost::system::error_code& /*error*/,
-                                        size_t /*bytes_transferred*/)
+void ServerConnection::handleWriteReceived(const boost::system::error_code& /*error*/,
+                                           size_t /*bytes_transferred*/)
 {
     std::cout << "written received" << std::endl;
     CryptoPP::byte raw_index[4];
@@ -63,14 +57,48 @@ void TCPConnection::handleWriteReceived(const boost::system::error_code& /*error
 }
 
 
-void TCPConnection::handleWriteVKPair(const boost::system::error_code& /*error*/,
-                                      size_t /*bytes_transferred*/)
+ClientConnection::ClientConnection(boost::asio::io_context& io_context,
+                                   VoteData& vote_data)
+                                   :
+                                   TCPConnection(io_context, vote_data)
+{}
+
+
+void ClientConnection::makeVKPairMsg(int index)
 {
-    std::cout << "written vkpair" << std::endl;
+    if (index < 0) {
+        vkpair_msg_.resize(4);
+        IntToByte(-1, vkpair_msg_.data());
+    }
+    else {
+        int num_options = vote_data_.numOptions();
+        vkpair_msg_.resize(489 * num_options + 4);
+        
+        IntToByte(index, vkpair_msg_.data());
+        size_t offset = 4;
+        VoteData::readVote(index, vkpair_msg_.data() + offset, num_options);
+        offset += 326 * num_options;
+        VoteData::readKey(index, vkpair_msg_.data() + offset, num_options);
+    }
 }
 
 
-/* ======================================================================== */
+void ClientConnection::sendVKPair(int index)
+{
+    makeVKPairMsg(index);
+    boost::asio::async_write(socket_, boost::asio::buffer(vkpair_msg_),
+                             boost::bind(&ClientConnection::handleWriteVKPair,
+                                         this,
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
+}
+
+
+void ClientConnection::handleWriteVKPair(const boost::system::error_code& /*error*/,
+                                         size_t /*bytes_transferred*/)
+{
+    std::cout << "written vkpair" << std::endl;
+}
 
 
 int ByteToInt(const CryptoPP::byte ch[4])
@@ -96,30 +124,4 @@ void IntToByte(int n, CryptoPP::byte output[4])
 
     n %= 256;
     output[3] = static_cast<unsigned char>(n);
-}
-
-
-void TCPConnection::makeReceivedMsg()
-{
-    received_msg_ = vote_data_.received();
-    num_voters_ = vote_data_.numVoters();
-}
-
-
-void TCPConnection::makeVKPairMsg(int index)
-{
-    if (index < 0) {
-        vkpair_msg_.resize(4);
-        IntToByte(-1, vkpair_msg_.data());
-    }
-    else {
-        int num_options = vote_data_.numOptions();
-        vkpair_msg_.resize(489 * num_options + 4);
-        
-        IntToByte(index, vkpair_msg_.data());
-        size_t offset = 4;
-        VoteData::readVote(index, vkpair_msg_.data() + offset, num_options);
-        offset += 326 * num_options;
-        VoteData::readKey(index, vkpair_msg_.data() + offset, num_options);
-    }
 }

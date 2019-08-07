@@ -19,7 +19,7 @@ private:
     boost::asio::ip::tcp::acceptor acceptor_;
 
     void startAccept();
-    void handleAccept(boost::shared_ptr<TCPConnection> new_connection,
+    void handleAccept(boost::shared_ptr<ServerConnection> connection,
                       const boost::system::error_code& error);
 };
 

@@ -19,7 +19,8 @@ void TCPClient::startConnect()
 {
     boost::shared_ptr<tcp::endpoint> endpoint(
         new tcp::endpoint(address::from_string(vote_data_.randomIP()), PORT));
-    auto connection = TCPConnection::create(io_, vote_data_);
+    boost::shared_ptr<ClientConnection> connection(
+        new ClientConnection(io_, vote_data_));
     connection->socket().async_connect(*endpoint, 
                                        boost::bind(&TCPClient::handleConnect,
                                                    this,
@@ -28,7 +29,7 @@ void TCPClient::startConnect()
 }
 
 
-void TCPClient::handleConnect(boost::shared_ptr<TCPConnection> connection,
+void TCPClient::handleConnect(boost::shared_ptr<ClientConnection> connection,
                               const boost::system::error_code& error)
 {
     if (!error) {

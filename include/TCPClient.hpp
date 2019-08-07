@@ -18,7 +18,7 @@ private:
     boost::asio::io_context& io_;
 
     void startConnect();
-    void handleConnect(boost::shared_ptr<TCPConnection> new_connection,
+    void handleConnect(boost::shared_ptr<ClientConnection> connection,
                        const boost::system::error_code& error);
 };
 

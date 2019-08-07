@@ -15,38 +15,49 @@
 class VoteData;
 
 
-class TCPConnection : public boost::enable_shared_from_this<TCPConnection> {
+class TCPConnection {
 public:
-    static boost::shared_ptr<TCPConnection> create(boost::asio::io_context& io_context,
-                                                   VoteData& vote_data);
-    void sendReceived();
-    void sendVKPair(int index);
     inline boost::asio::ip::tcp::socket& socket()
         { return socket_; }
 
-private:
+protected:
     boost::asio::ip::tcp::socket socket_;
     VoteData& vote_data_;
 
-    bool* received_msg_;
-    int num_voters_;
-    
-    std::vector<CryptoPP::byte> vkpair_msg_;
-
     TCPConnection(boost::asio::io_context& io_context, 
                   VoteData& vote_data);
-
-    void makeReceivedMsg();
-    void makeVKPairMsg(int index);
-
-    void handleWriteReceived(const boost::system::error_code& /*error*/,
-                             size_t /*bytes_transferred*/);
-    void handleWriteVKPair(const boost::system::error_code& /*error*/,
-                           size_t /*bytes_transferred*/);
 };
 
 
-/* ====================================================================== */
+class ServerConnection : public TCPConnection {
+public:
+    ServerConnection(boost::asio::io_context& io_context,
+                     VoteData& vote_data);
+    void sendReceived();
+
+private:
+    bool* received_msg_;
+    int num_voters_;
+
+    void makeReceivedMsg();    
+    void handleWriteReceived(const boost::system::error_code& /*error*/,
+                             size_t /*bytes_transferred*/);
+};
+
+
+class ClientConnection : public TCPConnection {
+public:
+    ClientConnection(boost::asio::io_context& io_context,
+                     VoteData& vote_data);
+    void sendVKPair(int index);
+
+private:
+    std::vector<CryptoPP::byte> vkpair_msg_;
+    
+    void makeVKPairMsg(int index);    
+    void handleWriteVKPair(const boost::system::error_code& /*error*/,
+                           size_t /*bytes_transferred*/);
+};
 
 
 int ByteToInt(const CryptoPP::byte ch[4]);

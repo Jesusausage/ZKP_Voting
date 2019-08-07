@@ -18,20 +18,21 @@ TCPServer::TCPServer(VoteData& vote_data,
 
 void TCPServer::startAccept()
 {
-    auto new_connection = TCPConnection::create(io_, vote_data_);
-    acceptor_.async_accept(new_connection->socket(), 
+    boost::shared_ptr<ServerConnection> connection(
+        new ServerConnection(io_, vote_data_));
+    acceptor_.async_accept(connection->socket(), 
                            boost::bind(&TCPServer::handleAccept, this,
-                                       new_connection,
+                                       connection,
                                        boost::asio::placeholders::error));
 }
 
 
-void TCPServer::handleAccept(boost::shared_ptr<TCPConnection> new_connection,
+void TCPServer::handleAccept(boost::shared_ptr<ServerConnection> connection,
                              const boost::system::error_code& error)
 {
     if (!error) {
         std::cout << "handling accept" << std::endl;
-        new_connection->sendReceived();
+        connection->sendReceived();
     }
     else {
         std::cout << "handleAccept: " << error.message() << std::endl;
