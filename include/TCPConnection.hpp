@@ -29,15 +29,19 @@ protected:
 };
 
 
-class ServerConnection : public TCPConnection {
+class ServerConnection : public TCPConnection, 
+                         public boost::enable_shared_from_this<ServerConnection> {
 public:
-    ServerConnection(boost::asio::io_context& io_context,
-                     VoteData& vote_data);
+    static boost::shared_ptr<ServerConnection> create(boost::asio::io_context& io_context,
+                                                      VoteData& vote_data);
     void sendReceived();
 
 private:
     bool* received_msg_;
     int num_voters_;
+
+    ServerConnection(boost::asio::io_context& io_context,
+                     VoteData& vote_data);
 
     void makeReceivedMsg();    
     void handleWriteReceived(const boost::system::error_code& /*error*/,
@@ -45,14 +49,18 @@ private:
 };
 
 
-class ClientConnection : public TCPConnection {
+class ClientConnection : public TCPConnection,
+                         public boost::enable_shared_from_this<ClientConnection> {
 public:
-    ClientConnection(boost::asio::io_context& io_context,
-                     VoteData& vote_data);
+    static boost::shared_ptr<ClientConnection> create(boost::asio::io_context& io_context,
+                                                      VoteData& vote_data);
     void sendVKPair(int index);
 
 private:
     std::vector<CryptoPP::byte> vkpair_msg_;
+    
+    ClientConnection(boost::asio::io_context& io_context,
+                     VoteData& vote_data);
     
     void makeVKPairMsg(int index);    
     void handleWriteVKPair(const boost::system::error_code& /*error*/,

@@ -13,6 +13,14 @@ TCPConnection::TCPConnection(boost::asio::io_context& io_context,
 {}
 
 
+boost::shared_ptr<ServerConnection> ServerConnection::create(boost::asio::io_context& io_context,
+                                                             VoteData& vote_data)
+{
+    return boost::shared_ptr<ServerConnection>(
+        new ServerConnection(io_context, vote_data));
+}
+
+
 ServerConnection::ServerConnection(boost::asio::io_context& io_context,
                                    VoteData& vote_data)
                                    :
@@ -32,7 +40,7 @@ void ServerConnection::sendReceived()
     makeReceivedMsg();
     boost::asio::async_write(socket_, boost::asio::buffer(received_msg_, num_voters_),
                              boost::bind(&ServerConnection::handleWriteReceived, 
-                                         this,
+                                         shared_from_this(),
                                          boost::asio::placeholders::error,
                                          boost::asio::placeholders::bytes_transferred));
 }
@@ -54,6 +62,14 @@ void ServerConnection::handleWriteReceived(const boost::system::error_code& /*er
         vote_data_.processVKPair(in, index);
         delete [] in;
     }
+}
+
+
+boost::shared_ptr<ClientConnection> ClientConnection::create(boost::asio::io_context& io_context,
+                                                             VoteData& vote_data)
+{
+    return boost::shared_ptr<ClientConnection>(
+        new ClientConnection(io_context, vote_data));
 }
 
 
@@ -88,7 +104,7 @@ void ClientConnection::sendVKPair(int index)
     makeVKPairMsg(index);
     boost::asio::async_write(socket_, boost::asio::buffer(vkpair_msg_),
                              boost::bind(&ClientConnection::handleWriteVKPair,
-                                         this,
+                                         shared_from_this(),
                                          boost::asio::placeholders::error,
                                          boost::asio::placeholders::bytes_transferred));
 }

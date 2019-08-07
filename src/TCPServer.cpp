@@ -18,8 +18,7 @@ TCPServer::TCPServer(VoteData& vote_data,
 
 void TCPServer::startAccept()
 {
-    boost::shared_ptr<ServerConnection> connection(
-        new ServerConnection(io_, vote_data_));
+    auto connection = ServerConnection::create(io_, vote_data_);
     acceptor_.async_accept(connection->socket(), 
                            boost::bind(&TCPServer::handleAccept, this,
                                        connection,
