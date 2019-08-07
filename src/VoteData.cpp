@@ -156,7 +156,7 @@ void VoteData::getUserVote()
 
     Voter voter(ecg_, gen_, id_sum_, tokens_[voter_index_]);
     voter.setTokenKeys(token_keys_);
-    voter.castVote(0);
+    voter.castVote(getUserInput());
     Vote vote = voter.getVoteAndProofs();
 
     KeyGen keygen(ecg_, gen_, token_sums_, voter_ids_[voter_index_]);
@@ -182,8 +182,13 @@ void VoteData::readPrivFromFile()
     }
     token_keys_.resize(num_options_);
     priv_in >> id_key_ >> std::ws;
-    for (int i = 0; i < num_options_; ++i)
+    for (int i = 0; i < num_options_; ++i) {
+        if (priv_in.eof()) {
+            std::cerr << "Incomplete private keys file: " << PRIV_KEY_FILE << std::endl;
+            exit(INCOMPLETE_FILE_ERROR);
+        }
         priv_in >> token_keys_[i] >> std::ws;
+    }
     priv_in.close();
 
     auto id = ecg_.curve.Multiply(id_key_, gen_);
@@ -193,6 +198,26 @@ void VoteData::readPrivFromFile()
             break;
         }
     }
+}
+
+
+int VoteData::getUserInput()
+{
+    std::cout << "Options: " << std::endl;
+    for (int i = 0; i < num_options_; ++i) {
+        std::cout << i << ": " << options_[i] << std::endl;
+    }
+    std::cout << std::endl << "Select an option to vote for: ";
+
+    int option;
+    std::cin >> option;
+    while (option < 0 || option >= num_options_) {
+        std::cout << "Please choose a valid option: ";
+        std::cin >> option;
+    }
+
+    std::cout << "You have voted for " << options_[option] << std::endl;
+    return option;
 }
 
 

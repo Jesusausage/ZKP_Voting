@@ -72,6 +72,7 @@ private:
 
     void getUserVote();
     void readPrivFromFile();
+    int getUserInput();
 
     bool verifyVote(const Vote& vote, int index);
     bool verifyKey(const Key& key, int index);
