@@ -1,7 +1,7 @@
 #include "PublicData.hpp"
 
 
-PublicData::PublicData(int num_voters, int num_options)
+PublicData::PublicData(const ECGroup& ecg, int num_voters, int num_options)
                        :
                        num_voters_(num_voters), num_options_(num_options)
 {
@@ -9,6 +9,7 @@ PublicData::PublicData(int num_voters, int num_options)
     voter_ids_.reserve(num_voters);
     readTokensFromFile();
     readIDsFromFile();
+    setSums(ecg);
 
     options_.resize(num_options);
     ip_addrs_.resize(num_voters);
@@ -38,6 +39,20 @@ void PublicData::readIDsFromFile()
     }
     ReadIDs(id_in, voter_ids_);
     id_in.close();
+}
+
+
+void PublicData::setSums(const ECGroup& ecg)
+{
+    token_sums_.resize(num_options_);
+
+    for (int i = 0; i < num_voters_; i++) {
+        id_sum_ = ecg.curve.Add(id_sum_, voter_ids_[i]);
+        for (int option = 0; option < num_options_; option++) {
+            token_sums_[option] = ecg.curve.Add(token_sums_[option],
+                                                 tokens_[i][option]);
+        }
+    }
 }
 
 

@@ -16,7 +16,7 @@
 
 class PublicData {
 public:
-    PublicData(int num_voters, int num_options);
+    PublicData(const ECGroup& ecg, int num_voters, int num_options);
 
     inline int numVoters() const
         { return num_voters_; }
@@ -27,6 +27,12 @@ public:
         { return voter_ids_[index]; }
     inline const std::vector<CryptoPP::ECPPoint> tokens(int index) const 
         { return tokens_[index]; }
+        
+    inline const CryptoPP::ECPPoint& idSum() const 
+        { return id_sum_; }
+    inline const std::vector<CryptoPP::ECPPoint>& tokenSums() const 
+        { return token_sums_; }
+
     inline const std::string option(int index) const 
         { return options_[index]; }
     inline const std::string ip(int index) const 
@@ -35,8 +41,12 @@ public:
 private:
     const int num_voters_;
     const int num_options_;
+
     std::vector<CryptoPP::ECPPoint> voter_ids_;
+    CryptoPP::ECPPoint id_sum_;
     std::vector< std::vector<CryptoPP::ECPPoint> > tokens_;
+    std::vector<CryptoPP::ECPPoint> token_sums_;
+
     std::vector<std::string> options_;
     std::vector<std::string> ip_addrs_;
 
@@ -45,6 +55,7 @@ private:
     void readIDsFromFile();
     void readOptionsFromFile();
     void readIPsFromFile();
+    void setSums(const ECGroup& ecg);
 };
 
 
