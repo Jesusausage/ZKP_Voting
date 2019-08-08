@@ -31,7 +31,7 @@ public:
 private:
     const ECGroup& ecg_;
     const CryptoPP::ECPPoint& gen_;
-    const CryptoPP::ECPPoint& id_sum_;
+    const CryptoPP::ECPPoint id_sum_;
     const std::vector<CryptoPP::ECPPoint> tokens_;    
     const int num_options_;
 
