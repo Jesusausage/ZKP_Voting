@@ -2,27 +2,29 @@
 
 
 PublicData::PublicData(int num_voters, int num_options)
+                       :
+                       num_voters_(num_voters), num_options_(num_options)
 {
     tokens_.reserve(num_voters);
     voter_ids_.reserve(num_voters);
-    readTokensFromFile(num_options);
+    readTokensFromFile();
     readIDsFromFile();
 
     options_.resize(num_options);
     ip_addrs_.resize(num_voters);
-    readOptionsFromFile(num_options);
-    readIPsFromFile(num_voters);
+    readOptionsFromFile();
+    readIPsFromFile();
 }
 
 
-void PublicData::readTokensFromFile(int num_options)
+void PublicData::readTokensFromFile()
 {
     std::ifstream token_in(TOKEN_FILE);
     if (!token_in.is_open()) {
         std::cerr << "Error opening " << TOKEN_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
-    ReadTokens(token_in, tokens_, num_options);
+    ReadTokens(token_in, tokens_, num_options_);
     token_in.close();
 }
 
@@ -39,14 +41,14 @@ void PublicData::readIDsFromFile()
 }
 
 
-void PublicData::readOptionsFromFile(int num_options)
+void PublicData::readOptionsFromFile()
 {
     std::ifstream options_in(OPTION_FILE);
     if (!options_in.is_open()) {
         std::cerr << "Error opening " << OPTION_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
-    for (int i = 0; i < num_options; i++) {
+    for (int i = 0; i < num_options_; i++) {
         if (options_in.eof()) {
             std::cerr << "Incomplete options file: " << OPTION_FILE << std::endl;
             exit(INCOMPLETE_FILE_ERROR);
@@ -57,14 +59,14 @@ void PublicData::readOptionsFromFile(int num_options)
 }
 
 
-void PublicData::readIPsFromFile(int num_voters)
+void PublicData::readIPsFromFile()
 {
     std::ifstream ips_in(IP_FILE);
     if (!ips_in.is_open()) {
         std::cerr << "Error opening " << IP_FILE << std::endl;
         exit(FILE_OPENING_ERROR);
     }
-    for (int i = 0; i < num_voters; i++) {
+    for (int i = 0; i < num_voters_; i++) {
         if (ips_in.eof()) {
             std::cerr << "Incomplete IP file: " << IP_FILE << std::endl;
             exit(INCOMPLETE_FILE_ERROR);

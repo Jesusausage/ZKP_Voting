@@ -18,6 +18,11 @@ class PublicData {
 public:
     PublicData(int num_voters, int num_options);
 
+    inline int numVoters() const
+        { return num_voters_; }
+    inline int numOptions() const
+        { return num_options_; }
+
     inline const CryptoPP::ECPPoint& id(int index) const
         { return voter_ids_[index]; }
     inline const std::vector<CryptoPP::ECPPoint> tokens(int index) const 
@@ -28,16 +33,18 @@ public:
         { return ip_addrs_[index]; }
 
 private:
+    const int num_voters_;
+    const int num_options_;
     std::vector<CryptoPP::ECPPoint> voter_ids_;
     std::vector< std::vector<CryptoPP::ECPPoint> > tokens_;
     std::vector<std::string> options_;
     std::vector<std::string> ip_addrs_;
 
 
-    void readTokensFromFile(int num_options);
+    void readTokensFromFile();
     void readIDsFromFile();
-    void readOptionsFromFile(int num_options);
-    void readIPsFromFile(int num_voters);
+    void readOptionsFromFile();
+    void readIPsFromFile();
 };
 
 
