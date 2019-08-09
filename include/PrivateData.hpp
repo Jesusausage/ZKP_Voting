@@ -6,6 +6,7 @@
 #include <cryptopp/integer.h>
 #include <vector>
 #include <fstream>
+#include <iostream>
 
 
 #define PRIV_KEY_FILE "private_keys.txt"

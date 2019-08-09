@@ -9,13 +9,10 @@
 
 class VoteDataTest {
 public:
-    static void testReadOptionsAndIPs();
-    static void testReadTokensAndIDs();
     static void testWriteVote();
     static void testWriteKey();
     static void testProcessHashes();
     static void testSuccessfulVote();
-    static void testGetUserVote();
 };
 
 

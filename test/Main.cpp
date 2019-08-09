@@ -1,12 +1,12 @@
-// #include "ECGroupTest.hpp"
-// #include "SchnorrProtocolTest.hpp"
-// #include "ElGamalProtocolTest.hpp"
-// #include "OrProtocolTest.hpp"
-// #include "VoterTest.hpp"
-// #include "KeyGenTest.hpp"
-// #include "VerifierTest.hpp"
-// #include "VoteDataTest.hpp"
-// #include "TCPServerTest.hpp"
+#include "ECGroupTest.hpp"
+#include "SchnorrProtocolTest.hpp"
+#include "ElGamalProtocolTest.hpp"
+#include "OrProtocolTest.hpp"
+#include "VoterTest.hpp"
+#include "KeyGenTest.hpp"
+#include "VerifierTest.hpp"
+#include "VoteDataTest.hpp"
+#include "TCPServerTest.hpp"
 
 #include "TCPServer.hpp"
 #include "TCPClient.hpp"
@@ -47,17 +47,14 @@ int main() {
     // TestVoteDecryption();
     // std::cout << "Verification test success." << std::endl; 
 
-    // VoteDataTest::testReadOptionsAndIPs();
-    // VoteDataTest::testReadTokensAndIDs();
-    // VoteDataTest::testWriteVote();
-    // VoteDataTest::testWriteKey();
-    // VoteDataTest::testProcessHashes();
-    // VoteDataTest::testSuccessfulVote();
-    // VoteDataTest::testGetUserVote();
-    // std::cout << "VoteData test success." << std::endl;
+    VoteDataTest::testWriteVote();
+    VoteDataTest::testWriteKey();
+    VoteDataTest::testProcessHashes();
+    VoteDataTest::testSuccessfulVote();
+    std::cout << "VoteData test success." << std::endl;
 
-    // TestIntByteConversion();
-    // std::cout << "TCPServer test success." << std::endl;
+    TestIntByteConversion();
+    std::cout << "TCPServer test success." << std::endl;
 
     auto ecg = GenerateECGroup();
     auto gen = GenerateECBase();

@@ -6,6 +6,7 @@
 #include "Errors.hpp"
 #include <vector>
 #include <fstream>
+#include <iostream>
 
 
 #define TOKEN_FILE "tokens.txt"
@@ -27,7 +28,7 @@ public:
         { return voter_ids_[index]; }
     inline const std::vector<CryptoPP::ECPPoint> tokens(int index) const 
         { return tokens_[index]; }
-        
+
     inline const CryptoPP::ECPPoint& idSum() const 
         { return id_sum_; }
     inline const std::vector<CryptoPP::ECPPoint>& tokenSums() const 
