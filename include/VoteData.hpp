@@ -54,6 +54,9 @@ private:
     void writeKey(const Key& key, int index);
 
     void findVoterIndex();
+
+    void getUserVote();
+    int getUserInput();
 };
 
 

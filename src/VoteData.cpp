@@ -11,15 +11,16 @@ VoteData::VoteData(const ECGroup& ecg,
                    pub_(pub_data),
                    priv_(priv_data)
 {
-    findVoterIndex();
-    // generate user vote
-    // check existing votes
-
     received_ = new bool[pub_data.numVoters()];
     for (int i = 0; i < pub_data.numVoters(); ++i)
         received_[i] = false;
 
     verifier_ = new Verifier(ecg_, gen_, pub_.idSum(), pub_.tokenSums());
+
+    findVoterIndex();
+    // check existing votes
+    if (received_[voter_index_] == false)
+        getUserVote();
 }
 
 
@@ -70,45 +71,41 @@ std::string VoteData::randomIP() const
 }
 
 
-// void VoteData::getUserVote()
-// {
-//     Voter voter(ecg_, gen_, id_sum_, tokens_[voter_index_]);
-//     voter.setTokenKeys(token_keys_);
-//     voter.castVote(getUserInput());
-//     Vote vote = voter.getVoteAndProofs();
+void VoteData::getUserVote()
+{
+    Voter voter(ecg_, gen_, pub_.idSum(), pub_.tokens(voter_index_));
+    voter.setTokenKeys(priv_.tokenKeys());
+    voter.castVote(getUserInput());
+    Vote vote = voter.getVoteAndProofs();
 
-//     KeyGen keygen(ecg_, gen_, token_sums_, voter_ids_[voter_index_]);
-//     keygen.setIDKey(id_key_);
-//     Key key = keygen.getKeysAndProofs();
+    KeyGen keygen(ecg_, gen_, pub_.tokenSums(), pub_.id(voter_index_));
+    keygen.setIDKey(priv_.idKey());
+    Key key = keygen.getKeysAndProofs();
 
-//     if (!verifyVote(vote, voter_index_) || !verifyKey(key, voter_index_)) {
-//         std::cerr << "Private keys invalid." << std::endl;
-//         exit(INVALID_PRIV_KEY);
-//     }
-//     writeVote(vote, voter_index_);
-//     writeKey(key, voter_index_);
-//     received_[voter_index_] = true;
-// }
+    writeVote(vote, voter_index_);
+    writeKey(key, voter_index_);
+    received_[voter_index_] = true;
+}
 
 
-// int VoteData::getUserInput()
-// {
-//     std::cout << "Options: " << std::endl;
-//     for (int i = 0; i < pub_.numOptions(); ++i) {
-//         std::cout << i << ": " << options_[i] << std::endl;
-//     }
-//     std::cout << std::endl << "Select an option to vote for: ";
+int VoteData::getUserInput()
+{
+    std::cout << "Options: " << std::endl;
+    for (int i = 0; i < pub_.numOptions(); ++i) {
+        std::cout << i << ": " << pub_.option(i) << std::endl;
+    }
+    std::cout << std::endl << "Select an option to vote for: ";
 
-//     int option;
-//     std::cin >> option;
-//     while (option < 0 || option >= pub_.numOptions()) {
-//         std::cout << "Please choose a valid option: ";
-//         std::cin >> option;
-//     }
+    int option;
+    std::cin >> option;
+    while (option < 0 || option >= pub_.numOptions()) {
+        std::cout << "Please choose a valid option: ";
+        std::cin >> option;
+    }
 
-//     std::cout << "You have voted for " << options_[option] << std::endl;
-//     return option;
-// }
+    std::cout << "You have voted for " << pub_.option(option) << std::endl;
+    return option;
+}
 
 
 bool VoteData::verifyVote(const Vote& vote, int index)
