@@ -3,21 +3,23 @@
 
 VoteData::VoteData(const ECGroup& ecg,
                    const CryptoPP::ECPPoint& generator,
-                   int num_voters, 
-                   int num_options)
+                   const PublicData& pub_data, 
+                   const PrivateData& priv_data)
                    :
                    ecg_(ecg),
                    gen_(generator),
-                   pub_(ecg, num_voters, num_options),
-                   priv_(num_options)
+                   pub_(pub_data),
+                   priv_(priv_data)
 {
-    received_ = new bool[num_voters];
-    for (int i = 0; i < num_voters; ++i)
+    findVoterIndex();
+    // generate user vote
+    // check existing votes
+
+    received_ = new bool[pub_data.numVoters()];
+    for (int i = 0; i < pub_data.numVoters(); ++i)
         received_[i] = false;
 
     verifier_ = new Verifier(ecg_, gen_, pub_.idSum(), pub_.tokenSums());
-
-    findVoterIndex();
 }
 
 

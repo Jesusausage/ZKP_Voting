@@ -17,7 +17,7 @@ class VoteData {
     friend class VoteDataTest;
 public:
     VoteData(const ECGroup& ecg, const CryptoPP::ECPPoint& generator,
-             int num_voters, int num_options);
+             const PublicData& pub_data, const PrivateData& priv_data);
     ~VoteData();
 
     int processReceived(bool received[]);
@@ -40,8 +40,8 @@ private:
     const ECGroup& ecg_;
     const CryptoPP::ECPPoint& gen_;
 
-    PublicData pub_;
-    PrivateData priv_;
+    const PublicData& pub_;
+    const PrivateData& priv_;
 
     int voter_index_;
     Verifier* verifier_ = nullptr;

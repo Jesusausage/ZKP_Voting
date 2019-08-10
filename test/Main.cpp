@@ -57,8 +57,11 @@ int main() {
     std::cout << "TCPServer test success." << std::endl;
 
     auto ecg = GenerateECGroup();
-    auto gen = GenerateECBase();
-    VoteData data(ecg, gen, 10, 5);
+    auto gen = GenerateECBase();    
+    PublicData pub(ecg, 10, 5);
+    PrivateData priv(5);
+    VoteData data(ecg, gen, pub, priv);
+    
     boost::asio::io_context sio;
     boost::asio::io_context cio;
     TCPServer ser(data, sio);

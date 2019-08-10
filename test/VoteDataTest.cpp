@@ -19,7 +19,9 @@ void VoteDataTest::testWriteVote()
     voter.castVote(2);
     Vote vote = voter.getVoteAndProofs();
 
-    VoteData data(ecg, gen, 10, 5);
+    PublicData pub(ecg, 10, 5);
+    PrivateData priv(5);
+    VoteData data(ecg, gen, pub, priv);
     data.writeVote(vote, 0);
 
     CryptoPP::byte output[1630];
@@ -56,7 +58,9 @@ void VoteDataTest::testWriteKey()
     key_gen.setIDKey(id_key);
     Key key = key_gen.getKeysAndProofs();
 
-    VoteData data(ecg, gen, 10, 5);
+    PublicData pub(ecg, 10, 5);
+    PrivateData priv(5);
+    VoteData data(ecg, gen, pub, priv);
     data.writeKey(key, 0);
     
     CryptoPP::byte output[815];
@@ -102,7 +106,9 @@ void VoteDataTest::testProcessHashes()
     vote.serialise(output, n);
     key.serialise(output + 1630, n);
 
-    VoteData data(ecg, gen, 10, 5);
+    PublicData pub(ecg, 10, 5);
+    PrivateData priv(5);
+    VoteData data(ecg, gen, pub, priv);
     data.processVKPair(output, 0);
     assert(data.received_[0] == false);
 }
@@ -145,7 +151,9 @@ void VoteDataTest::testSuccessfulVote()
         priv_out << token_keys[3][i] << std::endl;
     priv_out.close();
 
-    VoteData data(ecg, base, 10, 5);
+    PublicData pub(ecg, 10, 5);
+    PrivateData priv(5);
+    VoteData data(ecg, base, pub, priv);
 
     Voter voter(ecg, base, id_sum, tokens[1], 5);
     voter.setTokenKeys(token_keys[1]);
