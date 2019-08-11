@@ -51,6 +51,7 @@ int main() {
     VoteDataTest::testWriteKey();
     VoteDataTest::testProcessHashes();
     VoteDataTest::testSuccessfulVote();
+    VoteDataTest::testCheckExistingVotes();
     std::cout << "VoteData test success." << std::endl;
 
     TestIntByteConversion();
@@ -61,7 +62,7 @@ int main() {
     PublicData pub(ecg, 10, 5);
     PrivateData priv(5);
     VoteData data(ecg, gen, pub, priv);
-    
+
     boost::asio::io_context sio;
     boost::asio::io_context cio;
     TCPServer ser(data, sio);

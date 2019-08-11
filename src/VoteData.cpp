@@ -18,7 +18,7 @@ VoteData::VoteData(const ECGroup& ecg,
     verifier_ = new Verifier(ecg_, gen_, pub_.idSum(), pub_.tokenSums());
 
     findVoterIndex();
-    // check existing votes
+    checkExistingVotes();
     if (received_[voter_index_] == false)
         getUserVote();
 }
@@ -68,6 +68,41 @@ std::string VoteData::randomIP() const
     while (index == voter_index_);
 
     return pub_.ip(index);
+}
+
+
+void VoteData::checkExistingVotes() 
+{
+    std::string filename;
+    std::fstream fin;
+    size_t vote_length = 326 * pub_.numOptions();
+    size_t key_length = 163 * pub_.numOptions();
+
+    auto* vote = new CryptoPP::byte[vote_length];
+    auto* key = new CryptoPP::byte[key_length];
+    for (int i = 0; i < pub_.numVoters(); ++i) {     
+        filename = VOTE_FILE;
+        filename += std::to_string(i);
+        fin.open(filename, std::ios::in | std::ios::binary);
+        if (fin.is_open()) {
+            fin.read((char*)vote, vote_length);
+            Vote v(vote, pub_.numOptions(), ecg_.curve);
+            if (verifyVote(v, i))
+                received_[i] = true;
+        }
+        fin.close();
+
+        filename = KEY_FILE;
+        filename += std::to_string(i);
+        fin.open(filename, std::ios::in | std::ios::binary);
+        if (fin.is_open()) {
+            fin.read((char*)key, key_length);
+            Key k(key, pub_.numOptions(), ecg_.curve);
+            if (!verifyKey(k, i))
+                received_[i] = false;
+        }
+        fin.close();
+    }
 }
 
 

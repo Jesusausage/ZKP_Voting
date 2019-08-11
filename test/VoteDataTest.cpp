@@ -172,3 +172,61 @@ void VoteDataTest::testSuccessfulVote()
     data.processVKPair(output, 1);
     assert(data.received_[1] == true);
 }
+
+
+void VoteDataTest::testCheckExistingVotes()
+{
+    auto ecg = GenerateECGroup();
+    auto base = GenerateECBase();
+
+    std::ofstream token_out(TOKEN_FILE);
+    std::ofstream id_out(ID_FILE);
+
+    CryptoPP::Integer token_keys[10][5];
+    CryptoPP::ECPPoint tokens[10][5];
+    CryptoPP::ECPPoint token_sums[5];
+
+    CryptoPP::Integer id_keys[10];
+    CryptoPP::ECPPoint ids[10];
+    CryptoPP::ECPPoint id_sum;
+
+    for (int i = 0; i < 10; i++) {
+        for (int option = 0; option < 5; option++) {
+            token_keys[i][option] = RandomInteger(1, ecg.order);
+            tokens[i][option] = ecg.curve.Multiply(token_keys[i][option], base);
+            token_sums[option] = ecg.curve.Add(token_sums[option], tokens[i][option]);
+        }
+        WriteTokens(tokens[i], 5, token_out);
+        id_keys[i] = RandomInteger(1, ecg.order);
+        ids[i] = ecg.curve.Multiply(id_keys[i], base);
+        id_sum = ecg.curve.Add(id_sum, ids[i]);
+        WriteID(ids[i], id_out);
+    }
+    token_out.close();
+    id_out.close();
+
+    std::ofstream priv_out(PRIV_KEY_FILE);
+    priv_out << id_keys[3] << std::endl;
+    for (int i = 0; i < 5; ++i)
+        priv_out << token_keys[3][i] << std::endl;
+    priv_out.close();
+
+    PublicData pub(ecg, 10, 5);
+    PrivateData priv(5);
+    VoteData data(ecg, base, pub, priv);
+    assert(data.received_[4] == false);
+
+    Voter voter(ecg, base, id_sum, tokens[4], 5);
+    voter.setTokenKeys(token_keys[4]);
+    voter.castVote(3);
+    Vote vote = voter.getVoteAndProofs();
+    data.writeVote(vote, 4);
+
+    KeyGen key_gen(ecg, base, token_sums, ids[4], 5);
+    key_gen.setIDKey(id_keys[4]);
+    Key key = key_gen.getKeysAndProofs();
+    data.writeKey(key, 4);
+
+    VoteData data2(ecg, base, pub, priv);
+    assert(data2.received_[4] == true);
+}
