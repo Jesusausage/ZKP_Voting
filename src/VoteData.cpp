@@ -56,6 +56,73 @@ void VoteData::processVKPair(CryptoPP::byte* input, int index)
         writeVote(vote, index);
         writeKey(key, index);
         received_[index] = true;
+        checkComplete();
+    }
+}
+
+
+void VoteData::checkComplete() 
+{
+    bool complete = true;
+    for (int i = 0; i < numVoters(); ++i) {
+        if (!received_[i])
+            complete = false;
+    }
+
+    if (complete) {
+        std::cout << "All votes received. Tallying..." << std::endl;
+        tallyVotes();
+    }
+}
+
+
+void VoteData::tallyVotes()
+{
+    int num_opt = pub_.numOptions();
+
+    std::string filename;
+    std::fstream fin;
+    size_t vote_length = 326 * num_opt;
+    size_t key_length = 163 * num_opt;
+
+    std::vector<CryptoPP::ECPPoint> alpha(num_opt);
+    std::vector<CryptoPP::ECPPoint> beta(num_opt);
+
+    auto* vote = new CryptoPP::byte[vote_length];
+    auto* key = new CryptoPP::byte[key_length];
+    for (int i = 0; i < pub_.numVoters(); ++i) {   
+        filename = VOTE_FILE;
+        filename += std::to_string(i);
+        fin.open(filename, std::ios::in | std::ios::binary);
+        if (fin.is_open()) {
+            fin.read((char*)vote, vote_length);
+            Vote v(vote, num_opt, ecg_.curve);
+            for (int opt = 0; opt < num_opt; ++opt)
+                beta[opt] = ecg_.curve.Add(beta[opt], v.value(opt));
+        }
+        fin.close();
+
+        filename = KEY_FILE;
+        filename += std::to_string(i);
+        fin.open(filename, std::ios::in | std::ios::binary);
+        if (fin.is_open()) {
+            fin.read((char*)key, key_length);
+            Key k(key, num_opt, ecg_.curve);
+            for (int opt = 0; opt < num_opt; ++opt) 
+                alpha[opt] = ecg_.curve.Add(alpha[opt], k.value(opt));
+        }
+        fin.close();
+    }
+
+    std::fstream result("results.txt", std::ios::out);
+    for (int opt = 0; opt < num_opt; ++opt) {
+        auto gm = ecg_.curve.Add(ecg_.curve.Inverse(alpha[opt]), beta[opt]);
+
+        int m = 0;
+        while (!(gm == ecg_.curve.Multiply(m, gen_)))
+            m += 1;
+        std::cout << pub_.option(opt) << ": " << m << std::endl;
+        result << pub_.option(opt) << ": " << m << std::endl;
     }
 }
 

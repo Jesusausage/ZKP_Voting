@@ -22,6 +22,8 @@ public:
 
     int processReceived(bool received[]);
     void processVKPair(CryptoPP::byte* input, int index);
+    void checkComplete();
+    void tallyVotes();
 
     inline bool* received() const
         { return received_; }
