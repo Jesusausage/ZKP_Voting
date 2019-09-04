@@ -5,7 +5,7 @@
 
 
 int main() {
-    generateParams();
+    // generateParams();
     std::cout << "Generated params." << std::endl;
 
     auto ecg = GenerateECGroup();

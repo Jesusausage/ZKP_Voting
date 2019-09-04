@@ -152,10 +152,16 @@ void VoteData::checkExistingVotes()
         filename += std::to_string(i);
         fin.open(filename, std::ios::in | std::ios::binary);
         if (fin.is_open()) {
+            std::cout << "Found existing vote, verifying..." << std::endl;
             fin.read((char*)vote, vote_length);
             Vote v(vote, pub_.numOptions(), ecg_.curve);
-            if (verifyVote(v, i))
+            if (verifyVote(v, i)) {
                 received_[i] = true;
+                std::cout << "Verified vote " << i+1 << " of " << pub_.numVoters() << std::endl;
+            }
+            else {
+                std::cout << "Vote " << i+1 << " failed to verify" << std::endl;
+            }
         }
         fin.close();
 
@@ -170,6 +176,8 @@ void VoteData::checkExistingVotes()
         }
         fin.close();
     }
+
+    checkComplete();
 }
 
 
@@ -187,6 +195,7 @@ void VoteData::getUserVote()
     writeVote(vote, voter_index_);
     writeKey(key, voter_index_);
     received_[voter_index_] = true;
+    checkComplete();
 }
 
 
